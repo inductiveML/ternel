@@ -1,0 +1,37 @@
+diff --git a/ggml/src/ggml-cuda/mmvq.cu b/ggml/src/ggml-cuda/mmvq.cu
+index 37678f7..2f9aa82 100644
+--- a/ggml/src/ggml-cuda/mmvq.cu
++++ b/ggml/src/ggml-cuda/mmvq.cu
+@@ -1251,3 +1251,32 @@ void ggml_cuda_op_mul_mat_vec_q(
+ 
+     GGML_UNUSED_VARS(src1, dst, src1_ddf_i, src1_ncols, src1_padded_row_size);
+ }
++
++// Benchmark-only bridge for the BONSAI-TQ1-G128 representation experiment.
++// This calls the same private Q2_0 MMVQ dispatcher used by the production path;
++// it changes no kernel code and is deliberately not a runtime integration.
++extern "C" void bonsai_prism_q2_0_mmvq(
++        const void * q2, const void * q8, float * dst,
++        const int ncols, const int nrows, cudaStream_t stream) {
++    GGML_ASSERT(ncols % QK2_0 == 0);
++    ggml_cuda_mm_fusion_args_device fusion{};
++    mul_mat_vec_q_switch_type(
++        q2, GGML_TYPE_Q2_0, q8, nullptr, fusion, dst,
++        ncols, nrows, 1,
++        ncols / QK2_0, ncols / QK8_1, nrows,
++        1, 1, 1,
++        1, 1, 1,
++        1, 1,
++        1, 1, 1,
++        0, stream);
++}
++
++extern "C" void bonsai_prism_quantize_q8_1(
++        const float * src, void * q8, const int ncols, const int nrows,
++        cudaStream_t stream) {
++    GGML_ASSERT(ncols % QK8_1 == 0);
++    quantize_row_q8_1_cuda(
++        src, nullptr, q8, GGML_TYPE_Q2_0,
++        ncols, ncols, (int64_t) ncols * nrows, (int64_t) ncols * nrows,
++        ncols, nrows, 1, 1, stream);
++}

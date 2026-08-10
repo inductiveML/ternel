@@ -1,0 +1,862 @@
+diff --git a/ggml/include/ggml.h b/ggml/include/ggml.h
+index 915ce0fe..457fa323 100644
+--- a/ggml/include/ggml.h
++++ b/ggml/include/ggml.h
+@@ -430,7 +430,10 @@ extern "C" {
+         GGML_TYPE_NVFP4   = 40, // NVFP4 (4 blocks, E4M3 scale)
+         GGML_TYPE_Q1_0    = 41,
+         GGML_TYPE_Q2_0    = 42,
+-        GGML_TYPE_COUNT   = 43,
++        // Lossless Bonsai ternary weights: one FP16 g128 scale followed by
++        // 26 canonical base-3 bytes. Keep new GGUF-visible types at the end.
++        GGML_TYPE_TQ1_G128 = 43,
++        GGML_TYPE_COUNT    = 44,
+     };
+ 
+     // precision
+diff --git a/ggml/src/ggml-common.h b/ggml/src/ggml-common.h
+index 3bccec15..57d85c91 100644
+--- a/ggml/src/ggml-common.h
++++ b/ggml/src/ggml-common.h
+@@ -191,6 +191,13 @@ typedef struct {
+ } block_q2_0;
+ static_assert(sizeof(block_q2_0) == sizeof(ggml_half) + QK2_0 / 4, "wrong q2_0 block size/padding");
+ 
++#define QK_TQ1_G128 128
++typedef struct {
++    ggml_half d;       // scale, preserved bit-for-bit from Bonsai Q2_0
++    uint8_t qs[26];    // 25 five-trit bytes and one three-trit tail byte
++} block_tq1_g128;
++static_assert(sizeof(block_tq1_g128) == 28, "wrong tq1_g128 block size/padding");
++
+ #define QK4_0 32
+ typedef struct {
+     ggml_half d;           // delta
+diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
+index 67e88efc..117d59b1 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -237,6 +237,12 @@ static const struct ggml_type_traits_cpu type_traits_cpu[GGML_TYPE_COUNT] = {
+         .vec_dot_type             = GGML_TYPE_Q8_0,
+         .nrows                    = 1,
+     },
++    [GGML_TYPE_TQ1_G128] = {
++        .from_float               = NULL,
++        .vec_dot                  = ggml_vec_dot_tq1_g128_q8_0,
++        .vec_dot_type             = GGML_TYPE_Q8_0,
++        .nrows                    = 1,
++    },
+     [GGML_TYPE_Q4_0] = {
+         .from_float               = quantize_row_q4_0,
+         .vec_dot                  = ggml_vec_dot_q4_0_q8_0,
+diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
+index 9b60d237..141cfbe2 100644
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -4921,6 +4921,7 @@ void ggml_compute_forward_get_rows(
+     switch (src0->type) {
+         case GGML_TYPE_Q1_0:
+         case GGML_TYPE_Q2_0:
++        case GGML_TYPE_TQ1_G128:
+         case GGML_TYPE_Q4_0:
+         case GGML_TYPE_Q4_1:
+         case GGML_TYPE_Q5_0:
+diff --git a/ggml/src/ggml-cpu/quants.c b/ggml/src/ggml-cpu/quants.c
+index c47e8d2d..7ffd1cc9 100644
+--- a/ggml/src/ggml-cpu/quants.c
++++ b/ggml/src/ggml-cpu/quants.c
+@@ -221,6 +221,42 @@ void ggml_vec_dot_q2_0_q8_0_generic(int n, float * GGML_RESTRICT s, size_t bs, c
+     *s = sumf;
+ }
+ 
++void ggml_vec_dot_tq1_g128_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
++    assert(n % QK_TQ1_G128 == 0);
++    assert(nrc == 1);
++    UNUSED(nrc);
++    UNUSED(bx);
++    UNUSED(by);
++    UNUSED(bs);
++
++    const block_tq1_g128 * GGML_RESTRICT x = vx;
++    const block_q8_0 * GGML_RESTRICT y = vy;
++    const int nb = n / QK_TQ1_G128;
++    static const int powers[5] = { 1, 3, 9, 27, 81 };
++    float sumf = 0.0f;
++
++    for (int ib = 0; ib < nb; ++ib) {
++        const float d0 = GGML_CPU_FP16_TO_FP32(x[ib].d);
++        float sumi = 0.0f;
++        for (int k = 0; k < 4; ++k) {
++            const block_q8_0 * GGML_RESTRICT yb = &y[ib * 4 + k];
++            const float d1 = GGML_CPU_FP16_TO_FP32(yb->d);
++            int sumi_block = 0;
++            for (int j = 0; j < 32; ++j) {
++                const int logical = 32 * k + j;
++                const int trit = logical < 125
++                    ? (x[ib].qs[logical / 5] / powers[logical % 5]) % 3
++                    : (x[ib].qs[25] / powers[logical - 125]) % 3;
++                sumi_block += (trit - 1) * yb->qs[j];
++            }
++            sumi += d1 * sumi_block;
++        }
++        sumf += d0 * sumi;
++    }
++
++    *s = sumf;
++}
++
+ void ggml_vec_dot_q4_0_q8_0_generic(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
+     const int qk = QK8_0;
+     const int nb = n / qk;
+diff --git a/ggml/src/ggml-cpu/quants.h b/ggml/src/ggml-cpu/quants.h
+index 93ea7eef..c9a361f8 100644
+--- a/ggml/src/ggml-cpu/quants.h
++++ b/ggml/src/ggml-cpu/quants.h
+@@ -40,6 +40,7 @@ void quantize_row_iq4_xs (const float * GGML_RESTRICT x, void * GGML_RESTRICT y,
+ // Dot product
+ void ggml_vec_dot_q1_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+ void ggml_vec_dot_q2_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
++void ggml_vec_dot_tq1_g128_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+ void ggml_vec_dot_q4_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+ void ggml_vec_dot_q4_1_q8_1(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+ void ggml_vec_dot_q5_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+diff --git a/ggml/src/ggml-cuda/getrows.cu b/ggml/src/ggml-cuda/getrows.cu
+index 108c4dda..851faa71 100644
+--- a/ggml/src/ggml-cuda/getrows.cu
++++ b/ggml/src/ggml-cuda/getrows.cu
+@@ -76,6 +76,67 @@ static __global__ void k_get_rows_float(
+     }
+ }
+ 
++template<typename dst_t>
++static __global__ void k_get_rows_tq1_g128(
++        const uint8_t * __restrict__ codes, const int32_t * __restrict__ src1, dst_t * __restrict__ dst,
++        const int64_t ne00, const int64_t ne01, const int64_t ne11, const uint3 ne12_fdv,
++        const size_t s1, const size_t s2, const size_t s3,
++        const size_t s10, const size_t s11, const size_t s12) {
++    constexpr int m_tile = 256;
++    constexpr int code_slots = 26;
++    const int64_t groups = ne00 / QK_TQ1_G128;
++    const int64_t padded_rows = ((ne01 + m_tile - 1) / m_tile) * m_tile;
++    const half * scales = (const half *) (codes + padded_rows * groups * code_slots);
++
++    for (int64_t z = blockIdx.z; z < ne11 * (int64_t) ne12_fdv.z; z += gridDim.z) {
++        for (int64_t i00 = blockIdx.y * blockDim.x + threadIdx.x;
++                i00 < ne00; i00 += gridDim.y * blockDim.x) {
++            const int i10 = blockIdx.x;
++            const uint2 dm = fast_div_modulo((uint32_t) z, ne12_fdv);
++            const int i11 = dm.x;
++            const int i12 = dm.y;
++            const int i01 = src1[i10 * s10 + i11 * s11 + i12 * s12];
++            if (i01 < 0 || i01 >= ne01) {
++                continue;
++            }
++
++            const int group = i00 / QK_TQ1_G128;
++            const int logical = i00 - group * QK_TQ1_G128;
++            const int slot = logical < 125 ? logical / 5 : 25;
++            const int digit = logical < 125 ? logical % 5 : logical - 125;
++            const int power = digit == 0 ? 1 : digit == 1 ? 3 : digit == 2 ? 9 : digit == 3 ? 27 : 81;
++            const int tile = i01 / m_tile;
++            const int row = i01 - tile * m_tile;
++            const size_t code_index =
++                ((size_t) tile * groups + group) * code_slots * m_tile + slot * m_tile + row;
++            const size_t scale_index = ((size_t) tile * groups + group) * m_tile + row;
++            const int trit = (codes[code_index] / power) % 3;
++
++            dst_t * dst_row = dst + i10 * s1 + i11 * s2 + i12 * s3;
++            dst_row[i00] = ggml_cuda_cast<dst_t>((trit - 1) * __half2float(scales[scale_index]));
++        }
++    }
++}
++
++template<typename dst_t>
++static void get_rows_cuda_tq1_g128(
++        const void * src0_d, const int32_t * src1_d, dst_t * dst_d,
++        const int64_t ne00, const int64_t ne01,
++        const int64_t ne10, const int64_t ne11, const int64_t ne12,
++        const size_t nb10, const size_t nb11, const size_t nb12,
++        const size_t nb1, const size_t nb2, const size_t nb3,
++        cudaStream_t stream) {
++    GGML_ASSERT(ne00 % QK_TQ1_G128 == 0);
++    const dim3 block_dims(CUDA_GET_ROWS_BLOCK_SIZE, 1, 1);
++    const int block_num_y = (ne00 + CUDA_GET_ROWS_BLOCK_SIZE - 1) / CUDA_GET_ROWS_BLOCK_SIZE;
++    const dim3 block_nums(ne10, MIN(block_num_y, UINT16_MAX), MIN(ne11 * ne12, UINT16_MAX));
++    const uint3 ne12_fdv = init_fastdiv_values(ne12);
++    k_get_rows_tq1_g128<<<block_nums, block_dims, 0, stream>>>(
++        (const uint8_t *) src0_d, src1_d, dst_d, ne00, ne01, ne11, ne12_fdv,
++        nb1 / sizeof(dst_t), nb2 / sizeof(dst_t), nb3 / sizeof(dst_t),
++        nb10 / sizeof(int32_t), nb11 / sizeof(int32_t), nb12 / sizeof(int32_t));
++}
++
+ template<typename grad_t, typename dst_t>
+ static __global__ void k_get_rows_back_float(
+         const grad_t * __restrict__ grad, const int32_t * __restrict__ rows, dst_t * __restrict__ dst, const int64_t ncols, const int64_t nrows_grad) {
+@@ -176,7 +237,7 @@ static void get_rows_cuda_float(
+ template <typename dst_t>
+ static void ggml_cuda_get_rows_switch_src0_type(
+         const void * src0_d, const ggml_type src0_type, const int32_t * src1_d, dst_t * dst_d,
+-        const int64_t ne00, const size_t nb01, const size_t nb02, const size_t nb03,
++        const int64_t ne00, const int64_t ne01, const size_t nb01, const size_t nb02, const size_t nb03,
+         const int64_t ne10, const int64_t ne11, const int64_t ne12, const size_t nb10, const size_t nb11, const size_t nb12,
+         const size_t nb1, const size_t nb2, const size_t nb3,
+         cudaStream_t stream) {
+@@ -205,6 +266,11 @@ static void ggml_cuda_get_rows_switch_src0_type(
+             get_rows_cuda_q<QK2_0, QR2_0, dequantize_q2_0>(src0_d, src1_d, dst_d,
+                 ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+             break;
++        case GGML_TYPE_TQ1_G128:
++            get_rows_cuda_tq1_g128(
++                src0_d, src1_d, dst_d, ne00, ne01, ne10, ne11, ne12,
++                nb10, nb11, nb12, nb1, nb2, nb3, stream);
++            break;
+         case GGML_TYPE_Q4_0:
+             get_rows_cuda_q<QK4_0, QR4_0, dequantize_q4_0>(src0_d, src1_d, dst_d,
+                 ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+@@ -234,26 +300,26 @@ static void ggml_cuda_get_rows_switch_src0_type(
+ 
+ void get_rows_cuda(
+         const void * src0_d, ggml_type src0_type, const int32_t * src1_d, void * dst_d, ggml_type dst_type,
+-        int64_t ne00, size_t nb01, size_t nb02, size_t nb03,
++        int64_t ne00, int64_t ne01, size_t nb01, size_t nb02, size_t nb03,
+         int64_t ne10, int64_t ne11, int64_t ne12, size_t nb10, size_t nb11, size_t nb12,
+         size_t nb1, size_t nb2, size_t nb3,
+         cudaStream_t stream) {
+     switch (dst_type) {
+         case GGML_TYPE_F32:
+             ggml_cuda_get_rows_switch_src0_type(src0_d, src0_type, src1_d, (float *) dst_d,
+-                ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
++                ne00, ne01, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+             break;
+         case GGML_TYPE_I32:
+             ggml_cuda_get_rows_switch_src0_type(src0_d, src0_type, src1_d, (int32_t *) dst_d,
+-                ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
++                ne00, ne01, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+             break;
+         case GGML_TYPE_F16:
+             ggml_cuda_get_rows_switch_src0_type(src0_d, src0_type, src1_d, (half *) dst_d,
+-                ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
++                ne00, ne01, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+             break;
+         case GGML_TYPE_BF16:
+             ggml_cuda_get_rows_switch_src0_type(src0_d, src0_type, src1_d, (nv_bfloat16 *) dst_d,
+-                ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
++                ne00, ne01, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+             break;
+         default:
+             GGML_ABORT("%s: unsupported dst type: %s\n", __func__, ggml_type_name(dst_type));
+@@ -277,7 +343,7 @@ void ggml_cuda_op_get_rows(ggml_backend_cuda_context & ctx, ggml_tensor * dst) {
+     GGML_ASSERT(dst->nb[0]  == ggml_type_size(dst->type));
+ 
+     get_rows_cuda(src0->data, src0->type, (const int32_t *) src1->data, dst->data, dst->type,
+-        ne00, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
++        ne00, ne01, nb01, nb02, nb03, ne10, ne11, ne12, nb10, nb11, nb12, nb1, nb2, nb3, stream);
+ }
+ 
+ void ggml_cuda_op_get_rows_back(ggml_backend_cuda_context & ctx, ggml_tensor * dst) {
+diff --git a/ggml/src/ggml-cuda/getrows.cuh b/ggml/src/ggml-cuda/getrows.cuh
+index 3c5bea5f..2f60f5b8 100644
+--- a/ggml/src/ggml-cuda/getrows.cuh
++++ b/ggml/src/ggml-cuda/getrows.cuh
+@@ -5,7 +5,7 @@
+ 
+ void get_rows_cuda(
+         const void * src0_d, ggml_type src0_type, const int32_t * src1_d, void * dst_d, ggml_type dst_type,
+-        int64_t ne00, size_t nb01, size_t nb02, size_t nb03,
++        int64_t ne00, int64_t ne01, size_t nb01, size_t nb02, size_t nb03,
+         int64_t ne10, int64_t ne11, int64_t ne12, size_t nb10, size_t nb11, size_t nb12,
+         size_t nb1, size_t nb2, size_t nb3,
+         cudaStream_t stream);
+diff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu
+index 13e1b8a2..0966d6ff 100644
+--- a/ggml/src/ggml-cuda/ggml-cuda.cu
++++ b/ggml/src/ggml-cuda/ggml-cuda.cu
+@@ -52,6 +52,7 @@
+ #include "ggml-cuda/mean.cuh"
+ #include "ggml-cuda/tsembd.cuh"
+ #include "ggml-cuda/topk-moe.cuh"
++#include "ggml-cuda/tq1-g128.cuh"
+ #include "ggml-cuda/unary.cuh"
+ #include "ggml-cuda/upscale.cuh"
+ #include "ggml-cuda/wkv.cuh"
+@@ -684,6 +685,63 @@ static void ggml_backend_cuda_buffer_set_tensor(ggml_backend_buffer_t buffer, gg
+     ggml_backend_cuda_buffer_context * ctx = (ggml_backend_cuda_buffer_context *) buffer->context;
+ 
+     ggml_cuda_set_device(ctx->device);
++
++    if (tensor->type == GGML_TYPE_TQ1_G128) {
++        // Model tensors are uploaded whole. Convert canonical row-major packed
++        // blocks to the code-position-major CUDA layout one 256-row tile at a
++        // time. This is packed-to-packed; no ternary/int8/FP16 weight matrix is
++        // ever materialized.
++        GGML_ASSERT(offset == 0 && size == ggml_nbytes(tensor));
++        GGML_ASSERT(tensor->ne[2] == 1 && tensor->ne[3] == 1);
++        GGML_ASSERT(tensor->ne[0] % QK_TQ1_G128 == 0);
++
++        constexpr size_t m_tile = 256;
++        constexpr size_t code_slots = 26;
++        const size_t columns = tensor->ne[0];
++        const size_t rows = tensor->ne[1];
++        const size_t groups = columns / QK_TQ1_G128;
++        const size_t tiles = (rows + m_tile - 1) / m_tile;
++        const size_t padded_rows = tiles * m_tile;
++        const size_t code_bytes = padded_rows * groups * code_slots;
++        char * codes_dst = (char *) tensor->data;
++        char * scales_dst = codes_dst + code_bytes;
++        const block_tq1_g128 * src = (const block_tq1_g128 *) data;
++
++        std::vector<uint8_t> code_tile(groups * code_slots * m_tile, 0);
++        std::vector<uint16_t> scale_tile(groups * m_tile, 0);
++        for (size_t tile = 0; tile < tiles; ++tile) {
++            std::fill(code_tile.begin(), code_tile.end(), 0);
++            std::fill(scale_tile.begin(), scale_tile.end(), 0);
++            const size_t first_row = tile * m_tile;
++            const size_t valid_rows = std::min(m_tile, rows - first_row);
++            for (size_t row = 0; row < valid_rows; ++row) {
++                const block_tq1_g128 * src_row = src + (first_row + row) * groups;
++                for (size_t group = 0; group < groups; ++group) {
++                    const block_tq1_g128 & block = src_row[group];
++                    for (size_t slot = 0; slot < 25; ++slot) {
++                        GGML_ASSERT(block.qs[slot] <= 242);
++                    }
++                    GGML_ASSERT(block.qs[25] <= 26);
++                    uint16_t scale_bits;
++                    memcpy(&scale_bits, &block.d, sizeof(scale_bits));
++                    scale_tile[group * m_tile + row] = scale_bits;
++                    for (size_t slot = 0; slot < code_slots; ++slot) {
++                        code_tile[(group * code_slots + slot) * m_tile + row] = block.qs[slot];
++                    }
++                }
++            }
++            CUDA_CHECK(cudaMemcpyAsync(
++                codes_dst + tile * code_tile.size(), code_tile.data(), code_tile.size(),
++                cudaMemcpyHostToDevice, cudaStreamPerThread));
++            CUDA_CHECK(cudaMemcpyAsync(
++                scales_dst + tile * scale_tile.size() * sizeof(uint16_t),
++                scale_tile.data(), scale_tile.size() * sizeof(uint16_t),
++                cudaMemcpyHostToDevice, cudaStreamPerThread));
++            CUDA_CHECK(cudaStreamSynchronize(cudaStreamPerThread));
++        }
++        return;
++    }
++
+     CUDA_CHECK(cudaMemcpyAsync((char *) tensor->data + offset, data, size, cudaMemcpyHostToDevice, cudaStreamPerThread));
+     CUDA_CHECK(cudaStreamSynchronize(cudaStreamPerThread));
+ }
+@@ -803,6 +861,10 @@ static size_t ggml_backend_cuda_buffer_type_get_alignment(ggml_backend_buffer_ty
+ static size_t ggml_backend_cuda_buffer_type_get_alloc_size(ggml_backend_buffer_type_t buft, const ggml_tensor * tensor) {
+     ggml_backend_cuda_buffer_type_context * buft_ctx = (ggml_backend_cuda_buffer_type_context *) buft->context;
+ 
++    if (tensor->type == GGML_TYPE_TQ1_G128 && tensor->ne[2] == 1 && tensor->ne[3] == 1) {
++        return ggml_cuda_tq1_g128_storage_size(tensor->ne[0], tensor->ne[1]);
++    }
++
+     size_t size = tensor->op == GGML_OP_FLASH_ATTN_EXT
+         ? ggml_cuda_flash_attn_ext_get_alloc_size(buft_ctx->device, tensor)
+         : ggml_nbytes(tensor);
+@@ -2504,6 +2566,10 @@ static bool ggml_cuda_should_fuse_mul_mat_vec_q(const ggml_tensor * tensor) {
+     ggml_tensor *       src1 = tensor->src[1];
+     const ggml_tensor * dst  = tensor;
+ 
++    if (src0->type == GGML_TYPE_TQ1_G128) {
++        return false;
++    }
++
+     const bool bad_padding_clear = ggml_backend_buffer_get_usage(src0->buffer) == GGML_BACKEND_BUFFER_USAGE_COMPUTE &&
+                                    ggml_nbytes(src0) != ggml_backend_buffer_get_alloc_size(src0->buffer, src0) &&
+                                    src0->view_src;
+@@ -2542,6 +2608,12 @@ bool ggml_cuda_mul_mat_q1_hopper(ggml_backend_cuda_context & ctx, const ggml_ten
+ static void ggml_cuda_mul_mat(ggml_backend_cuda_context & ctx, const ggml_tensor * src0, const ggml_tensor * src1, ggml_tensor * dst) {
+     const bool split = ggml_backend_buft_is_cuda_split(src0->buffer->buft);
+ 
++    if (src0->type == GGML_TYPE_TQ1_G128) {
++        GGML_ASSERT(!split && "TQ1_G128 currently supports one CUDA device");
++        ggml_cuda_mul_mat_tq1_g128(ctx, src0, src1, dst);
++        return;
++    }
++
+     // If src0 is a temporary compute buffer it may have some padding that needs to be cleared for mul_mat_vec_q or mul_mat_q.
+     // But if src0 is also a view of another tensor then this cannot be done safely because it may overwrite valid tensor data.
+     // Therefore, in such cases use cuBLAS.
+@@ -2732,7 +2804,7 @@ static void ggml_cuda_mul_mat_id(ggml_backend_cuda_context & ctx, ggml_tensor *
+     const int32_t * ids_from_sorted = ids_buf_dev.ptr + 1*ne_get_rows;
+ 
+     get_rows_cuda(src1->data, src1->type, ids_to_sorted, src1_sorted.ptr, type_src1_sorted,
+-        ne10, nb11, nb12, nb13,
++        ne10, ne11, nb11, nb12, nb13,
+         ne_get_rows, 1, 1, sizeof(int32_t), ne_get_rows*sizeof(int32_t), ne_get_rows*sizeof(int32_t),
+         ne10*ts_src1_sorted, ne_get_rows*ne10*ts_src1_sorted, ne_get_rows*ne10*ts_src1_sorted, stream);
+     CUDA_CHECK(cudaGetLastError());
+@@ -2787,7 +2859,7 @@ static void ggml_cuda_mul_mat_id(ggml_backend_cuda_context & ctx, ggml_tensor *
+     }
+ 
+     get_rows_cuda(dst_sorted.ptr, type_dst_sorted, ids_from_sorted, dst->data, dst->type,
+-        ne0, ne0*ts_dst_sorted, ne_get_rows*ne0*ts_dst_sorted, ne_get_rows*ne0*ts_dst_sorted,
++        ne0, ne_get_rows, ne0*ts_dst_sorted, ne_get_rows*ne0*ts_dst_sorted, ne_get_rows*ne0*ts_dst_sorted,
+         ne_get_rows, 1, 1, sizeof(int32_t), ne_get_rows*sizeof(int32_t), ne_get_rows*sizeof(int32_t),
+         nb1, nb2, nb3, stream);
+ }
+@@ -5159,6 +5231,7 @@ static bool ggml_backend_cuda_device_supports_op(ggml_backend_dev_t dev, const g
+                     case GGML_TYPE_F16:
+                     case GGML_TYPE_Q1_0:
+                     case GGML_TYPE_Q2_0:
++                    case GGML_TYPE_TQ1_G128:
+                     case GGML_TYPE_Q4_0:
+                     case GGML_TYPE_Q4_1:
+                     case GGML_TYPE_Q5_0:
+@@ -5198,6 +5271,7 @@ static bool ggml_backend_cuda_device_supports_op(ggml_backend_dev_t dev, const g
+                     case GGML_TYPE_I32:
+                     case GGML_TYPE_Q1_0:
+                     case GGML_TYPE_Q2_0:
++                    case GGML_TYPE_TQ1_G128:
+                     case GGML_TYPE_Q4_0:
+                     case GGML_TYPE_Q4_1:
+                     case GGML_TYPE_Q5_0:
+diff --git a/ggml/src/ggml-quants.c b/ggml/src/ggml-quants.c
+index 1ebc50a7..6ad3d2bf 100644
+--- a/ggml/src/ggml-quants.c
++++ b/ggml/src/ggml-quants.c
+@@ -456,6 +456,25 @@ void dequantize_row_q2_0(const block_q2_0 * GGML_RESTRICT x, float * GGML_RESTRI
+     }
+ }
+ 
++void dequantize_row_tq1_g128(const block_tq1_g128 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k) {
++    assert(k % QK_TQ1_G128 == 0);
++
++    const int nb = k / QK_TQ1_G128;
++    static const int powers[5] = { 1, 3, 9, 27, 81 };
++
++    for (int ib = 0; ib < nb; ++ib) {
++        const float d = GGML_FP16_TO_FP32(x[ib].d);
++        for (int j = 0; j < 125; ++j) {
++            const int trit = (x[ib].qs[j / 5] / powers[j % 5]) % 3;
++            y[ib * QK_TQ1_G128 + j] = (trit - 1) * d;
++        }
++        for (int j = 0; j < 3; ++j) {
++            const int trit = (x[ib].qs[25] / powers[j]) % 3;
++            y[ib * QK_TQ1_G128 + 125 + j] = (trit - 1) * d;
++        }
++    }
++}
++
+ void dequantize_row_q4_0(const block_q4_0 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k) {
+     static const int qk = QK4_0;
+ 
+@@ -5537,6 +5556,27 @@ bool ggml_validate_row_data(enum ggml_type type, const void * data, size_t nbyte
+             {
+                 VALIDATE_ROW_DATA_D_F16_IMPL(block_q2_0, data, nb);
+             } break;
++        case GGML_TYPE_TQ1_G128:
++            {
++                const block_tq1_g128 * q = (const block_tq1_g128 *) data;
++                for (size_t i = 0; i < nb; ++i) {
++                    if (!validate_fp16(q[i].d, i)) {
++                        return false;
++                    }
++                    for (int j = 0; j < 25; ++j) {
++                        if (q[i].qs[j] > 242) {
++                            fprintf(stderr, "%s: invalid tq1_g128 code %u at block %zu slot %d\n",
++                                    __func__, q[i].qs[j], i, j);
++                            return false;
++                        }
++                    }
++                    if (q[i].qs[25] > 26) {
++                        fprintf(stderr, "%s: invalid tq1_g128 tail %u at block %zu\n",
++                                __func__, q[i].qs[25], i);
++                        return false;
++                    }
++                }
++            } break;
+         case GGML_TYPE_Q4_0:
+             {
+                 VALIDATE_ROW_DATA_D_F16_IMPL(block_q4_0, data, nb);
+diff --git a/ggml/src/ggml-quants.h b/ggml/src/ggml-quants.h
+index 75188f1a..19abafdf 100644
+--- a/ggml/src/ggml-quants.h
++++ b/ggml/src/ggml-quants.h
+@@ -45,6 +45,7 @@ GGML_API void quantize_row_iq2_s_ref  (const float * GGML_RESTRICT x, block_iq2_
+ // Dequantization
+ GGML_API void dequantize_row_q1_0(const block_q1_0 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
+ GGML_API void dequantize_row_q2_0(const block_q2_0 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
++GGML_API void dequantize_row_tq1_g128(const block_tq1_g128 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
+ GGML_API void dequantize_row_q4_0(const block_q4_0 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
+ GGML_API void dequantize_row_q4_1(const block_q4_1 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
+ GGML_API void dequantize_row_q5_0(const block_q5_0 * GGML_RESTRICT x, float * GGML_RESTRICT y, int64_t k);
+diff --git a/ggml/src/ggml.c b/ggml/src/ggml.c
+index de0615fb..fedc1a17 100644
+--- a/ggml/src/ggml.c
++++ b/ggml/src/ggml.c
+@@ -682,6 +682,14 @@ static const struct ggml_type_traits type_traits[GGML_TYPE_COUNT] = {
+         .to_float                 = (ggml_to_float_t) dequantize_row_q2_0,
+         .from_float_ref           = (ggml_from_float_t) quantize_row_q2_0_ref,
+     },
++    [GGML_TYPE_TQ1_G128] = {
++        .type_name                = "tq1_g128",
++        .blck_size                = QK_TQ1_G128,
++        .type_size                = sizeof(block_tq1_g128),
++        .is_quantized             = true,
++        .to_float                 = (ggml_to_float_t) dequantize_row_tq1_g128,
++        .from_float_ref           = NULL,
++    },
+     [GGML_TYPE_Q4_0] = {
+         .type_name                = "q4_0",
+         .blck_size                = QK4_0,
+diff --git a/gguf-py/gguf/constants.py b/gguf-py/gguf/constants.py
+index 4bf2d4ac..96b98843 100644
+--- a/gguf-py/gguf/constants.py
++++ b/gguf-py/gguf/constants.py
+@@ -4406,6 +4406,7 @@ class GGMLQuantizationType(IntEnum):
+     NVFP4   = 40
+     Q1_0    = 41
+     Q2_0    = 42
++    TQ1_G128 = 43
+ 
+ 
+ class ExpertGatingFuncType(IntEnum):
+@@ -4587,6 +4588,7 @@ GGML_QUANT_SIZES: dict[GGMLQuantizationType, tuple[int, int]] = {
+     GGMLQuantizationType.NVFP4:   (64, 4 + 32),
+     GGMLQuantizationType.Q1_0:    (128, 2 + 16),
+     GGMLQuantizationType.Q2_0:    (128, 2 + 32),
++    GGMLQuantizationType.TQ1_G128:(128, 2 + 26),
+ }
+ 
+ 
+diff --git a/src/llama-model-loader.cpp b/src/llama-model-loader.cpp
+index b2119507..5b543dae 100644
+--- a/src/llama-model-loader.cpp
++++ b/src/llama-model-loader.cpp
+@@ -1577,7 +1577,19 @@ bool llama_model_loader::load_all_data(
+                 }
+             } else {
+                 // If upload_backend is valid load the tensor in chunks to pinned memory and upload the buffers asynchronously to the GPU.
+-                if (upload_backend) {
++                // TQ1_G128's CUDA buffer performs a packed-to-packed tile
++                // transpose and therefore intentionally receives one complete
++                // canonical tensor. The temporary remains tensor-sized, never
++                // model-sized, and is released/reused immediately.
++                if (cur->type == GGML_TYPE_TQ1_G128) {
++                    read_buf.resize(n_size);
++                    file->seek(weight->offs, SEEK_SET);
++                    file->read_raw(read_buf.data(), n_size);
++                    ggml_backend_tensor_set(cur, read_buf.data(), 0, n_size);
++                    if (check_tensors && !ggml_validate_row_data(cur->type, read_buf.data(), n_size)) {
++                        throw std::runtime_error(format("tensor '%s' has invalid data", ggml_get_name(cur)));
++                    }
++                } else if (upload_backend) {
+                     size_t offset = weight->offs;
+                     alignment = file->read_alignment();
+                     size_t aligned_offset = offset & ~(alignment - 1);
+diff --git a/ggml/src/ggml-cuda/tq1-g128.cu b/ggml/src/ggml-cuda/tq1-g128.cu
+new file mode 100644
+index 00000000..bb02ef4b
+--- /dev/null
++++ b/ggml/src/ggml-cuda/tq1-g128.cu
+@@ -0,0 +1,285 @@
++#include "tq1-g128.cuh"
++
++#include "quantize.cuh"
++
++#include <cstddef>
++
++namespace {
++
++constexpr int TQ1_M_TILE = 256;
++constexpr int TQ1_CODE_SLOTS = 26;
++constexpr int TQ1_FULL_SLOTS = 25;
++constexpr int TQ1_K_CHUNK = 512;
++
++struct alignas(128) tq1_lut_buffer {
++    alignas(128) float l2[TQ1_FULL_SLOTS][32];
++    alignas(128) float l3[TQ1_FULL_SLOTS][32];
++    alignas(128) float tail[32];
++};
++
++static_assert(sizeof(tq1_lut_buffer) % 128 == 0, "tq1 LUT alignment");
++static_assert(offsetof(tq1_lut_buffer, l2) % 128 == 0, "tq1 L2 alignment");
++static_assert(offsetof(tq1_lut_buffer, l3) % 128 == 0, "tq1 L3 alignment");
++static_assert(offsetof(tq1_lut_buffer, tail) % 128 == 0, "tq1 tail alignment");
++
++__device__ __forceinline__ float tq1_load_q8(
++        const block_q8_1 * __restrict__ activation,
++        const int logical) {
++    const block_q8_1 & block = activation[logical >> 5];
++    return __half2float(block.data.d) * static_cast<float>(block.qs[logical & 31]);
++}
++
++__device__ __forceinline__ void tq1_build_lut(
++        const block_q8_1 * __restrict__ activation,
++        const int group,
++        const float trit0,
++        const float trit1,
++        const float trit2,
++        tq1_lut_buffer & lut) {
++    const int tid  = threadIdx.x;
++    const int warp = tid >> 5;
++    const int lane = tid & 31;
++
++    const int first_slot = warp == 0 ? 0 : 4 + (warp - 1) * 3;
++    const int slot_count = warp == 0 ? 4 : 3;
++    const int activation_count = 5 * slot_count + (warp == 7 ? 3 : 0);
++    const int first_logical = group * QK_TQ1_G128 + 5 * first_slot;
++    const float x = lane < activation_count
++        ? tq1_load_q8(activation, first_logical + lane)
++        : 0.0f;
++
++#pragma unroll
++    for (int local_slot = 0; local_slot < 4; ++local_slot) {
++        if (local_slot >= slot_count) {
++            break;
++        }
++        const int slot = first_slot + local_slot;
++        const int source = 5 * local_slot;
++        const float x0 = __shfl_sync(0xffffffffu, x, source + 0);
++        const float x1 = __shfl_sync(0xffffffffu, x, source + 1);
++        const float x2 = __shfl_sync(0xffffffffu, x, source + 2);
++        const float x3 = __shfl_sync(0xffffffffu, x, source + 3);
++        const float x4 = __shfl_sync(0xffffffffu, x, source + 4);
++        if (lane < 9) {
++            lut.l2[slot][lane] = trit0 * x0 + trit1 * x1;
++        }
++        if (lane < 27) {
++            lut.l3[slot][lane] = trit0 * x2 + trit1 * x3 + trit2 * x4;
++        }
++    }
++
++    if (warp == 7) {
++        const float x0 = __shfl_sync(0xffffffffu, x, 15);
++        const float x1 = __shfl_sync(0xffffffffu, x, 16);
++        const float x2 = __shfl_sync(0xffffffffu, x, 17);
++        if (lane < 27) {
++            lut.tail[lane] = trit0 * x0 + trit1 * x1 + trit2 * x2;
++        }
++    }
++    __syncthreads();
++}
++
++__device__ __forceinline__ float tq1_consume_code(
++        const tq1_lut_buffer & lut,
++        const int slot,
++        const int packed) {
++    const int upper = (packed * 57) >> 9;
++    const int lower = packed - 9 * upper;
++    return lut.l2[slot][lower] + lut.l3[slot][upper];
++}
++
++template <int GROUPS_PER_CHUNK, int FIXED_CHUNKS = 0, int FIXED_GROUPS = 0>
++__global__ __launch_bounds__(TQ1_M_TILE, 5) void tq1_lut23_streamk(
++        const uint8_t * __restrict__ codes,
++        const half * __restrict__ scales,
++        const block_q8_1 * __restrict__ activation,
++        float * __restrict__ output,
++        float * __restrict__ workspace,
++        unsigned int * __restrict__ tile_counters,
++        const int rows,
++        const int groups_per_row,
++        const int chunks_per_row) {
++    __shared__ tq1_lut_buffer lut[2];
++    __shared__ int final_chunk;
++
++    const int tid = threadIdx.x;
++    const int groups = FIXED_GROUPS > 0 ? FIXED_GROUPS : groups_per_row;
++    const int chunks = FIXED_CHUNKS > 0 ? FIXED_CHUNKS : chunks_per_row;
++    const int tile = blockIdx.x / chunks;
++    const int chunk = blockIdx.x - tile * chunks;
++    const int row = tile * TQ1_M_TILE + tid;
++    const int first_group = chunk * GROUPS_PER_CHUNK;
++    const int final_group = min(first_group + GROUPS_PER_CHUNK, groups);
++    const int lane = tid & 31;
++    const int lane_div3 = lane / 3;
++    const float trit0 = static_cast<float>(lane - 3 * lane_div3 - 1);
++    const float trit1 = static_cast<float>(lane_div3 - 3 * (lane_div3 / 3) - 1);
++    const float trit2 = static_cast<float>(lane / 9 - 1);
++    float partial = 0.0f;
++
++    if (first_group < final_group) {
++        tq1_build_lut(activation, first_group, trit0, trit1, trit2, lut[0]);
++
++        for (int group = first_group; group < final_group; ++group) {
++            const int local_group = group - first_group;
++            const tq1_lut_buffer & current = lut[local_group & 1];
++            const std::size_t group_code_base =
++                (static_cast<std::size_t>(tile) * groups + group) *
++                TQ1_CODE_SLOTS * TQ1_M_TILE + tid;
++            float group_sum = 0.0f;
++#pragma unroll
++            for (int batch = 0; batch < TQ1_FULL_SLOTS / 5; ++batch) {
++                const int first_slot = batch * 5;
++                const int packed0 = codes[group_code_base + (first_slot + 0) * TQ1_M_TILE];
++                const int packed1 = codes[group_code_base + (first_slot + 1) * TQ1_M_TILE];
++                const int packed2 = codes[group_code_base + (first_slot + 2) * TQ1_M_TILE];
++                const int packed3 = codes[group_code_base + (first_slot + 3) * TQ1_M_TILE];
++                const int packed4 = codes[group_code_base + (first_slot + 4) * TQ1_M_TILE];
++                group_sum += tq1_consume_code(current, first_slot + 0, packed0);
++                group_sum += tq1_consume_code(current, first_slot + 1, packed1);
++                group_sum += tq1_consume_code(current, first_slot + 2, packed2);
++                group_sum += tq1_consume_code(current, first_slot + 3, packed3);
++                group_sum += tq1_consume_code(current, first_slot + 4, packed4);
++            }
++            const int tail_code = codes[group_code_base + 25 * TQ1_M_TILE];
++            group_sum += current.tail[tail_code];
++            const std::size_t scale_index =
++                (static_cast<std::size_t>(tile) * groups + group) * TQ1_M_TILE + tid;
++            partial = fmaf(__half2float(scales[scale_index]), group_sum, partial);
++
++            const int next_group = group + 1;
++            if (next_group < final_group) {
++                tq1_build_lut(
++                    activation, next_group, trit0, trit1, trit2,
++                    lut[(local_group + 1) & 1]);
++            }
++        }
++    }
++
++    const std::size_t workspace_index =
++        (static_cast<std::size_t>(tile) * chunks + chunk) * TQ1_M_TILE + tid;
++    workspace[workspace_index] = partial;
++    __threadfence();
++    __syncthreads();
++    if (tid == 0) {
++        final_chunk = atomicAdd(&tile_counters[tile], 1u) ==
++            static_cast<unsigned int>(chunks - 1);
++    }
++    __syncthreads();
++    if (final_chunk) {
++        float result = 0.0f;
++        if constexpr (FIXED_CHUNKS > 0) {
++#pragma unroll
++            for (int index = 0; index < FIXED_CHUNKS; ++index) {
++                result += workspace[
++                    (static_cast<std::size_t>(tile) * FIXED_CHUNKS + index) *
++                    TQ1_M_TILE + tid];
++            }
++        } else {
++            for (int index = 0; index < chunks; ++index) {
++                result += workspace[
++                    (static_cast<std::size_t>(tile) * chunks + index) *
++                    TQ1_M_TILE + tid];
++            }
++        }
++        if (row < rows) {
++            output[row] = result;
++        }
++        __syncthreads();
++        if (tid == 0) {
++            atomicExch(&tile_counters[tile], 0u);
++        }
++    }
++}
++
++void tq1_launch(
++        const uint8_t * codes,
++        const half * scales,
++        const block_q8_1 * activation,
++        float * output,
++        float * workspace,
++        unsigned int * counters,
++        int rows,
++        int columns,
++        cudaStream_t stream) {
++    GGML_ASSERT(columns % QK_TQ1_G128 == 0);
++    const int groups = columns / QK_TQ1_G128;
++    const int tiles = (rows + TQ1_M_TILE - 1) / TQ1_M_TILE;
++    const int chunks = (columns + TQ1_K_CHUNK - 1) / TQ1_K_CHUNK;
++
++    if (groups == 136 && chunks == 34) {
++        tq1_lut23_streamk<4, 34, 136><<<tiles * 34, TQ1_M_TILE, 0, stream>>>(
++            codes, scales, activation, output, workspace, counters,
++            rows, 136, 34);
++        return;
++    }
++    tq1_lut23_streamk<4><<<tiles * chunks, TQ1_M_TILE, 0, stream>>>(
++        codes, scales, activation, output, workspace, counters,
++        rows, groups, chunks);
++}
++
++} // namespace
++
++std::size_t ggml_cuda_tq1_g128_storage_size(int64_t columns, int64_t rows) {
++    GGML_ASSERT(columns > 0 && rows > 0 && columns % QK_TQ1_G128 == 0);
++    const std::size_t groups = columns / QK_TQ1_G128;
++    const std::size_t padded_rows = ((rows + TQ1_M_TILE - 1) / TQ1_M_TILE) * TQ1_M_TILE;
++    return padded_rows * groups * sizeof(block_tq1_g128);
++}
++
++void ggml_cuda_mul_mat_tq1_g128(
++        ggml_backend_cuda_context & ctx,
++        const ggml_tensor * src0,
++        const ggml_tensor * src1,
++        ggml_tensor * dst) {
++    GGML_ASSERT(src0->type == GGML_TYPE_TQ1_G128);
++    GGML_ASSERT(src1->type == GGML_TYPE_F32);
++    GGML_ASSERT(dst->type == GGML_TYPE_F32);
++    GGML_ASSERT(src0->ne[2] == 1 && src0->ne[3] == 1);
++    GGML_ASSERT(src0->ne[0] == src1->ne[0]);
++    GGML_ASSERT(src0->ne[0] % QK_TQ1_G128 == 0);
++
++    const int64_t columns = src0->ne[0];
++    const int64_t rows = src0->ne[1];
++    const int64_t columns_padded = GGML_PAD(columns, MATRIX_ROW_PADDING);
++    const int64_t vectors = src1->ne[1] * src1->ne[2] * src1->ne[3];
++    const std::size_t q8_blocks_per_vector = columns_padded / QK8_1;
++    cudaStream_t stream = ctx.stream();
++
++    ggml_cuda_pool_alloc<block_q8_1> activations(
++        ctx.pool(), vectors * q8_blocks_per_vector);
++    quantize_row_q8_1_cuda(
++        (const float *) src1->data, nullptr, activations.get(), GGML_TYPE_Q2_0,
++        src1->ne[0], src1->nb[1] / sizeof(float),
++        src1->nb[2] / sizeof(float), src1->nb[3] / sizeof(float),
++        columns_padded, src1->ne[1], src1->ne[2], src1->ne[3], stream);
++
++    const std::size_t groups = columns / QK_TQ1_G128;
++    const std::size_t padded_rows = ((rows + TQ1_M_TILE - 1) / TQ1_M_TILE) * TQ1_M_TILE;
++    const std::size_t code_bytes = padded_rows * groups * TQ1_CODE_SLOTS;
++    const uint8_t * codes = (const uint8_t *) src0->data;
++    const half * scales = (const half *) (codes + code_bytes);
++
++    const std::size_t tiles = padded_rows / TQ1_M_TILE;
++    const std::size_t chunks = (columns + TQ1_K_CHUNK - 1) / TQ1_K_CHUNK;
++    ggml_cuda_pool_alloc<float> workspace(
++        ctx.pool(), tiles * chunks * TQ1_M_TILE);
++    ggml_cuda_pool_alloc<unsigned int> counters(ctx.pool(), tiles);
++    CUDA_CHECK(cudaMemsetAsync(counters.get(), 0, tiles * sizeof(unsigned int), stream));
++
++    for (int64_t i13 = 0; i13 < src1->ne[3]; ++i13) {
++        for (int64_t i12 = 0; i12 < src1->ne[2]; ++i12) {
++            for (int64_t i11 = 0; i11 < src1->ne[1]; ++i11) {
++                const int64_t vector_index =
++                    (i13 * src1->ne[2] + i12) * src1->ne[1] + i11;
++                const block_q8_1 * activation =
++                    activations.get() + vector_index * q8_blocks_per_vector;
++                float * output = (float *) ((char *) dst->data +
++                    i11 * dst->nb[1] + i12 * dst->nb[2] + i13 * dst->nb[3]);
++                tq1_launch(
++                    codes, scales, activation, output, workspace.get(), counters.get(),
++                    rows, columns, stream);
++            }
++        }
++    }
++}
+diff --git a/ggml/src/ggml-cuda/tq1-g128.cuh b/ggml/src/ggml-cuda/tq1-g128.cuh
+new file mode 100644
+index 00000000..881e0193
+--- /dev/null
++++ b/ggml/src/ggml-cuda/tq1-g128.cuh
+@@ -0,0 +1,17 @@
++#pragma once
++
++#include "common.cuh"
++
++#include <cstddef>
++#include <cstdint>
++
++// GPU storage is packed, but transposed over 256-row tiles at upload time:
++// codes[tile][g128][code_slot][row] followed by
++// scales[tile][g128][row]. No ternary value is expanded.
++std::size_t ggml_cuda_tq1_g128_storage_size(int64_t columns, int64_t rows);
++
++void ggml_cuda_mul_mat_tq1_g128(
++        ggml_backend_cuda_context & ctx,
++        const ggml_tensor * src0,
++        const ggml_tensor * src1,
++        ggml_tensor * dst);

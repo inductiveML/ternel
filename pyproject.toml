@@ -1,0 +1,35 @@
+[project]
+name = "ternel"
+version = "0.1.0"
+description = "Native lossless ternary model formats and kernels"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "gguf",
+  "huggingface-hub==0.34.4",
+  "ml-dtypes==0.5.3",
+  "numpy==2.3.2",
+  "tqdm==4.67.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.1",
+]
+
+[project.scripts]
+ternel-experiment = "bonsai_tq1.runner:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bonsai_tq1"]
+
+[tool.uv.sources]
+gguf = { git = "https://github.com/PrismML-Eng/llama.cpp.git", rev = "9ca265a57f85f2117942490f421f64a226dd9847", subdirectory = "gguf-py" }
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
