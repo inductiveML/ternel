@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .inspect_model import write_json_atomic
+from .format import write_json_atomic
 
 
 PRISM_COMMIT = "9ca265a57f85f2117942490f421f64a226dd9847"
@@ -60,6 +60,22 @@ def _file_sha256(path: Path) -> str:
         while chunk := handle.read(16 * 1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def quantile_summary(values: np.ndarray) -> dict[str, float]:
+    """Distribution summary for a sample of timings.
+
+    The median is the headline because a benchmark's tail is contention, not
+    signal; p5/p95 and the standard deviation are kept beside it so a reader can
+    see how wide that tail was before trusting the median.
+    """
+    return {
+        "median": float(np.median(values)),
+        "mean": float(np.mean(values)),
+        "p5": float(np.quantile(values, 0.05)),
+        "p95": float(np.quantile(values, 0.95)),
+        "std": float(np.std(values)),
+    }
 
 
 def paired_bootstrap_ratio(

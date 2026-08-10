@@ -1,0 +1,154 @@
+{
+  "baseline": {
+    "bits": 2,
+    "filename": "model.safetensors",
+    "group_size": 128,
+    "repo": "prism-ml/Ternary-Bonsai-27B-mlx-2bit",
+    "revision": "main",
+    "safetensors_metadata": {
+      "format": "mlx"
+    },
+    "tensor_count": 2180,
+    "url": "https://huggingface.co/prism-ml/Ternary-Bonsai-27B-mlx-2bit/resolve/main/model.safetensors"
+  },
+  "density": {
+    "baseline_bits_per_weight": 2.25,
+    "baseline_bytes_per_group": 36,
+    "tq1_bits_per_weight": 1.75,
+    "tq1_bytes_per_group": 28,
+    "tq1_saving_fraction": 0.2222222222222222
+  },
+  "schema_version": 1,
+  "tensors": [
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 93895,
+        "1": 57398,
+        "2": 94467
+      },
+      "columns": 5120,
+      "distinct_values_per_group": {
+        "3": 1920
+      },
+      "groups_per_row": 40,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.0.linear_attn.in_proj_a.weight",
+      "rows": 48,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    },
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 18496017,
+        "1": 15510662,
+        "2": 18422121
+      },
+      "columns": 5120,
+      "distinct_values_per_group": {
+        "3": 409600
+      },
+      "groups_per_row": 40,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.0.linear_attn.in_proj_qkv.weight",
+      "rows": 10240,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    },
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 10854751,
+        "1": 9796710,
+        "2": 10805819
+      },
+      "columns": 6144,
+      "distinct_values_per_group": {
+        "3": 245760
+      },
+      "groups_per_row": 48,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.0.linear_attn.out_proj.weight",
+      "rows": 5120,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    },
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 31856699,
+        "1": 25519126,
+        "2": 31753135
+      },
+      "columns": 17408,
+      "distinct_values_per_group": {
+        "3": 696320
+      },
+      "groups_per_row": 136,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.0.mlp.down_proj.weight",
+      "rows": 5120,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    },
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 1837958,
+        "1": 1571007,
+        "2": 1833915
+      },
+      "columns": 5120,
+      "distinct_values_per_group": {
+        "3": 40960
+      },
+      "groups_per_row": 40,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.3.self_attn.k_proj.weight",
+      "rows": 1024,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    },
+    {
+      "bias_equals_negative_scale": true,
+      "bias_over_scale_max": -1.0,
+      "bias_over_scale_min": -1.0,
+      "code_histogram": {
+        "0": 21836042,
+        "1": 19234283,
+        "2": 21844235
+      },
+      "columns": 5120,
+      "distinct_values_per_group": {
+        "3": 491520
+      },
+      "groups_per_row": 40,
+      "is_lossless_ternary": true,
+      "max_code": 2,
+      "name": "language_model.model.layers.3.self_attn.q_proj.weight",
+      "rows": 12288,
+      "uses_fourth_code": false,
+      "zero_scale_groups": 0
+    }
+  ],
+  "verdict": {
+    "baseline_is_lossless_ternary": true,
+    "framing": "memory-density result: the baseline already stores exact ternary weights, so TQ1_G128 competes on bits/weight and kernel speed, not on accuracy"
+  }
+}

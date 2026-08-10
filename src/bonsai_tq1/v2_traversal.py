@@ -11,8 +11,14 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from .constants import MODEL_SHA256, PRISM_COMMIT
-from .format import BLOCK_BYTES, BLOCK_SIZE, SOURCE_BLOCK_BYTES, read_sidecar, sha256_file
-from .inspect_model import write_json_atomic
+from .format import (
+    BLOCK_BYTES,
+    BLOCK_SIZE,
+    SOURCE_BLOCK_BYTES,
+    read_sidecar,
+    sha256_file,
+    write_json_atomic,
+)
 
 
 DEFAULT_L2_BYTES = 100_663_296

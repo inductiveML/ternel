@@ -11,7 +11,14 @@ import numpy as np
 from tqdm import tqdm
 
 from .constants import MODEL_FILENAME, MODEL_REPO, MODEL_REVISION, MODEL_SHA256, MODEL_SIZE
-from .format import BLOCK_BYTES, BLOCK_SIZE, SOURCE_BLOCK_BYTES, decode_q2_blocks, iter_memmap_blocks
+from .format import (
+    BLOCK_BYTES,
+    BLOCK_SIZE,
+    SOURCE_BLOCK_BYTES,
+    decode_q2_blocks,
+    iter_memmap_blocks,
+    write_json_atomic,
+)
 from .gguf_utils import load_tensor_infos, summarize_types
 from .stats import summarize_symbols
 
@@ -143,13 +150,6 @@ def inspect_model(model_path: Path, *, chunk_groups: int = DEFAULT_CHUNK_GROUPS)
         "elapsed_seconds": time.time() - started,
     }
     return result
-
-
-def write_json_atomic(path: Path, value: object) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    temporary.replace(path)
 
 
 def main(argv: list[str] | None = None) -> int:

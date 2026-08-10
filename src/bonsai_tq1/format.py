@@ -15,6 +15,11 @@ BLOCK_SIZE = 128
 SOURCE_BLOCK_BYTES = 34
 BLOCK_BYTES = 28
 TRIT_BYTES = 26
+# Largest legal code bytes: 3**5 - 1 for a regular slot's five trits, 3**3 - 1
+# for the tail slot's three. Anything above is unrepresentable, and the LUT23
+# kernels index their tables without a bounds check, so these are load-bearing.
+MAX_FULL_CODE_BYTE = 3**5 - 1
+MAX_TAIL_CODE_BYTE = 3**3 - 1
 ALIGNMENT = 256
 HEADER_BYTES = 256
 MAGIC = b"TQ1G128\0"
@@ -97,8 +102,8 @@ def decode_tq1_blocks(blocks: npt.ArrayLike, *, validate: bool = True) -> tuple[
         raise FormatError(f"expected TQ1 blocks shaped (N, 28), got {packed.shape}")
     payload = packed[:, 2:]
     if validate:
-        invalid_full = int(np.count_nonzero(payload[:, :25] > 242))
-        invalid_tail = int(np.count_nonzero(payload[:, 25] > 26))
+        invalid_full = int(np.count_nonzero(payload[:, :25] > MAX_FULL_CODE_BYTE))
+        invalid_tail = int(np.count_nonzero(payload[:, 25] > MAX_TAIL_CODE_BYTE))
         if invalid_full or invalid_tail:
             raise FormatError(
                 f"invalid base-3 bytes: regular={invalid_full}, tail={invalid_tail}"
@@ -255,6 +260,13 @@ def write_padding(handle: BinaryIO, target_offset: int) -> None:
 
 def canonical_json_bytes(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def write_json_atomic(path: Path, value: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
 
 
 def fsync_file(handle: BinaryIO) -> None:

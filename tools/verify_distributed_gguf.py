@@ -11,7 +11,7 @@ import numpy as np
 
 from bonsai_tq1.convert_gguf import TYPE_ID, gguf
 from bonsai_tq1.format import read_sidecar
-from bonsai_tq1.inspect_model import write_json_atomic
+from bonsai_tq1.format import write_json_atomic
 
 
 def array_sha256(array: np.ndarray, chunk_bytes: int = 16 * 1024 * 1024) -> str:

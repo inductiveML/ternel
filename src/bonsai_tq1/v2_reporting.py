@@ -10,7 +10,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .inspect_model import write_json_atomic
+from .format import write_json_atomic
 
 
 V1_VERDICT = "PACKING_ONLY_KERNEL_FAIL"
@@ -33,16 +33,6 @@ def _load(path: Path) -> dict:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def _quantile_summary(values: np.ndarray) -> dict[str, float]:
-    return {
-        "median": float(np.median(values)),
-        "mean": float(np.mean(values)),
-        "p5": float(np.quantile(values, 0.05)),
-        "p95": float(np.quantile(values, 0.95)),
-        "std": float(np.std(values)),
-    }
 
 
 def _paired_bootstrap(q2: np.ndarray, tq1: np.ndarray, samples: int = 100_000) -> dict:

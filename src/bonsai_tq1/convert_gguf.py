@@ -22,8 +22,13 @@ if _LOCAL_GGUF_PY.is_dir():
 import gguf  # noqa: E402
 
 from .constants import MODEL_REVISION, MODEL_SHA256  # noqa: E402
-from .format import BLOCK_BYTES, BLOCK_SIZE, read_sidecar, sha256_file  # noqa: E402
-from .inspect_model import write_json_atomic  # noqa: E402
+from .format import (  # noqa: E402
+    BLOCK_BYTES,
+    BLOCK_SIZE,
+    read_sidecar,
+    sha256_file,
+    write_json_atomic,
+)
 
 
 TYPE_NAME = "TQ1_G128"

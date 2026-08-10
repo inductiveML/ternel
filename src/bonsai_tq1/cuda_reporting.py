@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from .constants import PRISM_COMMIT
-from .inspect_model import write_json_atomic
+from .format import write_json_atomic
 
 
 def _load(path: Path) -> dict:

@@ -7,10 +7,15 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .inspect_model import write_json_atomic
+from .format import write_json_atomic
 
 
-def _run(command: list[str]) -> dict[str, object]:
+def run_command(command: list[str]) -> dict[str, object]:
+    """Record a probe command verbatim, including its failure.
+
+    A missing tool is evidence about the machine, so a non-zero exit is stored
+    rather than raised: the captured JSON must describe what was actually there.
+    """
     completed = subprocess.run(command, text=True, capture_output=True, check=False)
     return {
         "command": command,
@@ -31,20 +36,20 @@ def capture_environment() -> dict:
         "captured_at_utc": datetime.now(UTC).isoformat(),
         "platform": platform.platform(),
         "python": platform.python_version(),
-        "gpu": _run([
+        "gpu": run_command([
             "nvidia-smi",
             f"--query-gpu={gpu_fields}",
             "--format=csv,noheader,nounits",
         ]),
-        "compute_processes": _run([
+        "compute_processes": run_command([
             "nvidia-smi",
             "--query-compute-apps=pid,process_name,used_memory",
             "--format=csv,noheader,nounits",
         ]),
-        "nvcc": _run(["nvcc", "--version"]),
-        "compiler": _run(["c++", "--version"]),
-        "cmake": _run(["cmake", "--version"]),
-        "uv": _run(["uv", "--version"]),
+        "nvcc": run_command(["nvcc", "--version"]),
+        "compiler": run_command(["c++", "--version"]),
+        "cmake": run_command(["cmake", "--version"]),
+        "uv": run_command(["uv", "--version"]),
     }
 
 

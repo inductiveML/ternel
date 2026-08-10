@@ -19,8 +19,8 @@ from .format import (
     fsync_file,
     read_sidecar,
     sha256_file,
+    write_json_atomic,
 )
-from .inspect_model import write_json_atomic
 
 
 MAGIC = b"TQ1L23\0\0"
@@ -96,15 +96,22 @@ class Lut23Header:
         )
 
 
-def tensor_layout(rows: int, groups: int, start: int) -> dict[str, int]:
+def tensor_layout(rows: int, groups: int, start: int, *, tile: int) -> dict[str, int]:
     if rows <= 0 or groups <= 0:
         raise ValueError("tensor dimensions must be positive")
-    tiles = (rows + M_TILE - 1) // M_TILE
-    padded_rows = tiles * M_TILE
+    if tile <= 0:
+        raise ValueError("tile must be positive")
+    tiles = (rows + tile - 1) // tile
+    padded_rows = tiles * tile
     codes_offset = align_up(start)
     codes_bytes = padded_rows * groups * CODE_SLOTS
     scales_offset = align_up(codes_offset + codes_bytes)
     scales_bytes = padded_rows * groups * 2
+    # The tile is deliberately *not* returned. This dict is serialised into the
+    # LUT23 sidecar manifest, whose bytes fix the artifact's SHA-256, and the
+    # frozen CUDA evidence pins that hash. An extra key here would silently
+    # break reproduction of a published result; callers that need the tile
+    # already passed it in.
     return {
         "tiles": tiles,
         "padded_rows": padded_rows,
@@ -116,41 +123,45 @@ def tensor_layout(rows: int, groups: int, start: int) -> dict[str, int]:
     }
 
 
-def reorder_tensor_arrays(blocks: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def reorder_tensor_arrays(blocks: np.ndarray, *, tile: int) -> tuple[np.ndarray, np.ndarray]:
     source = np.asarray(blocks, dtype=np.uint8)
     if source.ndim != 3 or source.shape[2] != BLOCK_BYTES:
         raise ValueError("blocks must have shape (rows, groups, 28)")
+    if tile <= 0:
+        raise ValueError("tile must be positive")
     rows, groups, _ = source.shape
-    tiles = (rows + M_TILE - 1) // M_TILE
-    codes = np.zeros((tiles, groups, CODE_SLOTS, M_TILE), dtype=np.uint8)
-    scales = np.zeros((tiles, groups, M_TILE, 2), dtype=np.uint8)
-    for tile in range(tiles):
-        begin = tile * M_TILE
-        count = min(M_TILE, rows - begin)
+    tiles = (rows + tile - 1) // tile
+    codes = np.zeros((tiles, groups, CODE_SLOTS, tile), dtype=np.uint8)
+    scales = np.zeros((tiles, groups, tile, 2), dtype=np.uint8)
+    for index in range(tiles):
+        begin = index * tile
+        count = min(tile, rows - begin)
         part = source[begin : begin + count]
-        codes[tile, :, :, :count] = part[:, :, 2:].transpose(1, 2, 0)
-        scales[tile, :, :count, :] = part[:, :, :2].transpose(1, 0, 2)
+        codes[index, :, :, :count] = part[:, :, 2:].transpose(1, 2, 0)
+        scales[index, :, :count, :] = part[:, :, :2].transpose(1, 0, 2)
     return codes, scales
 
 
-def restore_tensor_arrays(codes: np.ndarray, scales: np.ndarray, rows: int) -> np.ndarray:
+def restore_tensor_arrays(codes: np.ndarray, scales: np.ndarray, rows: int, *, tile: int) -> np.ndarray:
     code_array = np.asarray(codes, dtype=np.uint8)
     scale_array = np.asarray(scales, dtype=np.uint8)
+    if tile <= 0:
+        raise ValueError("tile must be positive")
     if (
         code_array.ndim != 4
-        or code_array.shape[2:] != (CODE_SLOTS, M_TILE)
-        or scale_array.shape != (code_array.shape[0], code_array.shape[1], M_TILE, 2)
-        or not 0 < rows <= code_array.shape[0] * M_TILE
+        or code_array.shape[2:] != (CODE_SLOTS, tile)
+        or scale_array.shape != (code_array.shape[0], code_array.shape[1], tile, 2)
+        or not 0 < rows <= code_array.shape[0] * tile
     ):
         raise ValueError("invalid reordered tensor geometry")
     result = np.empty((rows, code_array.shape[1], BLOCK_BYTES), dtype=np.uint8)
-    for tile in range(code_array.shape[0]):
-        begin = tile * M_TILE
-        count = min(M_TILE, rows - begin)
+    for index in range(code_array.shape[0]):
+        begin = index * tile
+        count = min(tile, rows - begin)
         if count <= 0:
             break
-        result[begin : begin + count, :, 2:] = code_array[tile, :, :, :count].transpose(2, 0, 1)
-        result[begin : begin + count, :, :2] = scale_array[tile, :, :count, :].transpose(1, 0, 2)
+        result[begin : begin + count, :, 2:] = code_array[index, :, :, :count].transpose(2, 0, 1)
+        result[begin : begin + count, :, :2] = scale_array[index, :, :count, :].transpose(1, 0, 2)
     return result
 
 
@@ -184,7 +195,7 @@ def reorder_sidecar(
         groups_per_row = columns // 128
         if rows * groups_per_row != int(tensor["groups"]):
             raise Lut23FormatError(f"shape/group mismatch for {tensor['name']}")
-        layout = tensor_layout(rows, groups_per_row, cursor)
+        layout = tensor_layout(rows, groups_per_row, cursor, tile=M_TILE)
         layout.update(
             {
                 "index": int(tensor["index"]),

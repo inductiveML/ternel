@@ -25,6 +25,7 @@ from bonsai_tq1.format import (
 )
 from bonsai_tq1.reference import q2_g128_reference_gemv, tq1_g128_reference_gemv
 from bonsai_tq1.lut23_reorder import (
+    CODE_SLOTS as CODE_SLOTS_PER_GROUP,
     M_TILE,
     reorder_tensor_arrays,
     restore_tensor_arrays,
@@ -294,19 +295,57 @@ def test_lut23_code_position_major_round_trip(rows: int) -> None:
     scales = generator.integers(0, 256, size=(rows, 3, 2), dtype=np.uint8)
     logical = generator.integers(0, 3, size=(rows * 3, 128), dtype=np.uint8)
     packed = encode_tq1_blocks(scales.reshape(-1, 2), logical).reshape(rows, 3, BLOCK_BYTES)
-    codes, reordered_scales = reorder_tensor_arrays(packed)
+    codes, reordered_scales = reorder_tensor_arrays(packed, tile=M_TILE)
     assert codes.shape == ((rows + M_TILE - 1) // M_TILE, 3, 26, M_TILE)
     assert reordered_scales.shape == ((rows + M_TILE - 1) // M_TILE, 3, M_TILE, 2)
-    np.testing.assert_array_equal(restore_tensor_arrays(codes, reordered_scales, rows), packed)
+    np.testing.assert_array_equal(
+        restore_tensor_arrays(codes, reordered_scales, rows, tile=M_TILE), packed
+    )
     padded = codes.shape[-1] - (rows % M_TILE or M_TILE)
     if padded:
         assert not np.any(codes[-1, :, :, -padded:])
         assert not np.any(reordered_scales[-1, :, -padded:, :])
 
 
+@pytest.mark.parametrize(
+    ("rows", "tile"), ((48, 48), (100, 100), (1024, 256), (5120, 256), (513, 513))
+)
+def test_lut23_reorder_honours_a_per_tensor_tile(rows: int, tile: int) -> None:
+    """A tile that divides the row count reorders and restores with zero padding."""
+    generator = np.random.default_rng(20260810 + rows)
+    scales = generator.integers(0, 256, size=(rows, 3, 2), dtype=np.uint8)
+    logical = generator.integers(0, 3, size=(rows * 3, 128), dtype=np.uint8)
+    packed = encode_tq1_blocks(scales.reshape(-1, 2), logical).reshape(rows, 3, BLOCK_BYTES)
+
+    codes, reordered_scales = reorder_tensor_arrays(packed, tile=tile)
+    tiles = rows // tile
+    assert codes.shape == (tiles, 3, CODE_SLOTS_PER_GROUP, tile)
+    assert reordered_scales.shape == (tiles, 3, tile, 2)
+    np.testing.assert_array_equal(
+        restore_tensor_arrays(codes, reordered_scales, rows, tile=tile), packed
+    )
+    layout = tensor_layout(rows, 3, 256, tile=tile)
+    # No "tile" key: these bytes go into the sidecar manifest whose hash the
+    # frozen CUDA report pins, so the serialised shape must not grow.
+    assert "tile" not in layout
+    assert layout["tiles"] == tiles
+    assert layout["padded_rows"] == rows
+    assert layout["codes_bytes"] == rows * 3 * CODE_SLOTS_PER_GROUP
+    assert layout["scales_bytes"] == rows * 3 * 2
+
+
+@pytest.mark.parametrize("tile", (0, -1))
+def test_lut23_reorder_rejects_non_positive_tile(tile: int) -> None:
+    blocks = np.zeros((4, 3, BLOCK_BYTES), dtype=np.uint8)
+    with pytest.raises(ValueError, match="tile must be positive"):
+        reorder_tensor_arrays(blocks, tile=tile)
+    with pytest.raises(ValueError, match="tile must be positive"):
+        tensor_layout(4, 3, 0, tile=tile)
+
+
 def test_lut23_reorder_rejects_wrong_block_geometry() -> None:
     with pytest.raises(ValueError, match="shape"):
-        reorder_tensor_arrays(np.zeros((2, 3, 27), dtype=np.uint8))
+        reorder_tensor_arrays(np.zeros((2, 3, 27), dtype=np.uint8), tile=M_TILE)
 
 
 def test_lut23_mulshift_split_is_exact_for_all_243_codes() -> None:
@@ -338,7 +377,7 @@ def test_lut23_two_plus_three_tables_equal_direct_ternary_dot() -> None:
 
 
 def test_lut23_every_code_subtable_is_128_byte_aligned() -> None:
-    layout = tensor_layout(rows=257, groups=17, start=256)
+    layout = tensor_layout(rows=257, groups=17, start=256, tile=M_TILE)
     assert layout["codes_offset"] % 256 == 0
     assert layout["scales_offset"] % 256 == 0
     for tile in range(layout["tiles"]):
