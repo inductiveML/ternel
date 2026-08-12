@@ -301,6 +301,13 @@ def test_a_column_mismatch_is_refused_before_the_kernel() -> None:
 
 BENCHMARKS = Path("results/mlx/a5_op_benchmarks.json")
 
+# Two further runs of the identical protocol -- same seed, same 40 trials per
+# arm, the same 110 points -- captured on the two days before it. They exist
+# because no single sweep on this machine can rank one of our kernels against
+# another; see ``fastest_seen``.
+BENCHMARK_REPEATS = tuple(sorted(BENCHMARKS.parent.glob("a5_op_benchmarks_*.json")))
+SWEEPS_REQUIRED = 3
+
 # What the dispatch rule may give up against the fastest configuration measured
 # for each case, judged on absolute packed time.
 #
@@ -324,6 +331,22 @@ BENCHMARKS = Path("results/mlx/a5_op_benchmarks.json")
 MAX_DISPATCH_REGRET = 0.20
 MEAN_DISPATCH_REGRET = 0.03
 
+# Both bounds are judged on the floor of three sweeps rather than on any one of
+# them, because regret is systematically inflated by contention rather than
+# merely scattered by it. It divides by the fastest configuration measured, so a
+# rival that happens to get a quiet moment lowers the denominator for everybody,
+# and averaging over 110 cases does not remove a bias. Measured on the same 110
+# points: mean regret reads 2.43%, 5.16% and 5.76% across the three sweeps and
+# the worst case reads 14.5%, 72.0% and 119.9%, against 1.98% and 14.5% on the
+# floor.
+#
+# What corrupts the ranking is how much the foreign load *varies*, not how large
+# it is. The dirtiest-looking sweep is the cleanest of the three: its competitor
+# was a saturating MLX process holding 85% of the device continuously, which
+# scales every configuration alike and cancels in a ratio. The two captured
+# against a desktop compositor bursting between 0.4% and 95% are the unusable
+# ones.
+
 # The shape the dispatch tests below build. It is a real row count -- ssm_out,
 # attn_output and every attention projection but q are 5120 rows -- and it tiles
 # at 256, so it exercises the multi-tile divisibility check rather than the
@@ -335,6 +358,38 @@ def measured_cases() -> list[dict[str, object]]:
     if not BENCHMARKS.exists():
         pytest.skip(f"{BENCHMARKS} has not been produced yet")
     return json.loads(BENCHMARKS.read_text())["matmul"]
+
+
+def fastest_seen() -> dict[tuple[str, int], dict[str, float]]:
+    """Each configuration's fastest time across every repeat, per measured point.
+
+    The estimator is a minimum because the noise it is fighting is one-sided. A
+    competing process can only take GPU time away from a kernel, never give it
+    any, so of several timings of the same configuration the smallest is the one
+    nearest its uncontended speed, and repeating the sweep can only improve the
+    estimate. This is the same reason a benchmark reports best-of-N rather than
+    mean-of-N when its interference is additive.
+
+    That it is recovering signal rather than manufacturing a flattering number
+    is checkable: the floor reproduces the two figures this file already
+    documented from a quiet machine -- a mean regret near 2% and a worst case of
+    14.5% on ssm_out at batch 512, against its own twin configuration -- neither
+    of which any individual sweep here reproduces.
+    """
+    if len(BENCHMARK_REPEATS) + 1 != SWEEPS_REQUIRED:
+        raise FormatError(
+            f"the floor needs {SWEEPS_REQUIRED} independent sweeps and "
+            f"{len(BENCHMARK_REPEATS) + 1} are present; a floor over fewer is just the "
+            "contended reading of whichever survived"
+        )
+    floor: dict[tuple[str, int], dict[str, float]] = {}
+    for path in (BENCHMARKS, *BENCHMARK_REPEATS):
+        for case in json.loads(path.read_text())["matmul"]:
+            point = floor.setdefault((str(case["label"]), int(case["batch"])), {})
+            for variant in case["variants"]:
+                config, seconds = str(variant["config"]), packed_median(variant)
+                point[config] = min(point.get(config, seconds), seconds)
+    return floor
 
 
 def packed_median(variant: dict[str, object]) -> float:
@@ -369,20 +424,22 @@ def test_the_dispatch_rule_reproduces_the_measured_crossover() -> None:
     (shape, batch) pairs back through the functions and checks what they pick
     against what was actually fastest.
     """
+    floor = fastest_seen()
     regrets: list[tuple[float, str]] = []
     for case in measured_cases():
         chosen = dispatched_name(case)
-        times = {str(v["config"]): packed_median(v) for v in case["variants"]}
+        times = floor[(str(case["label"]), int(case["batch"]))]
         assert chosen in times, (
             f"{chosen} was dispatched for {case['label']} at batch {case['batch']} "
             "but never measured there"
         )
         best = min(times.values())
+        winner = min(times, key=lambda config: times[config])
         regrets.append((
             times[chosen] / best - 1.0,
             f"{case['label']} rows={case['rows']} batch={case['batch']}: "
             f"{chosen} at {times[chosen] * 1e6:.2f}us, "
-            f"best {case['best_config']} at {best * 1e6:.2f}us",
+            f"best {winner} at {best * 1e6:.2f}us",
         ))
 
     assert len(regrets) == 110

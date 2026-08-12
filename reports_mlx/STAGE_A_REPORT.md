@@ -536,6 +536,13 @@ measured points: **exact optimum in 43/110 cases, mean regret 2.43%, worst
 configuration it loses to is its own twin with the threadgroup trit table
 compiled out, and their p5/p95 bands sit inside one another.
 
+> Stage B later found that this sweep was captured while an unrelated MLX
+> process held 85% of the GPU, and repeated it twice more. Re-scored against
+> the floor of the three, the same rule is optimal in 46/110 cases with mean
+> regret 1.98% and the same 14.52% worst case, so the conclusions below stand;
+> see the Stage B report for why a steady competitor turned out to distort a
+> ranking less than a bursty one.
+
 Rules were compared on **predicted whole-forward-pass matmul time**, not on
 unweighted per-case regret, for the reason the forward-pass table gives. The
 reordering matters, and the clearest case is the narrow tile: the two candidate

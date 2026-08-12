@@ -1,9 +1,16 @@
-"""Range-read individual tensors out of a remote safetensors file.
+"""Read individual tensors out of a safetensors file, remote or local.
 
 The official MLX distribution of Ternary Bonsai 27B is a single 8.49 GB shard.
-Auditing a handful of tensors does not justify downloading it, so this module
-reads the safetensors header and then only the byte ranges of the tensors that
-are actually requested.
+Auditing a handful of tensors does not justify downloading it, so
+:class:`RemoteSafetensors` reads the header and then only the byte ranges of the
+tensors that are actually requested.
+
+Once a shard is on disk the same header is worth reading the same way, so
+:class:`LocalSafetensors` shares the parser and swaps the transport for a
+``numpy.memmap``. Keeping one parser means the reader used to *check* an
+artifact cannot disagree with the reader used to *audit* the baseline, and it
+keeps the verification path free of MLX -- a file written by MLX is poor
+evidence about itself.
 """
 
 from __future__ import annotations
@@ -13,7 +20,8 @@ import struct
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Iterator
+from pathlib import Path
+from typing import Callable, Iterator
 
 import ml_dtypes
 import numpy as np
@@ -98,28 +106,28 @@ def _http_get_range(url: str, begin: int, end_inclusive: int, *, timeout_seconds
     return payload
 
 
-class RemoteSafetensors:
-    """A remote safetensors file addressed by HTTP range requests."""
+class SafetensorsFile:
+    """The parsed header of a safetensors file, whatever it is stored on.
 
-    def __init__(self, url: str, *, timeout_seconds: float) -> None:
-        self.url = url
-        self.timeout_seconds = timeout_seconds
-        prefix = _http_get_range(url, 0, SAFETENSORS_LENGTH_BYTES - 1, timeout_seconds=timeout_seconds)
+    A subclass supplies ``_read_range(begin, end_inclusive)`` and a ``read``
+    that turns one tensor's extent into an array. Everything about the format
+    itself -- the length prefix, the JSON header, the offset arithmetic, the
+    shape/dtype consistency check -- is decided once, here.
+    """
+
+    def __init__(self, source: str, read_range: Callable[[int, int], bytes]) -> None:
+        self.source = source
+        prefix = read_range(0, SAFETENSORS_LENGTH_BYTES - 1)
         header_bytes = struct.unpack("<Q", prefix)[0]
         if header_bytes <= 0 or header_bytes > MAX_HEADER_BYTES:
-            raise FormatError(f"implausible safetensors header length {header_bytes}")
-        raw = _http_get_range(
-            url,
-            SAFETENSORS_LENGTH_BYTES,
-            SAFETENSORS_LENGTH_BYTES + header_bytes - 1,
-            timeout_seconds=timeout_seconds,
-        )
+            raise FormatError(f"implausible safetensors header length {header_bytes} in {source}")
+        raw = read_range(SAFETENSORS_LENGTH_BYTES, SAFETENSORS_LENGTH_BYTES + header_bytes - 1)
         try:
             header = json.loads(raw)
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise FormatError("remote safetensors header is not valid JSON") from exc
+            raise FormatError(f"safetensors header of {source} is not valid JSON") from exc
         if not isinstance(header, dict):
-            raise FormatError("remote safetensors header is not a JSON object")
+            raise FormatError(f"safetensors header of {source} is not a JSON object")
 
         self.data_start = SAFETENSORS_LENGTH_BYTES + header_bytes
         self.metadata = header.get("__metadata__")
@@ -142,7 +150,7 @@ class RemoteSafetensors:
             entry.validate()
             entries[name] = entry
         if not entries:
-            raise FormatError("remote safetensors header declares no tensors")
+            raise FormatError(f"safetensors header of {source} declares no tensors")
         self.entries = entries
 
     def __contains__(self, name: str) -> bool:
@@ -157,8 +165,34 @@ class RemoteSafetensors:
     def entry(self, name: str) -> TensorEntry:
         found = self.entries.get(name)
         if found is None:
-            raise FormatError(f"tensor {name!r} is not present in the remote file")
+            raise FormatError(f"tensor {name!r} is not present in {self.source}")
         return found
+
+    def _shaped(self, entry: TensorEntry, array: np.ndarray) -> np.ndarray:
+        expected_elements = 1
+        for dim in entry.shape:
+            expected_elements *= dim
+        if array.size != expected_elements:
+            raise FormatError(
+                f"tensor {entry.name} decoded to {array.size} elements, "
+                f"expected {expected_elements}"
+            )
+        return array.reshape(entry.shape)
+
+    def read(self, name: str) -> np.ndarray:
+        raise NotImplementedError
+
+
+class RemoteSafetensors(SafetensorsFile):
+    """A remote safetensors file addressed by HTTP range requests."""
+
+    def __init__(self, url: str, *, timeout_seconds: float) -> None:
+        self.url = url
+        self.timeout_seconds = timeout_seconds
+        super().__init__(
+            url,
+            lambda begin, end: _http_get_range(url, begin, end, timeout_seconds=timeout_seconds),
+        )
 
     def read(self, name: str) -> np.ndarray:
         """Fetch exactly one tensor's bytes and return it as a numpy array."""
@@ -166,12 +200,51 @@ class RemoteSafetensors:
         payload = _http_get_range(
             self.url, found.begin, found.end - 1, timeout_seconds=self.timeout_seconds
         )
-        array = np.frombuffer(payload, dtype=found.numpy_dtype)
-        expected_elements = 1
-        for dim in found.shape:
-            expected_elements *= dim
-        if array.size != expected_elements:
+        return self._shaped(found, np.frombuffer(payload, dtype=found.numpy_dtype))
+
+
+class LocalSafetensors(SafetensorsFile):
+    """A safetensors file on disk, read through one shared ``numpy.memmap``.
+
+    ``read`` returns a *view* into the mapping rather than a copy, so walking a
+    27B-parameter shard costs page cache rather than resident memory. Callers
+    that keep a result past the next tensor should copy it.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+        self._map = np.memmap(self.path, dtype=np.uint8, mode="r")
+        super().__init__(str(self.path), lambda begin, end: bytes(self._map[begin : end + 1]))
+
+    @property
+    def file_bytes(self) -> int:
+        return int(self._map.size)
+
+    def read(self, name: str) -> np.ndarray:
+        found = self.entry(name)
+        if found.end > self._map.size:
             raise FormatError(
-                f"tensor {name} decoded to {array.size} elements, expected {expected_elements}"
+                f"tensor {name} ends at byte {found.end} but {self.path} is "
+                f"{self._map.size} bytes"
             )
-        return array.reshape(found.shape)
+        window = self._map[found.begin : found.end]
+        return self._shaped(found, window.view(found.numpy_dtype))
+
+    def read_rows(self, name: str, begin: int, end: int) -> np.ndarray:
+        """A row slice of one tensor, without touching the rows outside it.
+
+        The largest tensors here are 248320 rows wide, so a whole-tensor read is
+        a gigabyte the comparison does not need all at once.
+        """
+        found = self.entry(name)
+        if not found.shape:
+            raise FormatError(f"tensor {name} is a scalar and has no rows")
+        rows = found.shape[0]
+        if begin < 0 or end > rows or begin > end:
+            raise FormatError(f"row range [{begin}, {end}) is outside {name}'s {rows} rows")
+        row_elements = 1
+        for dim in found.shape[1:]:
+            row_elements *= dim
+        row_bytes = row_elements * found.numpy_dtype.itemsize
+        window = self._map[found.begin + begin * row_bytes : found.begin + end * row_bytes]
+        return window.view(found.numpy_dtype).reshape((end - begin, *found.shape[1:]))

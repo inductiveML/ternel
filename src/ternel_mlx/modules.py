@@ -157,6 +157,13 @@ GEMM_NARROW_TILE = GemmConfig(
 # two buckets together -- so the second bucket is worth its JIT instantiation
 # and a third is not: a bucket added at 512 improved the predicted forward pass
 # by 0.1%.
+#
+# Those regrets were scored on one sweep, later found to have been captured on a
+# contended machine. They survive it because every candidate rule was scored on
+# the same file, so a distortion they share cancels out of the comparison, and
+# because the margins are far wider than the distortion: re-scoring the shipped
+# rule on the floor of three sweeps moves its mean regret by 0.45 points, against
+# the 17.6 that separate it from the TM=1 rule.
 GEMM_MIN_BATCH = 16
 GEMM_LARGE_MIN_BATCH = 32
 

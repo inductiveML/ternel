@@ -48,7 +48,7 @@ from bonsai_tq1.format import BLOCK_SIZE, FormatError, encode_tq1_blocks, write_
 from bonsai_tq1.lut23_reporting import paired_bootstrap_ratio, quantile_summary
 
 from . import LAYOUT_NAME, LAYOUT_VERSION
-from .environment import capture_environment
+from .environment import capture_environment, exclusive_gpu
 from .kernels import GemmConfig, MatmulConfig, tq1_gemm, tq1_get_rows, tq1_matmul
 from .layout import PackedTensorLayout
 from .packing import pack_blocks
@@ -631,18 +631,30 @@ def measure_jit_cost(configs: list[Variant]) -> list[dict[str, object]]:
     return results
 
 
-def run(*, shapes: tuple[tuple[str, int, int], ...], batches: tuple[int, ...]) -> dict[str, object]:
+def run(
+    *,
+    shapes: tuple[tuple[str, int, int], ...],
+    batches: tuple[int, ...],
+    max_foreign_gpu_share: float,
+) -> dict[str, object]:
     configs, unavailable = _configs()
 
     environment_before = capture_environment()
-    jit = measure_jit_cost(configs)
+    contention: list[dict[str, object]] = []
+    with exclusive_gpu("jit", max_foreign_share=max_foreign_gpu_share, record=contention):
+        jit = measure_jit_cost(configs)
 
     cases: list[dict[str, object]] = []
     for label, rows, columns in shapes:
         for batch in batches:
             case = OpCase(label=label, rows=rows, columns=columns, batch=batch)
             print(f"  {label:26s} {rows:6d}x{columns:<6d} batch={batch:<4d}", file=sys.stderr, end="")
-            result = measure_case(case, configs)
+            with exclusive_gpu(
+                f"{label} {rows}x{columns} batch={batch}",
+                max_foreign_share=max_foreign_gpu_share,
+                record=contention,
+            ):
+                result = measure_case(case, configs)
             print(
                 f"  best={result['best_config']:<28s} "
                 f"{result['best_speedup_vs_affine_2bit']:.2f}x",
@@ -650,7 +662,8 @@ def run(*, shapes: tuple[tuple[str, int, int], ...], batches: tuple[int, ...]) -
             )
             cases.append(result)
 
-    get_rows = measure_get_rows(248320, 5120, (1, 8, 64, 512))
+    with exclusive_gpu("get_rows", max_foreign_share=max_foreign_gpu_share, record=contention):
+        get_rows = measure_get_rows(248320, 5120, (1, 8, 64, 512))
     environment_after = capture_environment()
 
     return {
@@ -661,6 +674,8 @@ def run(*, shapes: tuple[tuple[str, int, int], ...], batches: tuple[int, ...]) -
         "trials_per_arm": TRIALS,
         "warmup_samples": WARMUP_SAMPLES,
         "min_sample_seconds": MIN_SAMPLE_SECONDS,
+        "max_foreign_gpu_share": max_foreign_gpu_share,
+        "gpu_contention": contention,
         "baseline": {
             "name": "mx.quantized_matmul",
             "mode": "affine",
@@ -705,6 +720,12 @@ def main(argv: list[str] | None = None) -> int:
         metavar="LABEL:ROWS:COLUMNS",
         help="a weight shape to measure; repeat the flag, or pass 'all' for the model's shapes",
     )
+    parser.add_argument(
+        "--max-foreign-gpu-share",
+        type=float,
+        required=True,
+        help="void the run if another process exceeds this share of the GPU while timing",
+    )
     args = parser.parse_args(argv)
 
     if args.shape == ["all"]:
@@ -712,7 +733,11 @@ def main(argv: list[str] | None = None) -> int:
     else:
         shapes = tuple(_parse_shape(entry) for entry in args.shape)
 
-    result = run(shapes=shapes, batches=tuple(args.batches))
+    result = run(
+        shapes=shapes,
+        batches=tuple(args.batches),
+        max_foreign_gpu_share=args.max_foreign_gpu_share,
+    )
     write_json_atomic(args.output, result)
     json.dump({"matmul": result["matmul"], "get_rows": result["get_rows"]}, sys.stdout, indent=2)
     sys.stdout.write("\n")

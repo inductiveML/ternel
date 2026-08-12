@@ -1,0 +1,849 @@
+{
+  "candidate": {
+    "active_memory_bytes": 5902108596,
+    "census": {
+      "by_dtype": {
+        "float16": {
+          "bytes": 5291008,
+          "elements": 2645504,
+          "tensors": 353
+        },
+        "uint16": {
+          "bytes": 420208640,
+          "elements": 210104320,
+          "tensors": 498
+        },
+        "uint8": {
+          "bytes": 5462712320,
+          "elements": 5462712320,
+          "tensors": 498
+        }
+      },
+      "largest_unpacked_parameter": {
+        "elements": 40960,
+        "name": "language_model.model.layers.0.linear_attn.conv1d.weight"
+      },
+      "max_unpacked_parameter_elements": 1048576,
+      "packed_bytes": 5882920960,
+      "packed_dtypes": [
+        "uint16",
+        "uint8"
+      ],
+      "packed_modules": {
+        "PackedEmbedding": 1,
+        "PackedLinear": 497
+      },
+      "total_bytes": 5888211968,
+      "unpacked_bytes": 5291008
+    },
+    "load_seconds": 0.9639751249924302,
+    "path": "artifacts/ternel-mlx",
+    "peak_memory_bytes": 6603936522,
+    "quantization_declared": false,
+    "vocabulary": 248320
+  },
+  "continuation_tokens": 48,
+  "environment": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 32.8,
+          "pid": 592,
+          "rss_kib": 258416
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 25.8,
+          "pid": 16842,
+          "rss_kib": 1591472
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 11.2,
+          "pid": 16411,
+          "rss_kib": 136496
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 5.4,
+          "pid": 85224,
+          "rss_kib": 216096
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.6,
+          "pid": 1197,
+          "rss_kib": 147744
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 2.1,
+          "pid": 22755,
+          "rss_kib": 361744
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 2.1,
+          "pid": 92548,
+          "rss_kib": 92048
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 2.0,
+          "pid": 22751,
+          "rss_kib": 75984
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-11T06:19:06.854337+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 8,
+      "cache_memory_bytes": 0,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 8
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 3.07 3.46 3.54 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "layout_name": "TQ1_G128_MLX_TILED",
+  "layout_version": 1,
+  "per_prompt": [
+    {
+      "candidate_nll": 3.5458010973956218,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 5,
+      "greedy_positions": 5,
+      "label": "factual_short",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 5,
+        "elements": 1241600,
+        "max_abs_error": 0.018162250518798828,
+        "max_relative_error": 157.1260369318182,
+        "mean_abs_error": 0.001671017467174129,
+        "min_cosine_similarity": 0.9999996875606187,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0018363096891044629,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.002199042596449401,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 5.81743917194238e-06,
+      "mean_kl_divergence": 3.0840750985331885e-06,
+      "nll_difference": 7.139412118428723e-05,
+      "reference_nll": 3.5457297032744375,
+      "smallest_flipped_margin": null,
+      "tokens": 5,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 1.903266943649917,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 47,
+      "greedy_positions": 47,
+      "label": "factual_long",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 47,
+        "elements": 11671040,
+        "max_abs_error": 0.017856121063232422,
+        "max_relative_error": 4685.93896484375,
+        "mean_abs_error": 0.0017491204277061353,
+        "min_cosine_similarity": 0.9999994078998503,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0016770193228137352,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.0022251617209294583,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_34"
+      },
+      "max_kl_divergence": 1.3553654619294915e-05,
+      "mean_kl_divergence": 3.7627544730523904e-06,
+      "nll_difference": -0.0002728608323652182,
+      "reference_nll": 1.9035398044822822,
+      "smallest_flipped_margin": null,
+      "tokens": 47,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 1.823525900408788,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 24,
+      "greedy_positions": 24,
+      "label": "reasoning",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 24,
+        "elements": 5959680,
+        "max_abs_error": 0.024214744567871094,
+        "max_relative_error": 1911.6983642578125,
+        "mean_abs_error": 0.0015289515146620044,
+        "min_cosine_similarity": 0.9999996329167334,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.002360614855055217,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.001962441657827844,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 2.4153418354306795e-05,
+      "mean_kl_divergence": 3.602076488586664e-06,
+      "nll_difference": -0.0012273263099522591,
+      "reference_nll": 1.8247532267187403,
+      "smallest_flipped_margin": null,
+      "tokens": 24,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 0.9958333333333332,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 0.6110032264611444,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 42,
+      "greedy_positions": 42,
+      "label": "code_python",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 42,
+        "elements": 10429440,
+        "max_abs_error": 0.026149511337280273,
+        "max_relative_error": 6522.723958333333,
+        "mean_abs_error": 0.0012782977466249,
+        "min_cosine_similarity": 0.9999992474704353,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0015740579866436605,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.001657372324852425,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 1.0718652014788734e-05,
+      "mean_kl_divergence": 1.1247511910923589e-06,
+      "nll_difference": 8.589230881950183e-05,
+      "reference_nll": 0.6109173341523249,
+      "smallest_flipped_margin": null,
+      "tokens": 42,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 0.6135099537394588,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 31,
+      "greedy_positions": 31,
+      "label": "code_c",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 31,
+        "elements": 7697920,
+        "max_abs_error": 0.03419685363769531,
+        "max_relative_error": 13652.200892857143,
+        "mean_abs_error": 0.0013138223277786255,
+        "min_cosine_similarity": 0.9999987273062798,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.003095613342026167,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.0017615849478149997,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 3.448725750794773e-05,
+      "mean_kl_divergence": 2.4971511879022574e-06,
+      "nll_difference": 0.00027322510960670066,
+      "reference_nll": 0.6132367286298521,
+      "smallest_flipped_margin": null,
+      "tokens": 31,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 0.996774193548387,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 2.4178791565888686,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 29,
+      "greedy_positions": 29,
+      "label": "markup_json",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 29,
+        "elements": 7201280,
+        "max_abs_error": 0.02594137191772461,
+        "max_relative_error": 11320.256510416666,
+        "mean_abs_error": 0.0014204393924118583,
+        "min_cosine_similarity": 0.9999989602392889,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.002215140497310707,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.0018845922026596964,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 4.8275243564721385e-05,
+      "mean_kl_divergence": 6.962817691050714e-06,
+      "nll_difference": -0.0001267085728615669,
+      "reference_nll": 2.41800586516173,
+      "smallest_flipped_margin": null,
+      "tokens": 29,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 0.993103448275862
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 2.1537808102211944,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 9,
+      "greedy_positions": 9,
+      "label": "multilingual_fr",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 9,
+        "elements": 2234880,
+        "max_abs_error": 0.020326316356658936,
+        "max_relative_error": 1698.4639945652175,
+        "mean_abs_error": 0.0015748487867924463,
+        "min_cosine_similarity": 0.9999989864282262,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0022742731587870138,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.002100861294051202,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 7.674209206978646e-06,
+      "mean_kl_divergence": 2.7212738680740643e-06,
+      "nll_difference": 0.0002223892043788922,
+      "reference_nll": 2.1535584210168155,
+      "smallest_flipped_margin": null,
+      "tokens": 9,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 9.039552110749511,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 3,
+      "greedy_positions": 3,
+      "label": "multilingual_zh",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 3,
+        "elements": 744960,
+        "max_abs_error": 0.02831101417541504,
+        "max_relative_error": 830.8872612847222,
+        "mean_abs_error": 0.0032702125115352185,
+        "min_cosine_similarity": 0.9999948019331549,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0025108042853425436,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.004155201644083044,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_1"
+      },
+      "max_kl_divergence": 2.0756780467862893e-05,
+      "mean_kl_divergence": 1.2356753059156184e-05,
+      "nll_difference": 0.0012140824848394516,
+      "reference_nll": 9.038338028264672,
+      "smallest_flipped_margin": null,
+      "tokens": 3,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 3.6233215880188916,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 13,
+      "greedy_positions": 13,
+      "label": "multilingual_ja",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 13,
+        "elements": 3228160,
+        "max_abs_error": 0.03802919387817383,
+        "max_relative_error": 3076.18408203125,
+        "mean_abs_error": 0.001990823418372888,
+        "min_cosine_similarity": 0.9999987851535825,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.003635352364754481,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.00272566881900998,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 4.077701724628139e-05,
+      "mean_kl_divergence": 7.006732931750714e-06,
+      "nll_difference": -0.001340884107333018,
+      "reference_nll": 3.6246624721262246,
+      "smallest_flipped_margin": null,
+      "tokens": 13,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 1.9161718845767866,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 11,
+      "greedy_positions": 11,
+      "label": "repetition",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 11,
+        "elements": 2731520,
+        "max_abs_error": 0.02205967903137207,
+        "max_relative_error": 444.87752403846156,
+        "mean_abs_error": 0.0018658999847006794,
+        "min_cosine_similarity": 0.9999993660514944,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.00177699113657371,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.0024399787923000747,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 2.2613247785031495e-05,
+      "mean_kl_divergence": 4.9372508244004844e-06,
+      "nll_difference": 0.00021344652016419552,
+      "reference_nll": 1.9159584380566224,
+      "smallest_flipped_margin": null,
+      "tokens": 11,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 2.300510955489734,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 103,
+      "greedy_positions": 103,
+      "label": "long_context",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 103,
+        "elements": 25576960,
+        "max_abs_error": 0.0367279052734375,
+        "max_relative_error": 468.901953125,
+        "mean_abs_error": 0.001510896985454547,
+        "min_cosine_similarity": 0.9999990728222448,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0021349554382379655,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.001965908865650072,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_0"
+      },
+      "max_kl_divergence": 1.8757131167051226e-05,
+      "mean_kl_divergence": 3.099134043144174e-06,
+      "nll_difference": -0.000536839241732423,
+      "reference_nll": 2.3010477947314665,
+      "smallest_flipped_margin": null,
+      "tokens": 103,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 1.0,
+        "top_5": 0.9961165048543689
+      },
+      "unexplained_flips": 0
+    },
+    {
+      "candidate_nll": 0.6598435778508239,
+      "continuation_agreement": 1.0,
+      "continuation_agreements": 48,
+      "continuation_common_prefix": 48,
+      "continuation_length": 48,
+      "drift_explained_flips": 0,
+      "first_greedy_disagreement": null,
+      "greedy_agreement": 1.0,
+      "greedy_agreements": 26,
+      "greedy_positions": 26,
+      "label": "numeric",
+      "logits": {
+        "bit_exact": false,
+        "candidate_non_finite": 0,
+        "cases": 26,
+        "elements": 6456320,
+        "max_abs_error": 0.04870128631591797,
+        "max_relative_error": 3342.155691964286,
+        "mean_abs_error": 0.0013728234194001036,
+        "min_cosine_similarity": 0.9999991588296863,
+        "mismatched_cases": 0,
+        "mismatches": 0,
+        "non_finite_pattern_mismatches": 0,
+        "normalised_max_abs_error": 0.0032637511248363874,
+        "passed": true,
+        "reference": "mlx_2bit",
+        "reference_non_finite": 0,
+        "rmse": 0.0018012670834077786,
+        "tolerance": 0.02,
+        "worst_case": "position_0",
+        "worst_cosine_case": "position_1"
+      },
+      "max_kl_divergence": 8.609671827569073e-06,
+      "mean_kl_divergence": 1.7193016231858963e-06,
+      "nll_difference": -0.00026529876250724893,
+      "reference_nll": 0.6601088766133312,
+      "smallest_flipped_margin": null,
+      "tokens": 26,
+      "top_k_overlap": {
+        "top_1": 1.0,
+        "top_10": 0.9961538461538461,
+        "top_5": 1.0
+      },
+      "unexplained_flips": 0
+    }
+  ],
+  "prompts": [
+    "factual_short",
+    "factual_long",
+    "reasoning",
+    "code_python",
+    "code_c",
+    "markup_json",
+    "multilingual_fr",
+    "multilingual_zh",
+    "multilingual_ja",
+    "repetition",
+    "long_context",
+    "numeric"
+  ],
+  "reference": {
+    "active_memory_bytes": 7569472532,
+    "census": {
+      "by_dtype": {
+        "float16": {
+          "bytes": 845708288,
+          "elements": 422854144,
+          "tensors": 1349
+        },
+        "uint32": {
+          "bytes": 6723338240,
+          "elements": 1680834560,
+          "tensors": 498
+        }
+      },
+      "largest_unpacked_parameter": {
+        "elements": 79462400,
+        "name": "language_model.model.embed_tokens.weight"
+      },
+      "max_unpacked_parameter_elements": 1048576,
+      "packed_bytes": 0,
+      "packed_dtypes": [
+        "uint16",
+        "uint8"
+      ],
+      "packed_modules": {
+        "PackedEmbedding": 0,
+        "PackedLinear": 0
+      },
+      "total_bytes": 7569046528,
+      "unpacked_bytes": 7569046528
+    },
+    "load_seconds": 1.7678312081843615,
+    "path": "artifacts/baseline-mlx-2bit",
+    "peak_memory_bytes": 8198228054,
+    "quantization_declared": true,
+    "vocabulary": 248320
+  },
+  "representation_problems": [],
+  "schema_version": 1,
+  "thresholds": {
+    "logit_tolerance": 0.02,
+    "max_kl_divergence": 0.01,
+    "min_continuation_prefix": 8,
+    "min_greedy_agreement": 0.99
+  },
+  "totals": {
+    "characteristic_drift": 0.009731292724609375,
+    "continuation_agreement": 1.0,
+    "continuation_agreements": 576,
+    "continuation_positions": 576,
+    "drift_explained_flips": 0,
+    "greedy_agreement": 1.0,
+    "greedy_agreements": 343,
+    "max_abs_logit_error": 0.04870128631591797,
+    "max_kl_divergence": 4.8275243564721385e-05,
+    "max_nll_difference": 0.001340884107333018,
+    "max_normalised_logit_drift": 0.003635352364754481,
+    "mean_kl_divergence": 3.4290503823950754e-06,
+    "min_cosine_similarity": 0.9999948019331549,
+    "prompts": 12,
+    "shortest_continuation_prefix": 48,
+    "smallest_flipped_margin": null,
+    "teacher_forced_positions": 343,
+    "unexplained_flips": 0
+  },
+  "verdict": {
+    "continuation_identical": true,
+    "continuation_prefix_met": true,
+    "greedy_agreement_met": true,
+    "kl_within_bound": true,
+    "logit_drift_within_tolerance": true,
+    "no_unexplained_greedy_flips": true,
+    "pass": true,
+    "representation_packed": true
+  },
+  "what_this_measures": "the two checkpoints hold bit-identical weights (Stage B6), so every difference below is kernel accumulation order, not quantisation error"
+}
