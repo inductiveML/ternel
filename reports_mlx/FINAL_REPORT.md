@@ -83,6 +83,10 @@ Captured programmatically before and after every measured run, into each
 - MLX 0.32.0, MLX-LM 0.31.3, Python 3.12.11, uv 0.9.18
 - Thermal state: no thermal warning and no performance warning, before **and**
   after each run
+- Process identities in the captures are redacted at capture time to system
+  software and this repository's interpreter (everything else reads
+  `[redacted third-party process]`); pids, GPU shares, and every measured
+  number are untouched
 
 ---
 
@@ -226,8 +230,25 @@ divisibility and raises rather than silently splitting a group.
 - `config.json` — text-only (`language_model_only: true`), `quantization`
   **omitted** so mlx-lm does not call `nn.quantize` over our packed modules, and
   `model_file: ternel_packed_model.py` so stock `mlx_lm.utils.load_model` loads
-  Ternel's `Model` class by itself. No fork of MLX or MLX-LM is needed to run
-  this checkpoint; `pip install ternel` and point `mlx_lm` at the directory.
+  Ternel's `Model` class by itself. The named file is **self-contained**:
+  `ternel_mlx.model_file` generates it from the package sources — `layout`,
+  `kernels`, `modules`, `packed_model` concatenated in dependency order, the
+  package-internal imports stripped and their values inlined, with the name
+  accounting failing closed — so the only packages it imports are mlx and
+  mlx-lm. No fork of MLX or MLX-LM is needed to run this checkpoint, and
+  neither is this repository; `pip install mlx-lm` and point `mlx_lm` at the
+  directory. It is not a second definition of the format free to drift from
+  the verified one: the package remains the only definition, and a test
+  regenerates the file against the shipped artifact so an edit to any kernel
+  without a re-emission fails the suite. A subprocess test loads the emitted
+  file through the exact `spec_from_file_location` call mlx-lm makes, with
+  `ternel_mlx` and `bonsai_tq1` blocked from importing, and the manifest
+  records the file's sha256 plus the sha256 of each source it was emitted
+  from. One consequence is load-bearing: mlx-lm executes the file without
+  registering it in `sys.modules`, where `@dataclass` under PEP 563 string
+  annotations crashes, so the emitted file drops
+  `from __future__ import annotations` and its sections rely on dependency
+  order for eager annotation evaluation.
 - `ternel_manifest.json` — layout name and version, and for every tensor its
   logical name on both sides, rows, columns, groups per row, tile, byte counts,
   the reorder it took, and both frozen digests (`logical_weight_sha256`,
@@ -1244,6 +1265,9 @@ uv run python -m ternel_mlx.bench_split_k --output results/mlx/a6_split_k_prefil
 uv run python -m ternel_mlx.convert --gguf <gguf> --sidecar <sidecar> \
               --baseline artifacts/baseline-mlx-2bit --out artifacts/ternel-mlx \
               --max-shard-bytes 4294967296 --activation-dtype bfloat16
+# After any later edit to layout/kernels/modules/packed_model, re-emit the
+# artifact's self-contained model_file; the drift test fails until this runs.
+uv run python -m ternel_mlx.model_file --artifact artifacts/ternel-mlx
 uv run python -m ternel_mlx.crosscheck --gguf <gguf> --baseline artifacts/baseline-mlx-2bit \
               --result results/mlx/b4_crosscheck.json --weights-per-chunk 33554432 \
               --max-recorded-rows 8 --max-weight-difference 1.1920928955078125e-07

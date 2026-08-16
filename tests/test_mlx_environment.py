@@ -10,7 +10,10 @@ replaced it, and the arithmetic it uses to decide a run is void.
 
 from __future__ import annotations
 
+import json
+import sys
 import time
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -18,13 +21,20 @@ import pytest
 from bonsai_tq1.format import FormatError
 from ternel_mlx import environment
 from ternel_mlx.environment import (
+    OWN_INTERPRETER,
+    REDACTED_PROCESS,
+    SYSTEM_COMMAND_PREFIXES,
+    SYSTEM_PROCESS_NAMES,
     GpuContentionError,
     await_quiet_gpu,
     exclusive_gpu,
     foreign_gpu_share,
     gpu_client_usage,
     measure_gpu_contention,
+    redact_process_identity,
 )
+
+RESULTS_DIR = Path(__file__).resolve().parents[1] / "results" / "mlx"
 
 
 def test_a_competitor_on_the_gpu_voids_the_measurement_it_overlapped():
@@ -33,7 +43,7 @@ def test_a_competitor_on_the_gpu_voids_the_measurement_it_overlapped():
         {999: ("competitor", 850_000_000)},
     ])
     record: list[dict[str, object]] = []
-    with pytest.raises(FormatError, match=r"pid 999 \(competitor\)"):
+    with pytest.raises(FormatError, match=r"pid 999 \(\[redacted third-party process\]\)"):
         with mock.patch.object(environment, "gpu_client_usage", lambda: next(samples)):
             with exclusive_gpu("pp32", max_foreign_share=0.05, record=record):
                 time.sleep(1.0)
@@ -133,7 +143,8 @@ def test_clients_are_ranked_so_the_busiest_is_the_one_reported():
         seconds=1.0,
         own_pids=frozenset(),
     )
-    assert [entry["command"] for entry in share["clients"]] == ["loud", "quiet"]
+    assert [entry["pid"] for entry in share["clients"]] == [2, 1]
+    assert [entry["command"] for entry in share["clients"]] == [REDACTED_PROCESS] * 2
     assert share["busiest_share"] == pytest.approx(0.9)
     assert share["total_share"] == pytest.approx(1.0)
 
@@ -223,7 +234,7 @@ def test_contention_is_a_distinct_failure_a_caller_may_answer_by_measuring_again
 
     assert isinstance(raised.value, FormatError)
     assert float(raised.value.share["total_share"]) > 0.25
-    assert raised.value.share["clients"][0]["command"] == "competitor"
+    assert raised.value.share["clients"][0]["command"] == REDACTED_PROCESS
 
 
 # The counters are nanoseconds of GPU time, so a share is a delta divided by the
@@ -285,3 +296,57 @@ def test_the_retry_wait_gives_up_rather_than_blocking_forever():
 def test_a_negative_wait_is_rejected():
     with pytest.raises(FormatError, match="cannot be negative"):
         await_quiet_gpu(max_foreign_share=0.25, timeout_seconds=-1.0, sample_seconds=0.01)
+
+
+def test_a_process_identity_survives_only_as_system_software():
+    """The redaction that keeps a published document from describing the machine
+    owner's desktop. Fail-closed: an identity survives by being recognisably
+    Apple system software or this repository's own interpreter, never by not
+    being on a blocklist."""
+    assert redact_process_identity(sys.executable) == OWN_INTERPRETER
+    kept = "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+    assert redact_process_identity(kept) == kept
+    assert redact_process_identity("/usr/libexec/trustd") == "/usr/libexec/trustd"
+    assert redact_process_identity("WindowServer") == "WindowServer"
+    assert redact_process_identity("SomeChatApp") == REDACTED_PROCESS
+    application = "/Applications/SomeChatApp.app/Contents/MacOS/SomeChatApp"
+    assert redact_process_identity(application) == REDACTED_PROCESS
+    assert redact_process_identity("/Users/someone/bin/tool") == REDACTED_PROCESS
+
+
+def test_the_published_results_never_name_a_third_party_process():
+    """The repository is public and the results ship with it, so this is pinned
+    by a test rather than by a one-time scrub: every process identity in every
+    tracked result must have passed :func:`redact_process_identity`, and no
+    home-directory path may appear anywhere in the documents."""
+    documents = sorted(RESULTS_DIR.glob("*.json"))
+    assert documents, f"no results to audit under {RESULTS_DIR}"
+    for path in documents:
+        text = path.read_text(encoding="utf-8")
+        assert "/Users/" not in text, f"{path.name} carries a home-directory path"
+        for line in text.splitlines():
+            if "sleep prevented by" in line:
+                assert "sleep prevented by [redacted]" in line, (
+                    f"{path.name} names a sleep-assertion holder: {line.strip()!r}"
+                )
+        commands: list[str] = []
+
+        def collect(node: object) -> None:
+            if isinstance(node, dict):
+                command = node.get("command")
+                if isinstance(command, str) and isinstance(node.get("pid"), int):
+                    commands.append(command)
+                for value in node.values():
+                    collect(value)
+            elif isinstance(node, list):
+                for value in node:
+                    collect(value)
+
+        collect(json.loads(text))
+        for command in commands:
+            allowed = (
+                command in (OWN_INTERPRETER, REDACTED_PROCESS)
+                or command in SYSTEM_PROCESS_NAMES
+                or command.startswith(SYSTEM_COMMAND_PREFIXES)
+            )
+            assert allowed, f"{path.name} names a process: {command!r}"

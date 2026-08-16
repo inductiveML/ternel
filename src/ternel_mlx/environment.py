@@ -21,6 +21,13 @@ because a competitor can be CPU-bound in a way that still perturbs a benchmark,
 but it is no longer the only thing standing between a contended run and a
 published number. That gap cost a full 39-minute benchmark: a second MLX process
 took 85% of the device and the result read as a 7x throughput collapse.
+
+What the probes may *name* is a separate question from what they measure. A
+process list is a look at the machine owner's desktop, so every identity passes
+through :func:`redact_process_identity` before it enters a document and only
+system software survives; pids and shares stay, application names do not. The
+same line is drawn at display hardware in :func:`_gpu` and at pmset's
+sleep-assertion holders in :func:`_power`.
 """
 
 from __future__ import annotations
@@ -30,6 +37,7 @@ import json
 import os
 import platform
 import plistlib
+import re
 import sys
 import time
 from collections.abc import Iterator
@@ -62,6 +70,77 @@ BUSIEST_PROCESS_COUNT = 8
 
 # The IO registry class every Metal client is registered under on Apple silicon.
 GPU_CLIENT_CLASS = "AGXDeviceUserClient"
+
+# What a published document may say about a process. Identities that are system
+# software on every Mac say nothing about this machine's owner and stay, because
+# some of them matter to the methodology -- WindowServer holding the GPU is why
+# timed runs wait for the display to sleep. Anything else -- an application
+# name, a path under a home directory -- is what the owner had open, which is
+# not the report's to publish. It is replaced at capture, so no document this
+# module emits can carry it; the pid and every measured number stay, because
+# they are the evidence and the name was only ever colour.
+REDACTED_PROCESS = "[redacted third-party process]"
+
+# This repository's own interpreter, named without the absolute path it runs
+# from. That the busiest process was the benchmark itself is evidence worth
+# keeping legible; the home directory in front of it is not.
+OWN_INTERPRETER = ".venv/bin/python3 (this repository)"
+
+# ``ps`` reports executables by full path; these prefixes are Apple's.
+SYSTEM_COMMAND_PREFIXES = ("/System/", "/usr/", "/bin/", "/sbin/", "/Library/Apple/")
+
+# ``ioreg`` and ``pmset`` report short names. Only names that are macOS system
+# software may pass; a name not on the list is redacted, never the reverse.
+SYSTEM_PROCESS_NAMES = frozenset({
+    "WindowServer",
+    "SkyLight",
+    "loginwindow",
+    "launchd",
+    "kernel_task",
+    "powerd",
+    "runningboardd",
+    "Spotlight",
+    "logd",
+    "coreaudiod",
+    "mds",
+    "mds_stores",
+    "bluetoothd",
+})
+
+# pmset appends the processes holding sleep assertions to the settings it
+# reports, e.g. ``sleep 1 (sleep prevented by runningboardd, SomeApp)``.
+SLEEP_ASSERTION_HOLDERS = re.compile(r"\((display )?sleep prevented by [^)]*\)")
+
+
+def redact_process_identity(identity: str) -> str:
+    """The identity a published document may carry for a process.
+
+    Fail-closed in the redacting direction: everything passes through here
+    before entering a document, and an identity survives only by being
+    recognisably system software or this repository's own interpreter.
+    """
+    if identity == sys.executable:
+        return OWN_INTERPRETER
+    if identity.startswith(SYSTEM_COMMAND_PREFIXES):
+        return identity
+    if identity in SYSTEM_PROCESS_NAMES:
+        return identity
+    return REDACTED_PROCESS
+
+
+def _power() -> dict[str, object]:
+    """``pmset -g`` with the sleep-assertion holders redacted.
+
+    The settings are what a reader needs -- a low-power run is not comparable
+    to a nominal one -- but the assertion holders are application names.
+    """
+    probe = run_command(["pmset", "-g"])
+    stdout = probe.get("stdout")
+    if isinstance(stdout, str):
+        probe["stdout"] = SLEEP_ASSERTION_HOLDERS.sub(
+            lambda match: f"({match.group(1) or ''}sleep prevented by [redacted])", stdout
+        )
+    return probe
 
 # Long enough that a competitor between kernel launches is still caught, short
 # enough that capturing the environment stays a quick operation.
@@ -113,7 +192,7 @@ def _busiest_processes() -> dict[str, object]:
             "pid": int(fields[0]),
             "cpu_percent": float(fields[1]),
             "rss_kib": int(fields[2]),
-            "command": fields[3],
+            "command": redact_process_identity(fields[3]),
         })
     return {"returncode": probe["returncode"], "processes": processes}
 
@@ -187,7 +266,11 @@ def foreign_gpu_share(
             continue
         share = (nanoseconds - earlier[1]) / (seconds * 1e9)
         if share > 0:
-            ranked.append({"pid": pid, "command": name, "gpu_share": share})
+            ranked.append({
+                "pid": pid,
+                "command": redact_process_identity(name),
+                "gpu_share": share,
+            })
     ranked.sort(key=lambda entry: float(entry["gpu_share"]), reverse=True)
     return {
         "seconds": seconds,
@@ -346,7 +429,7 @@ def capture_environment() -> dict[str, object]:
         "sw_vers": run_command(["sw_vers"]),
         "sysctl": _sysctl(),
         "gpu": _gpu(),
-        "power": run_command(["pmset", "-g"]),
+        "power": _power(),
         "thermal": run_command(["pmset", "-g", "therm"]),
         "metal_compiler": run_command(["xcrun", "-sdk", "macosx", "metal", "--version"]),
         "xcode": run_command(["xcodebuild", "-version"]),
