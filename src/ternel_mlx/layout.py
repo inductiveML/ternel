@@ -145,3 +145,54 @@ class PackedTensorLayout:
             "payload_bytes": self.payload_bytes,
             "bits_per_weight": self.bits_per_weight,
         }
+
+
+@dataclass(frozen=True)
+class ModelLinearShape:
+    """One distinct linear weight shape, and how much of a token it accounts for.
+
+    ``dispatches_per_token`` is what makes this a census rather than a list: a
+    shape's cost to a user is its own cost times how often a decoded token
+    issues it, and the two vary independently. ``mlp.gate_proj`` is dispatched
+    128 times a token; ``lm_head``, which is 14 times the weights, once.
+    """
+
+    label: str
+    rows: int
+    columns: int
+    dispatches_per_token: int
+    modules: tuple[str, ...]
+
+    def layout(self) -> "PackedTensorLayout":
+        return PackedTensorLayout.for_tensor(self.rows, self.columns)
+
+
+# Every distinct linear shape in Ternary Bonsai 27B, verified against the
+# artifact manifest's 498 quantised tensors. Shapes that repeat under more than
+# one module name are folded onto one entry, ``modules`` naming all of them --
+# ``self_attn.o_proj`` is 5120x6144, the same shape as ``linear_attn.out_proj``,
+# and measuring it twice under two names measures nothing new.
+#
+# The counts are what 48 linear-attention layers of eight matmuls, 16
+# full-attention layers of seven, and one output head come to. ``embed_tokens``
+# is not here: it shares ``lm_head``'s shape but is gathered, never multiplied.
+MODEL_LINEAR_SHAPES: tuple[ModelLinearShape, ...] = (
+    ModelLinearShape("linear_attn.in_proj_a", 48, 5120, 96,
+                     ("linear_attn.in_proj_a", "linear_attn.in_proj_b")),
+    ModelLinearShape("self_attn.k_proj", 1024, 5120, 32,
+                     ("self_attn.k_proj", "self_attn.v_proj")),
+    ModelLinearShape("linear_attn.out_proj", 5120, 6144, 64,
+                     ("linear_attn.out_proj", "self_attn.o_proj")),
+    ModelLinearShape("mlp.down_proj", 5120, 17408, 64, ("mlp.down_proj",)),
+    ModelLinearShape("linear_attn.in_proj_z", 6144, 5120, 48, ("linear_attn.in_proj_z",)),
+    ModelLinearShape("linear_attn.in_proj_qkv", 10240, 5120, 48, ("linear_attn.in_proj_qkv",)),
+    ModelLinearShape("self_attn.q_proj", 12288, 5120, 16, ("self_attn.q_proj",)),
+    ModelLinearShape("mlp.gate_proj", 17408, 5120, 128, ("mlp.gate_proj", "mlp.up_proj")),
+    ModelLinearShape("lm_head", 248320, 5120, 1, ("lm_head",)),
+)
+
+# Matmuls a decoded token issues, which is what the counts above must sum to.
+DISPATCHES_PER_TOKEN = 497
+
+if sum(shape.dispatches_per_token for shape in MODEL_LINEAR_SHAPES) != DISPATCHES_PER_TOKEN:
+    raise FormatError("the shape census no longer accounts for a whole decoded token")

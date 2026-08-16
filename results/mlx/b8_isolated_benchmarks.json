@@ -13,56 +13,56 @@
       "processes": [
         {
           "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
-          "cpu_percent": 10.6,
+          "cpu_percent": 9.0,
           "pid": 592,
-          "rss_kib": 220096
+          "rss_kib": 235472
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 5.8,
-          "pid": 62948,
-          "rss_kib": 40176
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 5.7,
-          "pid": 1310,
-          "rss_kib": 248416
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 5.3,
+          "cpu_percent": 4.4,
           "pid": 1197,
-          "rss_kib": 179344
+          "rss_kib": 187552
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 3.5,
-          "pid": 6271,
-          "rss_kib": 466304
+          "cpu_percent": 2.6,
+          "pid": 629,
+          "rss_kib": 354336
+        },
+        {
+          "command": "/usr/libexec/trustd",
+          "cpu_percent": 1.9,
+          "pid": 956,
+          "rss_kib": 13568
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 3.0,
-          "pid": 62949,
-          "rss_kib": 38944
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 2.9,
-          "pid": 85044,
-          "rss_kib": 149712
+          "cpu_percent": 1.5,
+          "pid": 6221,
+          "rss_kib": 896496
         },
         {
           "command": ".venv/bin/python3 (this repository)",
-          "cpu_percent": 2.2,
-          "pid": 55145,
-          "rss_kib": 101120
+          "cpu_percent": 1.3,
+          "pid": 32605,
+          "rss_kib": 55648
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 164,
+          "rss_kib": 349056
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 165,
+          "rss_kib": 345280
         }
       ],
       "returncode": 0
     },
-    "captured_at_utc": "2026-08-11T15:46:54.331408+00:00",
+    "captured_at_utc": "2026-08-15T13:03:12.750291+00:00",
     "gpu": {
       "adapters": [
         {
@@ -80,7 +80,8 @@
     "gpu_contention": {
       "busiest_share": 0.0,
       "clients": [],
-      "seconds": 3.0076690423302352
+      "seconds": 3.036041562911123,
+      "total_share": 0
     },
     "metal_compiler": {
       "command": [
@@ -138,7 +139,7 @@
       "hw.perflevel0.logicalcpu": "12",
       "hw.perflevel1.logicalcpu": "4",
       "machdep.cpu.brand_string": "Apple M4 Max",
-      "vm.loadavg": "{ 1.68 1.61 1.71 }"
+      "vm.loadavg": "{ 1.20 2.51 2.51 }"
     },
     "thermal": {
       "command": [
@@ -173,57 +174,57 @@
     "busiest_processes": {
       "processes": [
         {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 20.5,
-          "pid": 33607,
-          "rss_kib": 687440
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 9.0,
+          "pid": 592,
+          "rss_kib": 270480
         },
         {
-          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
-          "cpu_percent": 13.4,
-          "pid": 592,
-          "rss_kib": 235008
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.7,
+          "pid": 1197,
+          "rss_kib": 218928
         },
         {
           "command": ".venv/bin/python3 (this repository)",
-          "cpu_percent": 11.4,
-          "pid": 55145,
-          "rss_kib": 90704
+          "cpu_percent": 2.1,
+          "pid": 32605,
+          "rss_kib": 90912
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 9.3,
-          "pid": 1310,
-          "rss_kib": 240608
+          "cpu_percent": 1.3,
+          "pid": 164,
+          "rss_kib": 369312
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 6.0,
-          "pid": 1197,
-          "rss_kib": 187424
+          "cpu_percent": 1.1,
+          "pid": 165,
+          "rss_kib": 363056
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 2.9,
-          "pid": 85044,
-          "rss_kib": 153744
+          "cpu_percent": 1.1,
+          "pid": 166,
+          "rss_kib": 349968
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 2.2,
-          "pid": 85045,
-          "rss_kib": 110656
+          "cpu_percent": 0.5,
+          "pid": 637,
+          "rss_kib": 535280
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 2.2,
-          "pid": 85018,
-          "rss_kib": 882048
+          "cpu_percent": 0.5,
+          "pid": 96076,
+          "rss_kib": 460656
         }
       ],
       "returncode": 0
     },
-    "captured_at_utc": "2026-08-11T15:17:20.555763+00:00",
+    "captured_at_utc": "2026-08-15T12:26:43.094615+00:00",
     "gpu": {
       "adapters": [
         {
@@ -239,15 +240,10 @@
       "returncode": 0
     },
     "gpu_contention": {
-      "busiest_share": 0.09238745585008161,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.09238745585008161,
-          "pid": 1310
-        }
-      ],
-      "seconds": 3.009910332970321
+      "busiest_share": 0.0,
+      "clients": [],
+      "seconds": 3.0461563956923783,
+      "total_share": 0
     },
     "metal_compiler": {
       "command": [
@@ -305,7 +301,7 @@
       "hw.perflevel0.logicalcpu": "12",
       "hw.perflevel1.logicalcpu": "4",
       "machdep.cpu.brand_string": "Apple M4 Max",
-      "vm.loadavg": "{ 3.30 3.25 2.82 }"
+      "vm.loadavg": "{ 2.08 1.78 1.81 }"
     },
     "thermal": {
       "command": [
@@ -338,504 +334,798 @@
   },
   "gpu_contention": [
     {
-      "busiest_share": 0.06691398020640199,
+      "busiest_share": 0.013278760487000128,
       "clients": [
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.06691398020640199,
-          "pid": 1310
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.002918007353711302,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.00030531299310113927,
-          "pid": 595
-        }
-      ],
-      "label": "round 1 candidate",
-      "seconds": 139.38087458303198
-    },
-    {
-      "busiest_share": 0.006233363517936679,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.006233363517936679,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0006935282137807505,
+          "gpu_share": 0.013278760487000128,
           "pid": 1310
         },
         {
           "command": "loginwindow",
-          "gpu_share": 0.0006749879479156934,
+          "gpu_share": 0.0006783517846408493,
           "pid": 595
-        }
-      ],
-      "label": "round 1 reference",
-      "seconds": 144.52554345782846
-    },
-    {
-      "busiest_share": 0.0012794445335592608,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0012794445335592608,
-          "pid": 85044
         },
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.0004105077289486941,
-          "pid": 1310
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.000383315078551488,
-          "pid": 595
-        }
-      ],
-      "label": "round 2 reference",
-      "seconds": 126.34851512499154
-    },
-    {
-      "busiest_share": 0.0023556863222106415,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0023556863222106415,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.001416530256646448,
-          "pid": 1310
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0004504815100413882,
-          "pid": 595
-        }
-      ],
-      "label": "round 2 candidate",
-      "seconds": 164.50416354089975
-    },
-    {
-      "busiest_share": 0.0011808781132008953,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0011808781132008953,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0009578343841863397,
-          "pid": 1310
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0004374395433230436,
-          "pid": 595
+          "gpu_share": 9.511889429830054e-05,
+          "pid": 6322
         },
         {
           "command": "Spotlight",
-          "gpu_share": 0.00028716787910285877,
+          "gpu_share": 6.99113804724709e-05,
           "pid": 9895
         }
       ],
-      "label": "round 3 candidate",
-      "seconds": 168.2341985842213
+      "label": "round 1 attempt 1 candidate",
+      "seconds": 111.60200166655704,
+      "timed_seconds": 111.5810837498866,
+      "total_share": 0.014122142546411748
     },
     {
-      "busiest_share": 0.004282281798844778,
+      "busiest_share": 0.02300329908713738,
       "clients": [
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.004282281798844778,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0011674047011235027,
-          "pid": 595
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.00022095795978040243,
-          "pid": 1310
-        }
-      ],
-      "label": "round 3 reference",
-      "seconds": 130.17540091602132
-    },
-    {
-      "busiest_share": 0.0016092722629149207,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0016092722629149207,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0006657042416992421,
-          "pid": 595
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.000575899882100408,
-          "pid": 1310
-        }
-      ],
-      "label": "round 4 reference",
-      "seconds": 127.86915970779955
-    },
-    {
-      "busiest_share": 0.004246555162402476,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.004246555162402476,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0004808143650665196,
+          "gpu_share": 0.02300329908713738,
           "pid": 1310
         },
         {
           "command": "loginwindow",
-          "gpu_share": 0.0003977948988014691,
-          "pid": 595
-        }
-      ],
-      "label": "round 4 candidate",
-      "seconds": 167.97967545920983
-    },
-    {
-      "busiest_share": 0.0016240915405802277,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0016240915405802277,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0008919958966647109,
+          "gpu_share": 0.001078657303334213,
           "pid": 595
         },
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.00034236924613894774,
-          "pid": 1310
+          "gpu_share": 7.618028984929678e-05,
+          "pid": 6322
         }
       ],
-      "label": "round 5 candidate",
-      "seconds": 169.69276491738856
+      "label": "round 1 attempt 1 reference",
+      "seconds": 104.63062054198235,
+      "timed_seconds": 104.61219508387148,
+      "total_share": 0.024158136680320887
     },
     {
-      "busiest_share": 0.0013195631432146194,
+      "busiest_share": 0.0466173904778834,
       "clients": [
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.0013195631432146194,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0009538416839243778,
-          "pid": 595
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.00010960367337636303,
-          "pid": 1310
-        }
-      ],
-      "label": "round 5 reference",
-      "seconds": 132.10018929094076
-    },
-    {
-      "busiest_share": 0.0013942487933611462,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0013942487933611462,
-          "pid": 85044
-        },
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.0010463231951373226,
-          "pid": 595
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0002959731975230464,
-          "pid": 1310
-        }
-      ],
-      "label": "round 6 reference",
-      "seconds": 129.20159433363006
-    },
-    {
-      "busiest_share": 0.0013320865046621902,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0013320865046621902,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0007082307508262084,
+          "gpu_share": 0.0466173904778834,
           "pid": 1310
         },
         {
           "command": "loginwindow",
-          "gpu_share": 0.00041403148245987883,
+          "gpu_share": 0.0009532932025027121,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.270246155045867e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "round 2 attempt 1 reference",
+      "seconds": 136.68390025012195,
+      "timed_seconds": 136.66654108278453,
+      "total_share": 0.04763338614193657
+    },
+    {
+      "busiest_share": 0.07634841358236538,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.07634841358236538,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0007919282336740744,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 7.752404403164218e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "round 2 attempt 1 candidate",
+      "seconds": 155.00084070814773,
+      "timed_seconds": 154.98337225010619,
+      "total_share": 0.0772178658600711
+    },
+    {
+      "busiest_share": 0.0010254925034364792,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0010254925034364792,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0006918235330398696,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00010794043377955229,
+          "pid": 6322
+        }
+      ],
+      "label": "round 3 attempt 1 candidate",
+      "seconds": 150.695762750227,
+      "timed_seconds": 150.6771449171938,
+      "total_share": 0.001825256470255901
+    },
+    {
+      "busiest_share": 0.0005871441540260135,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0005871441540260135,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0003992852241165591,
+          "pid": 1310
+        }
+      ],
+      "label": "round 3 attempt 1 reference",
+      "seconds": 133.43834127066657,
+      "timed_seconds": 133.4206049577333,
+      "total_share": 0.0009864293781425726
+    },
+    {
+      "busiest_share": 0.0011800093201852627,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0011800093201852627,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0003031540772008236,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 9.095475299774139e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "round 4 attempt 1 reference",
+      "seconds": 128.9473569379188,
+      "timed_seconds": 128.93034779187292,
+      "total_share": 0.0015741181503838278
+    },
+    {
+      "busiest_share": 0.0007046123525757925,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0007046123525757925,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0005575310173371673,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 5.174365822124874e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "round 4 attempt 1 candidate",
+      "seconds": 151.63775175018236,
+      "timed_seconds": 151.62031654221937,
+      "total_share": 0.0013138870281342086
+    },
+    {
+      "busiest_share": 0.10534441095516013,
+      "clients": [
+        {
+          "command": "WindowServer",
+          "gpu_share": 0.10534441095516013,
+          "pid": 592
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.010644463571817081,
+          "pid": 96198
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0008686594799597194,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0006649913207251976,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0002380994371166009,
+          "pid": 6322
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.967861775815684e-05,
+          "pid": 160
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 2.9842118518252097e-05,
+          "pid": 1811
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 2.0446433924583718e-05,
+          "pid": 1468
+        }
+      ],
+      "label": "round 5 attempt 1 candidate",
+      "seconds": 165.4261575625278,
+      "timed_seconds": 165.40812241612002,
+      "total_share": 0.11788059193497973
+    },
+    {
+      "busiest_share": 0.0004199613432648262,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0004199613432648262,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00029159014869494063,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 1.8498111499012563e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "round 5 attempt 1 reference",
+      "seconds": 132.4774693963118,
+      "timed_seconds": 132.45975666679442,
+      "total_share": 0.0007300496034587793
+    },
+    {
+      "busiest_share": 0.19647531337520743,
+      "clients": [
+        {
+          "command": "WindowServer",
+          "gpu_share": 0.19647531337520743,
+          "pid": 592
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.018426525537101848,
+          "pid": 6322
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.017782591311523894,
+          "pid": 96198
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0005138865714586227,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00017506325739232473,
+          "pid": 6338
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0001673713930147154,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.703242137807484e-05,
+          "pid": 160
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 2.6939709259950268e-05,
+          "pid": 1468
+        }
+      ],
+      "label": "round 6 attempt 1 reference",
+      "seconds": 145.37554812524468,
+      "timed_seconds": 145.35667637502775,
+      "total_share": 0.23365834486646636
+    },
+    {
+      "busiest_share": 0.45361206739303367,
+      "clients": [
+        {
+          "command": "WindowServer",
+          "gpu_share": 0.45361206739303367,
+          "pid": 592
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.10796552668840366,
+          "pid": 96198
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.03943590276950686,
+          "pid": 6322
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0006652973588561717,
+          "pid": 1811
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0004768760879907621,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00022527573623152893,
+          "pid": 6221
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00013935384118682939,
+          "pid": 6338
+        }
+      ],
+      "label": "round 6 attempt 1 candidate",
+      "seconds": 220.54768450045958,
+      "timed_seconds": 220.52710454212502,
+      "total_share": 0.6025202998752095
+    },
+    {
+      "busiest_share": 0.3044471908653056,
+      "clients": [
+        {
+          "command": "WindowServer",
+          "gpu_share": 0.3044471908653056,
+          "pid": 592
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.07667654876113329,
+          "pid": 96198
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.02373904944239576,
+          "pid": 6322
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0004841595729487628,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00019059906889921837,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 3.946968243823191e-05,
+          "pid": 6338
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 2.2860411680454834e-05,
+          "pid": 1468
+        }
+      ],
+      "label": "round 6 attempt 2 reference",
+      "seconds": 158.14457108359784,
+      "timed_seconds": 158.12286912510172,
+      "total_share": 0.4055998778048013
+    },
+    {
+      "busiest_share": 0.0004439820395387808,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0004439820395387808,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0004106079065201147,
           "pid": 595
         }
       ],
-      "label": "round 6 candidate",
-      "seconds": 169.12049195868894
+      "label": "round 6 attempt 3 reference",
+      "seconds": 130.88855364592746,
+      "timed_seconds": 130.8683026251383,
+      "total_share": 0.0008545899460588955
+    },
+    {
+      "busiest_share": 0.0008364095068678324,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0008364095068678324,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00030730837101394527,
+          "pid": 1310
+        }
+      ],
+      "label": "round 6 attempt 3 candidate",
+      "seconds": 155.0238441042602,
+      "timed_seconds": 155.00580512499437,
+      "total_share": 0.0011437178778817777
     }
   ],
   "layout_name": "TQ1_G128_MLX_TILED",
   "layout_version": 1,
   "max_foreign_gpu_share": 0.25,
   "measured": "one model per process, arms alternating by round",
+  "round_attempts": 8,
+  "round_retry_wait_seconds": 1800.0,
   "rounds": 6,
   "samples_per_arm": 30,
   "schema_version": 1,
   "seed": 20260811,
   "solo_warmup_rounds": 1,
   "trials_per_round": 5,
+  "voided_rounds": [
+    {
+      "attempt": 1,
+      "reason": "round 6 attempt 1 candidate was timed while other processes used 60.3% of the GPU, over the 25.0% this run allows; the busiest was pid 592 (WindowServer) at 45.4%; the measurement is void",
+      "round": 6,
+      "share": {
+        "busiest_share": 0.45361206739303367,
+        "clients": [
+          {
+            "command": "WindowServer",
+            "gpu_share": 0.45361206739303367,
+            "pid": 592
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.10796552668840366,
+            "pid": 96198
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.03943590276950686,
+            "pid": 6322
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.0006652973588561717,
+            "pid": 1811
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.0004768760879907621,
+            "pid": 1310
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.00022527573623152893,
+            "pid": 6221
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.00013935384118682939,
+            "pid": 6338
+          }
+        ],
+        "seconds": 220.54768450045958,
+        "total_share": 0.6025202998752095
+      },
+      "waited_for": {
+        "busiest_share": 0.09937219936262129,
+        "clients": [
+          {
+            "command": "WindowServer",
+            "gpu_share": 0.09937219936262129,
+            "pid": 592
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.08091246386972871,
+            "pid": 96198
+          }
+        ],
+        "seconds": 2.039926249999553,
+        "settled": true,
+        "total_share": 0.18028466323234998
+      }
+    },
+    {
+      "attempt": 2,
+      "reason": "round 6 attempt 2 reference was timed while other processes used 40.6% of the GPU, over the 25.0% this run allows; the busiest was pid 592 (WindowServer) at 30.4%; the measurement is void",
+      "round": 6,
+      "share": {
+        "busiest_share": 0.3044471908653056,
+        "clients": [
+          {
+            "command": "WindowServer",
+            "gpu_share": 0.3044471908653056,
+            "pid": 592
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.07667654876113329,
+            "pid": 96198
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.02373904944239576,
+            "pid": 6322
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 0.0004841595729487628,
+            "pid": 1310
+          },
+          {
+            "command": "loginwindow",
+            "gpu_share": 0.00019059906889921837,
+            "pid": 595
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 3.946968243823191e-05,
+            "pid": 6338
+          },
+          {
+            "command": "[redacted third-party process]",
+            "gpu_share": 2.2860411680454834e-05,
+            "pid": 1468
+          }
+        ],
+        "seconds": 158.14457108359784,
+        "total_share": 0.4055998778048013
+      },
+      "waited_for": {
+        "busiest_share": 0.0,
+        "clients": [],
+        "seconds": 2.0297356247901917,
+        "settled": true,
+        "total_share": 0
+      }
+    }
+  ],
   "workloads": [
     {
       "affine_2bit_rates": {
-        "decode_seconds": 2.259404791519046,
-        "generated_tokens_per_second": 27.88344976361839,
-        "prompt_tokens_per_second": 91.4952050102815,
-        "time_to_first_token_seconds": 0.3497451040893793
+        "decode_seconds": 2.214202541857958,
+        "generated_tokens_per_second": 28.452681635500298,
+        "prompt_tokens_per_second": 95.27143550715039,
+        "time_to_first_token_seconds": 0.3358824166934937
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 2.2973084304947404,
-          "median": 2.259404791519046,
-          "p5": 2.128989543369971,
-          "p95": 2.561628429335542,
-          "std": 0.13606449935882073
+          "mean": 2.163232127763331,
+          "median": 2.214202541857958,
+          "p5": 1.3486097330693156,
+          "p95": 2.6067118186503646,
+          "std": 0.3876097717478946
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.3420629880510713,
-            1.4153841333378907
+            0.9967031489325301,
+            1.0631577451356586
           ],
-          "median": 1.3857097184224663,
+          "median": 1.0390116614605036,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.131056130677462,
-          "median": 3.1308303750120103,
-          "p5": 2.994022235670127,
-          "p95": 3.293083085748367,
-          "std": 0.09962544986876584
+          "mean": 2.258695318115254,
+          "median": 2.3047397292684764,
+          "p5": 1.7795833833515644,
+          "p95": 2.4896944208070635,
+          "std": 0.23663327318130584
         },
-        "speedup_vs_affine_2bit": 0.7216631119820339
+        "speedup_vs_affine_2bit": 0.9607169580752378
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp32_tg64",
       "packed_rates": {
-        "decode_seconds": 3.1308303750120103,
-        "generated_tokens_per_second": 20.122457129207557,
-        "prompt_tokens_per_second": 73.2709137902322,
-        "time_to_first_token_seconds": 0.43673537485301495
+        "decode_seconds": 2.3047397292684764,
+        "generated_tokens_per_second": 27.33497374994103,
+        "prompt_tokens_per_second": 60.948419363479076,
+        "time_to_first_token_seconds": 0.5250341244973242
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 0.35077559182730816,
-          "median": 0.3497451040893793,
-          "p5": 0.307282596337609,
-          "p95": 0.4165433518821373,
-          "std": 0.03184317689775813
+          "mean": 0.32821604303705193,
+          "median": 0.3358824166934937,
+          "p5": 0.2070384708000347,
+          "p95": 0.42066989985760295,
+          "std": 0.06386876368402072
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.2128209882529175,
-            1.3073690207919462
+            1.5056257409073577,
+            1.6003994640859787
           ],
-          "median": 1.2518546029051605,
+          "median": 1.5572915924451467,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 0.42922638325641554,
-          "median": 0.43673537485301495,
-          "p5": 0.37389787298161536,
-          "p95": 0.45714874169789255,
-          "std": 0.02802973357817211
+          "mean": 0.5250583540493001,
+          "median": 0.5250341244973242,
+          "p5": 0.31663636439479886,
+          "p95": 0.5776338164927438,
+          "std": 0.1868668143500443
         },
-        "speedup_vs_affine_2bit": 0.8008169803215218
+        "speedup_vs_affine_2bit": 0.6397344496704338
       },
       "prompt_tokens": 32,
       "samples": 30
     },
     {
       "affine_2bit_rates": {
-        "decode_seconds": 1.8381833748426288,
-        "generated_tokens_per_second": 34.27296800864254,
-        "prompt_tokens_per_second": 152.28128592589556,
-        "time_to_first_token_seconds": 3.362199083669111
+        "decode_seconds": 1.8448568328749388,
+        "generated_tokens_per_second": 34.14899133491228,
+        "prompt_tokens_per_second": 150.27512987012506,
+        "time_to_first_token_seconds": 3.4070840626955032
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 1.930659838890036,
-          "median": 1.8381833748426288,
-          "p5": 1.7568976084934547,
-          "p95": 2.4339001144748176,
-          "std": 0.2132372790947228
+          "mean": 1.8094559653041264,
+          "median": 1.8448568328749388,
+          "p5": 1.3970272600883618,
+          "p95": 2.053188060852699,
+          "std": 0.20836092210390178
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.5627173972675812,
-            1.6062901080726641
+            1.0511790757662567,
+            1.089658403655923
           ],
-          "median": 1.5965853480498813,
+          "median": 1.0661113795231212,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 2.945695509715006,
-          "median": 2.935530041810125,
-          "p5": 2.9091169062070548,
-          "p95": 3.0157202878035605,
-          "std": 0.03339166012278445
+          "mean": 1.9670261528653403,
+          "median": 1.966063416795805,
+          "p5": 1.7994603128172457,
+          "p95": 2.0478616752894596,
+          "std": 0.12122221802735592
         },
-        "speedup_vs_affine_2bit": 0.6261844875241531
+        "speedup_vs_affine_2bit": 0.9383506234410267
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp512_tg64",
       "packed_rates": {
-        "decode_seconds": 2.935530041810125,
-        "generated_tokens_per_second": 21.461200908423525,
-        "prompt_tokens_per_second": 137.25810492952832,
-        "time_to_first_token_seconds": 3.730198666686192
+        "decode_seconds": 1.966063416795805,
+        "generated_tokens_per_second": 32.043727308997155,
+        "prompt_tokens_per_second": 131.2802089984806,
+        "time_to_first_token_seconds": 3.9000547295436263
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 3.4222259528158854,
-          "median": 3.362199083669111,
-          "p5": 3.200542678567581,
-          "p95": 3.875180479488335,
-          "std": 0.21998222610340265
+          "mean": 3.2767180778086185,
+          "median": 3.4070840626955032,
+          "p5": 2.376397162512876,
+          "p95": 3.758841522596776,
+          "std": 0.409218796694345
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.0678854163602194,
-            1.133075774299397
+            1.1122218201269358,
+            1.1703608749551488
           ],
-          "median": 1.1078441262316256,
+          "median": 1.1411912652056095,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.5418219722652187,
-          "median": 3.730198666686192,
-          "p5": 2.671522177592851,
-          "p95": 3.834348698053509,
-          "std": 0.39822928810978747
+          "mean": 3.790841918019578,
+          "median": 3.9000547295436263,
+          "p5": 2.486133489641361,
+          "p95": 4.835465667000971,
+          "std": 0.6749747405917071
         },
-        "speedup_vs_affine_2bit": 0.9013458488676149
+        "speedup_vs_affine_2bit": 0.8735990387227697
       },
       "prompt_tokens": 512,
       "samples": 30
     },
     {
       "affine_2bit_rates": {
-        "decode_seconds": 1.8502788541372865,
-        "generated_tokens_per_second": 34.048921793128564,
-        "prompt_tokens_per_second": 175.51767067148444,
-        "time_to_first_token_seconds": 11.668340812437236
+        "decode_seconds": 1.8419745415449142,
+        "generated_tokens_per_second": 34.20242711235313,
+        "prompt_tokens_per_second": 173.03838118708873,
+        "time_to_first_token_seconds": 11.835524500114843
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 1.8785324070292215,
-          "median": 1.8502788541372865,
-          "p5": 1.7736069998238235,
-          "p95": 2.113853993592784,
-          "std": 0.1095599755222186
+          "mean": 1.8345332445887228,
+          "median": 1.8419745415449142,
+          "p5": 1.6029053249396383,
+          "p95": 2.0075040814466774,
+          "std": 0.14155224438022362
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.6270072698227505,
-            1.6713315436432408
+            1.1034329778957586,
+            1.1470745239837998
           ],
-          "median": 1.648195766791109,
+          "median": 1.1272858707525482,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.0452525056277713,
-          "median": 3.0530794167425483,
-          "p5": 2.915988368354738,
-          "p95": 3.1178290398558604,
-          "std": 0.05565289200513484
+          "mean": 2.060978243096421,
+          "median": 2.076547729084268,
+          "p5": 1.8425838605733589,
+          "p95": 2.214556875219569,
+          "std": 0.11507653971033706
         },
-        "speedup_vs_affine_2bit": 0.6060369225873012
+        "speedup_vs_affine_2bit": 0.8870369391206828
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp2048_tg64",
       "packed_rates": {
-        "decode_seconds": 3.0530794167425483,
-        "generated_tokens_per_second": 20.634903780923327,
-        "prompt_tokens_per_second": 141.67914772342837,
-        "time_to_first_token_seconds": 14.45519706257619
+        "decode_seconds": 2.076547729084268,
+        "generated_tokens_per_second": 30.338816256239976,
+        "prompt_tokens_per_second": 141.5375641507593,
+        "time_to_first_token_seconds": 14.469656958477572
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 11.796168230536084,
-          "median": 11.668340812437236,
-          "p5": 11.184719676687383,
-          "p95": 13.03783063981682,
-          "std": 0.5381073644138061
+          "mean": 11.672198224952444,
+          "median": 11.835524500114843,
+          "p5": 9.85305751520209,
+          "p95": 12.645749239833094,
+          "std": 0.7822876317747921
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.2191891420922967,
-            1.2527370821164479
+            1.197243081332501,
+            1.2421484258724398
           ],
-          "median": 1.2388066635455899,
+          "median": 1.222757876897105,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 13.929183697188273,
-          "median": 14.45519706257619,
-          "p5": 10.787771373055875,
-          "p95": 14.648549079243093,
-          "std": 1.2464986454851497
+          "mean": 13.95192615557462,
+          "median": 14.469656958477572,
+          "p5": 10.334953435673379,
+          "p95": 15.335620733816175,
+          "std": 1.7640801964139659
         },
-        "speedup_vs_affine_2bit": 0.8072073152600603
+        "speedup_vs_affine_2bit": 0.8179547403285586
       },
       "prompt_tokens": 2048,
       "samples": 30

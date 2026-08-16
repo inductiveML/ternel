@@ -9,14 +9,17 @@ supposed to notice when an arm stops saying the same thing.
 
 from __future__ import annotations
 
+import itertools
 import subprocess
 import sys
 import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
 
 from bonsai_tq1.format import FormatError
+from ternel_mlx import bench_model
 from ternel_mlx.bench_model import (
     RSS_POLL_SECONDS,
     TRIALS,
@@ -31,6 +34,7 @@ from ternel_mlx.bench_model import (
     sample_resident_bytes,
     workload_by_label,
 )
+from ternel_mlx.environment import GpuContentionError
 from ternel_mlx.graph_gate import PROMPTS
 
 
@@ -160,6 +164,8 @@ def test_a_single_round_cannot_alternate_and_is_rejected():
             rounds=1,
             trials_per_round=64,
             max_foreign_gpu_share=0.05,
+            round_attempts=1,
+            round_retry_wait_seconds=0.0,
         )
 
 
@@ -173,6 +179,162 @@ def test_too_few_isolated_samples_are_rejected_before_anything_is_launched():
             rounds=4,
             trials_per_round=7,
             max_foreign_gpu_share=0.05,
+            round_attempts=1,
+            round_retry_wait_seconds=0.0,
+        )
+
+
+class ScriptedGpu:
+    """A GPU that is busy on the attempts named, and quiet on the rest.
+
+    Stands in for ``exclusive_gpu`` so the retry can be exercised without two
+    27B checkpoints. It records what it was asked to time, which is how the
+    tests below tell a re-measured round from a half-measured one.
+    """
+
+    def __init__(self, busy_labels: set[str]) -> None:
+        self.busy_labels = busy_labels
+        self.timed: list[str] = []
+
+    @contextmanager
+    def __call__(self, label, *, max_foreign_share, record):
+        self.timed.append(label)
+        yield
+        share = {"total_share": 0.9, "clients": [{"pid": 1, "command": "other"}]}
+        record.append({"label": label} | share)
+        if label in self.busy_labels:
+            raise GpuContentionError(f"{label} is void", share=share)
+
+
+def scripted_isolated(monkeypatch, gpu: ScriptedGpu, *, rounds: int, round_attempts: int):
+    """``measure_isolated`` with the GPU and the subprocess both stubbed out.
+
+    Each solo run reports a decode time no other run reports, so the series that
+    reach the summary say exactly which runs were kept. Returns the payload and
+    those series, keyed by arm.
+    """
+    monkeypatch.setattr(bench_model, "exclusive_gpu", gpu)
+    monkeypatch.setattr(bench_model, "capture_environment", lambda: {})
+
+    counter = itertools.count(1)
+
+    def solo(path: Path, *, trials: int) -> dict[str, object]:
+        stamp = float(next(counter))
+        return {
+            "path": str(path),
+            "workloads": {
+                workload.label: {
+                    "prefill_seconds": [1.0] * trials,
+                    "decode_seconds": [stamp] * trials,
+                    "prompt_digest": "digest",
+                    "tokens": [7, 8, 9],
+                }
+                for workload in WORKLOADS
+            },
+        }
+
+    monkeypatch.setattr(bench_model, "run_solo", solo)
+
+    kept: list[list[float]] = []
+    real_summary = bench_model.quantile_summary
+
+    def recording_summary(values):
+        kept.append([float(value) for value in values])
+        return real_summary(values)
+
+    monkeypatch.setattr(bench_model, "quantile_summary", recording_summary)
+
+    payload = measure_isolated(
+        Path("artifact"),
+        Path("baseline"),
+        rounds=rounds,
+        trials_per_round=10,
+        max_foreign_gpu_share=0.25,
+        round_attempts=round_attempts,
+        round_retry_wait_seconds=0.0,
+    )
+    # Four series per workload, in the order the payload builds them: prefill
+    # candidate, prefill reference, decode candidate, decode reference.
+    return payload, {"candidate": sorted(set(kept[2])), "reference": sorted(set(kept[3]))}
+
+
+def test_a_round_that_shared_the_gpu_is_measured_again_instead_of_ending_the_run(monkeypatch):
+    """A desktop that wakes for ten seconds should cost ten seconds, not the run.
+
+    The bar itself does not move: the block that shared the GPU is still void.
+    What changes is that the rounds already collected, and the model loads that
+    produced them, survive it.
+    """
+    gpu = ScriptedGpu({"round 2 attempt 1 reference"})
+    payload, _ = scripted_isolated(monkeypatch, gpu, rounds=4, round_attempts=3)
+
+    assert [entry["round"] for entry in payload["voided_rounds"]] == [2]
+    assert payload["voided_rounds"][0]["attempt"] == 1
+    assert payload["round_attempts"] == 3
+    # Four rounds of two arms, plus the one that had to be done twice.
+    assert len(gpu.timed) == 9
+
+
+def test_both_arms_of_a_voided_round_are_discarded_even_when_only_one_was_hit(monkeypatch):
+    """The bootstrap pairs samples by position, so a half-round misaligns it.
+
+    Round 2 runs the reference first; the *candidate* is the one that shares the
+    GPU, so the reference's own block passed and its numbers are sitting there,
+    tempting. Keeping them would give that arm one more sample than its partner
+    and shift every pair after it.
+
+    The solo runs are stamped 1 upward in launch order, so round 2's first
+    attempt is runs 3 (reference) and 4 (candidate). Neither may appear: 3 is
+    the tempting one, and 4 is the void itself.
+    """
+    gpu = ScriptedGpu({"round 2 attempt 1 candidate"})
+    payload, kept = scripted_isolated(monkeypatch, gpu, rounds=4, round_attempts=3)
+
+    assert kept["reference"] == [2.0, 5.0, 8.0, 9.0]
+    assert kept["candidate"] == [1.0, 6.0, 7.0, 10.0]
+    assert payload["samples_per_arm"] == 40
+
+
+def test_a_round_that_never_gets_a_quiet_gpu_still_fails_the_run(monkeypatch):
+    """The retry is a budget, not a licence to keep going until it passes."""
+    gpu = ScriptedGpu({f"round 1 attempt {n} candidate" for n in (1, 2, 3)})
+    with pytest.raises(FormatError, match="shared the GPU on all 3 attempts"):
+        scripted_isolated(monkeypatch, gpu, rounds=4, round_attempts=3)
+
+
+def test_a_failure_that_is_not_contention_is_not_retried(monkeypatch):
+    """Repeating a shape mismatch would only reproduce it, slowly."""
+
+    def broken(path, *, trials):
+        raise FormatError("the arms were not timed on the same prompt")
+
+    gpu = ScriptedGpu(set())
+    monkeypatch.setattr(bench_model, "exclusive_gpu", gpu)
+    monkeypatch.setattr(bench_model, "capture_environment", lambda: {})
+    monkeypatch.setattr(bench_model, "run_solo", broken)
+    with pytest.raises(FormatError, match="not timed on the same prompt"):
+        measure_isolated(
+            Path("artifact"),
+            Path("baseline"),
+            rounds=4,
+            trials_per_round=10,
+            max_foreign_gpu_share=0.25,
+            round_attempts=3,
+            round_retry_wait_seconds=0.0,
+        )
+    assert len(gpu.timed) == 1
+
+
+def test_a_round_needs_at_least_one_attempt():
+    with pytest.raises(FormatError, match="at least one attempt"):
+        measure_isolated(
+            Path("artifact"),
+            Path("baseline"),
+            rounds=4,
+            trials_per_round=10,
+            max_foreign_gpu_share=0.25,
+            round_attempts=0,
+            round_retry_wait_seconds=0.0,
         )
 
 
@@ -183,6 +345,17 @@ def test_too_few_isolated_samples_are_rejected_before_anything_is_launched():
         ["--artifact", "a", "--baseline", "b", "--output", "o"],
         ["--artifact", "a", "--baseline", "b", "--isolated-output", "i", "--rounds", "6"],
         ["--artifact", "a", "--baseline", "b", "--isolated-output", "i", "--trials-per-round", "5"],
+        # No retry budget: a voided round would have nowhere to go.
+        [
+            "--artifact", "a", "--baseline", "b", "--isolated-output", "i",
+            "--rounds", "6", "--trials-per-round", "5", "--max-foreign-gpu-share", "0.25",
+        ],
+        # No wait budget between retries: the run would not know how patient to be.
+        [
+            "--artifact", "a", "--baseline", "b", "--isolated-output", "i",
+            "--rounds", "6", "--trials-per-round", "5", "--max-foreign-gpu-share", "0.25",
+            "--round-attempts", "4",
+        ],
         ["--baseline", "b", "--isolated-output", "i"],
         ["--solo", "a"],
         ["--probe", "a"],

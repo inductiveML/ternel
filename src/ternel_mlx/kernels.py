@@ -249,12 +249,25 @@ _MATMUL_SOURCE = """
     const int tail_base = tq1_tail_base(PAD);
     const int rows_per_thread = (TILE + TG - 1) / TG;
     const uint columns = uint(G) * uint(TQ1_BLOCK);
+    // Split-K. A threadgroup owns one contiguous run of groups instead of all G
+    // of them, so a tensor whose row count only yields a handful of row tiles
+    // still launches KS times as many threadgroups. Nothing is recomputed: the
+    // chunks partition the K axis, so each group's table is still built exactly
+    // once per row tile. What it costs is that the KS partial sums have to be
+    // added up afterwards, by the caller, in a second pass.
+    //
+    // At KS = 1 every expression below folds to what it was: one chunk starting
+    // at group zero and ending at G, written at output offset zero.
+    const int groups_per_chunk = (G + KS - 1) / KS;
 
     threadgroup float lut[BT * tq1_lut_floats(PAD)];
 
     const uint lane = thread_position_in_threadgroup.x;
     const uint tile_index = threadgroup_position_in_grid.x;
     const uint batch_tile = threadgroup_position_in_grid.y;
+    const uint k_chunk = threadgroup_position_in_grid.z;
+    const uint first_group = k_chunk * uint(groups_per_chunk);
+    const uint last_group = min(uint(G), first_group + uint(groups_per_chunk));
     const uint batch = uint(x_shape[0]);
     const uint rows = uint(codes_shape[0]) * uint(TILE);
 
@@ -263,7 +276,7 @@ _MATMUL_SOURCE = """
         for (int j = 0; j < BT; ++j) { acc[r][j] = 0.0f; }
     }
 
-    for (uint g = 0; g < uint(G); ++g) {
+    for (uint g = first_group; g < last_group; ++g) {
         // Guards the previous iteration's table reads against this one's writes.
         threadgroup_barrier(mem_flags::mem_threadgroup);
         for (int j = 0; j < BT; ++j) {
@@ -318,7 +331,11 @@ _MATMUL_SOURCE = """
         for (int j = 0; j < BT; ++j) {
             uint sample = batch_tile * uint(BT) + uint(j);
             if (sample < batch) {
-                out[ulong(sample) * ulong(rows) + row] = static_cast<T>(acc[r][j]);
+                // At KS = 1 the chunk term vanishes and this is the plain
+                // (sample, row) store the single-pass kernel always did. Above
+                // that, out carries a leading chunk axis for the caller to sum.
+                out[(ulong(k_chunk) * ulong(batch) + ulong(sample)) * ulong(rows) + row]
+                    = static_cast<OT>(acc[r][j]);
             }
         }
     }
@@ -342,6 +359,12 @@ _MATMUL_SOURCE = """
 # direct loses by up to 35 percent, at TM = 2 it is roughly even, and at TM = 4
 # it wins by 10 to 100 percent and carries the kernel past mx.quantized_matmul.
 # Neither dominates, so both are built and the dispatch picks per tiling.
+#
+# The TM = 1 figure holds only where it was taken, which is at row blocks of 128
+# and 256 -- the A5 ladder has no narrow TM = 1 tiling to have measured. At row
+# block 32 the ranking inverts and direct wins by 9 percent in a whole prefill
+# pass; see GemmConfig.direct_fragments. Read TM as the axis worth checking
+# first, not as the answer.
 #
 # The two forms are emitted as separate sources rather than as one source
 # branching on a template constant. A barrier inside a branch is well defined
@@ -944,6 +967,7 @@ class MatmulConfig:
     batch_tile: int
     padded_lut: bool
     safe_clamp: bool
+    k_split: int
 
     def __post_init__(self) -> None:
         if self.threads <= 0 or self.threads % 32:
@@ -952,6 +976,8 @@ class MatmulConfig:
             )
         if self.batch_tile <= 0:
             raise FormatError(f"batch tile must be positive, got {self.batch_tile}")
+        if self.k_split <= 0:
+            raise FormatError(f"k split must be positive, got {self.k_split}")
         used = threadgroup_bytes(batch_tile=self.batch_tile, padded=self.padded_lut)
         if used > THREADGROUP_MEMORY_BYTES:
             raise FormatError(
@@ -972,8 +998,12 @@ class MatmulConfig:
         read off ``results/mlx/a5_op_benchmarks.json`` can be replayed against
         it, rather than a test re-deriving a naming scheme and agreeing with
         itself.
+
+        The unsplit label is spelled exactly as the committed sweep spells it,
+        so adding split-K did not rename anything already measured.
         """
-        return f"lut23_bt{self.batch_tile}_{'padded' if self.padded_lut else 'packed'}"
+        name = f"lut23_bt{self.batch_tile}_{'padded' if self.padded_lut else 'packed'}"
+        return name if self.k_split == 1 else f"{name}_k{self.k_split}"
 
 
 def gemm_threadgroup_bytes(
@@ -1032,6 +1062,17 @@ class GemmConfig:
       registers costs one decode per trit where the staged fill costs one per
       byte, so at ``TM = 1`` it loses by up to 35 percent and at ``TM = 4`` it
       wins by 10 to 100 and carries the kernel past ``mx.quantized_matmul``.
+      TM does not settle it alone, and the exception is one this file ships: the
+      35 percent is a *wide*-block figure, since every ``TM = 1`` tiling the A5
+      ladder swept has a row block of 128 or 256. At row block 32 the ranking
+      inverts. Timed in a whole prefill pass with three shapes -- out_proj,
+      down_proj, in_proj_z, 176 of the 497 dispatches a token costs -- routed
+      into ``batch_block`` 16 by row block 32 and nothing else varied, the
+      register form ran 256.7 ms against the staged twin's 280.5 ms, ten rounds
+      in both orders with the two ranges not touching. So ``TM = 1`` is a reason
+      to check the form rather than a rule for choosing it, and
+      ``GEMM_SMALL_BATCH_NARROW_BLOCK`` builds its fragments in registers on
+      that measurement rather than in spite of it.
     - ``direct_epilogue`` is worth about four percent either way at ``TM = 4``,
       but it is what frees the last claim on threadgroup memory, so it decides
       the largest tilings: at 128x256 the staged epilogue needs the whole 32 KiB
@@ -1184,29 +1225,50 @@ def tq1_matmul(
 
     ``x`` is 2-D ``(batch, columns)``; the caller flattens any leading
     dimensions. The returned array is ``(batch, rows)`` in ``x``'s dtype.
+
+    A ``k_split`` above one splits the K axis across that many threadgroups per
+    row tile and sums the partials in a second pass. It exists for the narrow
+    tensors, where the row count alone cannot fill the machine and a chained
+    dispatch pays the whole per-group latency serially. The partials are fp32
+    and the reduction is an ordinary ``mx.sum``: a float atomic would be one
+    dispatch cheaper but its addition order varies between runs, which would
+    cost the bit-identical greedy continuations the artifact gate relies on.
     """
     tiles = _check_packed(codes, scales, groups_per_row=groups_per_row, tile=tile)
     batch = _check_activations(x, groups_per_row=groups_per_row)
+    split = config.k_split
+    if groups_per_row % split:
+        # Ragged chunks would leave one threadgroup holding a full chunk while
+        # another holds nothing, and the slowest chunk is what the caller waits
+        # for, so an uneven split buys threadgroups that do not shorten anything.
+        raise FormatError(
+            f"k split {split} does not divide the tensor's {groups_per_row} groups per row"
+        )
 
     rows = tiles * tile
     batch_tiles = math.ceil(batch / config.batch_tile)
+    partial_dtype = x.dtype if split == 1 else mx.float32
     outputs = _MATMUL_KERNEL(
         inputs=[codes, scales, x],
         template=[
             ("T", x.dtype),
+            ("OT", partial_dtype),
             ("G", groups_per_row),
             ("TILE", tile),
             ("TG", config.threads),
             ("BT", config.batch_tile),
             ("PAD", config.padded_lut),
             ("SAFE", config.safe_clamp),
+            ("KS", split),
         ],
-        grid=(tiles * config.threads, batch_tiles, 1),
+        grid=(tiles * config.threads, batch_tiles, split),
         threadgroup=(config.threads, 1, 1),
-        output_shapes=[(batch, rows)],
-        output_dtypes=[x.dtype],
+        output_shapes=[(batch, rows) if split == 1 else (split, batch, rows)],
+        output_dtypes=[partial_dtype],
     )
-    return outputs[0]
+    if split == 1:
+        return outputs[0]
+    return mx.sum(outputs[0], axis=0).astype(x.dtype)
 
 
 def _check_activations(x: mx.array, *, groups_per_row: int) -> int:

@@ -18,6 +18,8 @@ import pytest
 from bonsai_tq1.format import FormatError
 from ternel_mlx import environment
 from ternel_mlx.environment import (
+    GpuContentionError,
+    await_quiet_gpu,
     exclusive_gpu,
     foreign_gpu_share,
     gpu_client_usage,
@@ -158,3 +160,128 @@ def test_a_live_contention_sample_apportions_a_real_window():
     assert 0.0 <= float(measured["busiest_share"]) <= float(measured["total_share"])
     for entry in measured["clients"]:
         assert float(entry["gpu_share"]) > 0.0
+
+
+def test_the_window_covers_the_sampling_and_not_just_the_block():
+    """A short block must not be charged for the time ``ioreg`` itself took.
+
+    Reading the registry costs a few hundred milliseconds. The counters
+    accumulate across both reads, so apportioning that delta over the block
+    alone divides a wide numerator by a narrow denominator -- which is not a
+    small error on a short block: it reported 210% of a device that this process
+    had entirely to itself, and voided the run.
+
+    Each read here takes half a second, so the two of them span a window of
+    roughly 0.5s around a block that lasts a millisecond. The competitor uses
+    50ms of GPU in that window, which is a tenth of it. Charged to the block
+    instead, the same 50ms would read as fifty times the machine.
+    """
+    slow_registry = iter([
+        {999: ("competitor", 0)},
+        {999: ("competitor", 50_000_000)},
+    ])
+
+    def sample() -> dict[int, tuple[str, int]]:
+        # Half the cost before the read and half after, which is where the
+        # midpoint estimator assumes the registry is actually sampled.
+        time.sleep(0.25)
+        entry = next(slow_registry)
+        time.sleep(0.25)
+        return entry
+
+    record: list[dict[str, object]] = []
+    with mock.patch.object(environment, "gpu_client_usage", sample):
+        with exclusive_gpu("short block", max_foreign_share=0.25, record=record):
+            time.sleep(0.001)
+
+    assert float(record[0]["total_share"]) == pytest.approx(0.10, abs=0.02)
+    # Both durations are kept, so a reader can tell a quiet run from one whose
+    # window was mostly sampling overhead.
+    assert float(record[0]["timed_seconds"]) < 0.1
+    assert float(record[0]["seconds"]) > 0.4
+
+
+def test_contention_is_a_distinct_failure_a_caller_may_answer_by_measuring_again():
+    """A void block is the one failure worth repeating, so it has its own type.
+
+    Everything else ``exclusive_gpu``'s callers raise is a fact about the run --
+    a shape that does not match, an arm that changed its answer -- and repeating
+    it would only reproduce it. A caller that retried on the message text would
+    retry on those too, so the distinction is carried by the exception rather
+    than by its wording, and the share that voided the block travels with it so
+    a retry loop can record what it was up against.
+    """
+    samples = iter([
+        {999: ("competitor", 0)},
+        {999: ("competitor", 850_000_000)},
+    ])
+    record: list[dict[str, object]] = []
+    with mock.patch.object(environment, "gpu_client_usage", lambda: next(samples)):
+        with pytest.raises(GpuContentionError) as raised:
+            with exclusive_gpu("block", max_foreign_share=0.25, record=record):
+                time.sleep(0.01)
+
+    assert isinstance(raised.value, FormatError)
+    assert float(raised.value.share["total_share"]) > 0.25
+    assert raised.value.share["clients"][0]["command"] == "competitor"
+
+
+# The counters are nanoseconds of GPU time, so a share is a delta divided by the
+# window it covers. A fifth of a second is long enough that the jitter around
+# ``time.sleep`` is a rounding error on the shares these tests assert.
+WAIT_SAMPLE_SECONDS = 0.2
+BUSY_NANOSECONDS = int(WAIT_SAMPLE_SECONDS * 1e9 * 0.9)
+QUIET_NANOSECONDS = int(WAIT_SAMPLE_SECONDS * 1e9 * 0.01)
+
+
+def scripted_reads(deltas: tuple[int, ...]):
+    """One ``gpu_client_usage`` per read, paired into before/after per sample."""
+    reads: list[dict[int, tuple[str, int]]] = []
+    for delta in deltas:
+        reads.append({999: ("competitor", 0)})
+        reads.append({999: ("competitor", delta)})
+    return lambda: reads.pop(0)
+
+
+def test_the_retry_wait_returns_as_soon_as_the_gpu_is_quiet():
+    """A wait that outlasted the contention would be pure delay.
+
+    Two samples are scripted and only two are supplied, so a third poll would
+    fail on an empty list rather than quietly pass.
+    """
+    with mock.patch.object(
+        environment, "gpu_client_usage", scripted_reads((BUSY_NANOSECONDS, QUIET_NANOSECONDS))
+    ):
+        settled = await_quiet_gpu(
+            max_foreign_share=0.25,
+            timeout_seconds=30.0,
+            sample_seconds=WAIT_SAMPLE_SECONDS,
+        )
+
+    assert settled["settled"] is True
+    assert float(settled["total_share"]) < 0.25
+
+
+def test_the_retry_wait_gives_up_rather_than_blocking_forever():
+    """The budget is a bound, and the sample it gives up on is reported.
+
+    Giving up is not a failure: the retry it precedes is gated by
+    :func:`exclusive_gpu` regardless, so a wait that expires costs one more
+    voided attempt rather than a wrong number.
+    """
+    with mock.patch.object(
+        environment, "gpu_client_usage", scripted_reads((BUSY_NANOSECONDS,))
+    ):
+        gave_up = await_quiet_gpu(
+            max_foreign_share=0.25,
+            timeout_seconds=0.0,
+            sample_seconds=WAIT_SAMPLE_SECONDS,
+        )
+
+    assert gave_up["settled"] is False
+    assert float(gave_up["total_share"]) > 0.25
+
+
+def test_a_negative_wait_is_rejected():
+    with pytest.raises(FormatError, match="cannot be negative"):
+        await_quiet_gpu(max_foreign_share=0.25, timeout_seconds=-1.0, sample_seconds=0.01)

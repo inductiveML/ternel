@@ -1,0 +1,4756 @@
+{
+  "artifact": "artifacts/ternel-mlx",
+  "baseline": null,
+  "batches": [
+    8,
+    16,
+    31
+  ],
+  "dispatches_per_token": 497,
+  "environment_after": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 9.9,
+          "pid": 592,
+          "rss_kib": 243760
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 5.1,
+          "pid": 1197,
+          "rss_kib": 200736
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 3.9,
+          "pid": 71380,
+          "rss_kib": 213120
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.6,
+          "pid": 9074,
+          "rss_kib": 568784
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 10105,
+          "rss_kib": 552544
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 10104,
+          "rss_kib": 549232
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 10106,
+          "rss_kib": 536112
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.0,
+          "pid": 10942,
+          "rss_kib": 277760
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-16T07:30:58.212877+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.011852548760423576,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.011852548760423576,
+          "pid": 595
+        }
+      ],
+      "seconds": 3.0436316044069827,
+      "total_share": 0.011852548760423576
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 5889743884,
+      "cache_memory_bytes": 124,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 6300846718
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 1.47 1.30 1.58 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "environment_before": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 11.5,
+          "pid": 6606,
+          "rss_kib": 433008
+        },
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 10.3,
+          "pid": 592,
+          "rss_kib": 260704
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 9.2,
+          "pid": 1310,
+          "rss_kib": 309488
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 7.0,
+          "pid": 33607,
+          "rss_kib": 1283456
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.9,
+          "pid": 1197,
+          "rss_kib": 201072
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 3.9,
+          "pid": 6408,
+          "rss_kib": 652368
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 2.8,
+          "pid": 25317,
+          "rss_kib": 85712
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.4,
+          "pid": 10942,
+          "rss_kib": 360800
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-16T07:01:34.051702+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.09446189182146675,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.09446189182146675,
+          "pid": 1310
+        }
+      ],
+      "seconds": 3.04270274983719,
+      "total_share": 0.09446189182146675
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 8,
+      "cache_memory_bytes": 0,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 8
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 1.81 2.51 2.46 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "evaluated": "cache",
+  "gemm_large_min_batch": 32,
+  "gemm_min_batch": 16,
+  "gpu_contention": [
+    {
+      "busiest_share": 0.001999475793021917,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.001999475793021917,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00017854749544922655,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_a batch=8",
+      "seconds": 52.18382356222719,
+      "timed_seconds": 52.162697040941566,
+      "total_share": 0.0021780232884711435
+    },
+    {
+      "busiest_share": 0.0045561754095252635,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0045561754095252635,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0001040488191558312,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass self_attn.k_proj batch=8",
+      "seconds": 53.122899854555726,
+      "timed_seconds": 53.1014532498084,
+      "total_share": 0.004660224228681095
+    },
+    {
+      "busiest_share": 0.00025331777506704757,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00025331777506704757,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00016050841078401004,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass linear_attn.out_proj batch=8",
+      "seconds": 58.3889464372769,
+      "timed_seconds": 58.36808462487534,
+      "total_share": 0.0004138261858510576
+    },
+    {
+      "busiest_share": 0.00015014774702565658,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00015014774702565658,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00012027972040660323,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass mlp.down_proj batch=8",
+      "seconds": 78.16606131289154,
+      "timed_seconds": 78.14441216690466,
+      "total_share": 0.00027042746743225984
+    },
+    {
+      "busiest_share": 0.0002184827188045483,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0002184827188045483,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00011415189782625304,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 8.62480652408473e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_z batch=8",
+      "seconds": 71.68663995806128,
+      "timed_seconds": 71.66505812481046,
+      "total_share": 0.00041888268187164864
+    },
+    {
+      "busiest_share": 0.0004339926629769498,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0004339926629769498,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 7.648799817494107e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_qkv batch=8",
+      "seconds": 65.74832810368389,
+      "timed_seconds": 65.72700241580606,
+      "total_share": 0.0005104806611518908
+    },
+    {
+      "busiest_share": 0.00013348463325288948,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00013348463325288948,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 7.724865788473487e-05,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 4.789057956378226e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass self_attn.q_proj batch=8",
+      "seconds": 63.957421854138374,
+      "timed_seconds": 63.93661524960771,
+      "total_share": 0.0002586238707014066
+    },
+    {
+      "busiest_share": 0.0003486162191930379,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0003486162191930379,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.782819023560391e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass mlp.gate_proj batch=8",
+      "seconds": 67.2317657917738,
+      "timed_seconds": 67.21120395883918,
+      "total_share": 0.0004164444094286418
+    },
+    {
+      "busiest_share": 0.0003409263078572403,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0003409263078572403,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.278748284338669e-05,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 4.9884804271788036e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass lm_head batch=8",
+      "seconds": 64.53117431234568,
+      "timed_seconds": 64.50981970783323,
+      "total_share": 0.000453598594972415
+    },
+    {
+      "busiest_share": 0.00045284458854503686,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00045284458854503686,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 8.845719693055697e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_a batch=16",
+      "seconds": 46.24976985435933,
+      "timed_seconds": 46.22744624968618,
+      "total_share": 0.0005413017854755939
+    },
+    {
+      "busiest_share": 6.84897873010082e-05,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.84897873010082e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass self_attn.k_proj batch=16",
+      "seconds": 45.07606347836554,
+      "timed_seconds": 45.05522533413023,
+      "total_share": 6.84897873010082e-05
+    },
+    {
+      "busiest_share": 0.00030792288474391243,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00030792288474391243,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00021760848622831165,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass linear_attn.out_proj batch=16",
+      "seconds": 45.26133227022365,
+      "timed_seconds": 45.24066804209724,
+      "total_share": 0.0005255313709722241
+    },
+    {
+      "busiest_share": 0.00030057344991579423,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00030057344991579423,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00029443196349361215,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass mlp.down_proj batch=16",
+      "seconds": 46.95524506224319,
+      "timed_seconds": 46.934446749743074,
+      "total_share": 0.0005950054134094063
+    },
+    {
+      "busiest_share": 0.00023474384528799594,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00023474384528799594,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00010242771089450333,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 5.6999317798333785e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_z batch=16",
+      "seconds": 45.49835156230256,
+      "timed_seconds": 45.47684825025499,
+      "total_share": 0.0003941708739808331
+    },
+    {
+      "busiest_share": 0.00023394431810290747,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00023394431810290747,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 7.018364450591268e-05,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 5.717842576294653e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_qkv batch=16",
+      "seconds": 45.548945520073175,
+      "timed_seconds": 45.52394791599363,
+      "total_share": 0.0003613063883717667
+    },
+    {
+      "busiest_share": 0.0001375014712803297,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0001375014712803297,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 5.239758502781581e-06,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass self_attn.q_proj batch=16",
+      "seconds": 45.461637186817825,
+      "timed_seconds": 45.44017912494019,
+      "total_share": 0.0001427412297831113
+    },
+    {
+      "busiest_share": 0.00029545653803870076,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00029545653803870076,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 3.464733829637517e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass mlp.gate_proj batch=16",
+      "seconds": 47.86081937421113,
+      "timed_seconds": 47.839415959082544,
+      "total_share": 0.00033010387633507595
+    },
+    {
+      "busiest_share": 0.00028221640951383984,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00028221640951383984,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00026024747591745683,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass lm_head batch=16",
+      "seconds": 45.998682437930256,
+      "timed_seconds": 45.977837750222534,
+      "total_share": 0.0005424638854312966
+    },
+    {
+      "busiest_share": 0.00014449721142621556,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00014449721142621556,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00011613155020060733,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_a batch=31",
+      "seconds": 84.00710214534774,
+      "timed_seconds": 83.98563312459737,
+      "total_share": 0.00026062876162682286
+    },
+    {
+      "busiest_share": 0.000470226449665736,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.000470226449665736,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 7.45914264342605e-05,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 5.57274530821882e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass self_attn.k_proj batch=31",
+      "seconds": 81.74979741638526,
+      "timed_seconds": 81.72918412461877,
+      "total_share": 0.0006005453291821846
+    },
+    {
+      "busiest_share": 0.00020444291238850813,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00020444291238850813,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 8.214462961283124e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass linear_attn.out_proj batch=31",
+      "seconds": 81.25352845899761,
+      "timed_seconds": 81.23280758410692,
+      "total_share": 0.00028658754200133936
+    },
+    {
+      "busiest_share": 0.00035649505701094536,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00035649505701094536,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 8.092905984421743e-05,
+          "pid": 595
+        }
+      ],
+      "label": "whole-pass mlp.down_proj batch=31",
+      "seconds": 81.47670333366841,
+      "timed_seconds": 81.45538733387366,
+      "total_share": 0.00043742411685516276
+    },
+    {
+      "busiest_share": 0.0002732098173821812,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0002732098173821812,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.000267843575833914,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 3.204158647584439e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_z batch=31",
+      "seconds": 81.03921452071518,
+      "timed_seconds": 81.01810741610825,
+      "total_share": 0.0005730949796919396
+    },
+    {
+      "busiest_share": 0.0001567417504415357,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0001567417504415357,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.093603319671853e-05,
+          "pid": 1310
+        }
+      ],
+      "label": "whole-pass linear_attn.in_proj_qkv batch=31",
+      "seconds": 82.56814131233841,
+      "timed_seconds": 82.54639675002545,
+      "total_share": 0.00021767778363825422
+    },
+    {
+      "busiest_share": 0.0004005260672335599,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0004005260672335599,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00011690158233650917,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 4.474856975548334e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass self_attn.q_proj batch=31",
+      "seconds": 82.65535681275651,
+      "timed_seconds": 82.63471850007772,
+      "total_share": 0.0005621762193255525
+    },
+    {
+      "busiest_share": 0.000282212777154377,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.000282212777154377,
+          "pid": 1310
+        },
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00012201664837030618,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 3.937003967230648e-05,
+          "pid": 6322
+        }
+      ],
+      "label": "whole-pass mlp.gate_proj batch=31",
+      "seconds": 87.49249502085149,
+      "timed_seconds": 87.47181695792824,
+      "total_share": 0.00044359946519698963
+    },
+    {
+      "busiest_share": 0.000498068194153046,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.000498068194153046,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00014100616819564464,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 4.8358941453425296e-05,
+          "pid": 6322
+        },
+        {
+          "command": "WindowServer",
+          "gpu_share": 3.6286577072183256e-05,
+          "pid": 592
+        }
+      ],
+      "label": "whole-pass lm_head batch=31",
+      "seconds": 83.29983822908252,
+      "timed_seconds": 83.27916199993342,
+      "total_share": 0.0007237198808742992
+    }
+  ],
+  "inner_passes_per_reading": 3,
+  "layout_name": "TQ1_G128_MLX_TILED",
+  "layout_version": 1,
+  "max_foreign_gpu_share": 0.25,
+  "measured": {
+    "16": {
+      "shapes": {
+        "linear_attn.in_proj_a": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.20165395829826593,
+                0.18526066560298204,
+                0.18916058400645852,
+                0.1867855000309646,
+                0.1860466250218451,
+                0.18528349976986647,
+                0.1810465003363788,
+                0.18386016692966223,
+                0.18634699983522296,
+                0.1817342503927648
+              ],
+              "reference_seconds": 0.18566506239585578,
+              "samples": [
+                0.007529499940574169,
+                0.01428545918315649,
+                0.016730706673115492,
+                0.01523341704159975,
+                0.014882166869938374,
+                0.014248708263039589,
+                0.021659708581864834,
+                0.018681625369936228,
+                0.012621582951396704,
+                0.017043208703398705
+              ],
+              "seconds": 0.015057791955769062,
+              "shipped": false,
+              "threadgroups": 1
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1840699166059494,
+                0.18546204175800085,
+                0.1861292920075357,
+                0.18558158306404948,
+                0.18539441609755158,
+                0.18360666697844863,
+                0.18362770788371563,
+                0.18686808412894607,
+                0.18172741681337357,
+                0.1813713340088725
+              ],
+              "reference_seconds": 0.1847321663517505,
+              "samples": [
+                0.010739041026681662,
+                0.011378458235412836,
+                0.01210079062730074,
+                0.012917667161673307,
+                0.009132834151387215,
+                0.012074458412826061,
+                0.01994050107896328,
+                0.007523498963564634,
+                0.012431250419467688,
+                0.018149083014577627
+              ],
+              "seconds": 0.0120876245200634,
+              "shipped": false,
+              "threadgroups": 2
+            },
+            "lut23": {
+              "config": "lut23_bt1_padded_k40",
+              "family": "lut23",
+              "reference_samples": [
+                0.1833692081272602,
+                0.1838382501155138,
+                0.18500408297404647,
+                0.18872108403593302,
+                0.18266520835459232,
+                0.18211287492886186,
+                0.18998670810833573,
+                0.18314029229804873,
+                0.18457716703414917,
+                0.1825733338482678
+              ],
+              "reference_seconds": 0.183603729121387,
+              "samples": [
+                0.002983291633427143,
+                -3.879191353917122e-05,
+                0.0012975833378732204,
+                -0.002112584188580513,
+                0.0027165417559444904,
+                0.0031250840984284878,
+                -0.00048562511801719666,
+                0.0007054987363517284,
+                0.0003897910937666893,
+                0.0005751661956310272
+              ],
+              "seconds": 0.0006403324659913778,
+              "shipped": true,
+              "threadgroups": 640
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 96,
+          "label": "linear_attn.in_proj_a",
+          "modules": [
+            "linear_attn.in_proj_a",
+            "linear_attn.in_proj_b"
+          ],
+          "rows": 48,
+          "shipped": "lut23"
+        },
+        "linear_attn.in_proj_qkv": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.18839329108595848,
+                0.18475395813584328,
+                0.18340650014579296,
+                0.18534566555172205,
+                0.18543858313933015,
+                0.18481166707351804,
+                0.1846210421063006,
+                0.18644241709262133,
+                0.19434058340266347,
+                0.1903552496805787
+              ],
+              "reference_seconds": 0.1853921243455261,
+              "samples": [
+                -0.0022998321801424026,
+                0.005160625092685223,
+                0.0024493751116096973,
+                0.0012719593942165375,
+                0.00048012519255280495,
+                0.0006836238317191601,
+                0.002723999321460724,
+                0.0016452912241220474,
+                -0.0009983335621654987,
+                -0.004856290761381388
+              ],
+              "seconds": 0.0009777916129678488,
+              "shipped": false,
+              "threadgroups": 80
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.18339212518185377,
+                0.18674387456849217,
+                0.18457137513905764,
+                0.18361449986696243,
+                0.1851419173181057,
+                0.1850325409322977,
+                0.18459783401340246,
+                0.18734125001356006,
+                0.18797195795923471,
+                0.183637083042413
+              ],
+              "reference_seconds": 0.18481518747285008,
+              "samples": [
+                0.0011854590848088264,
+                -0.001391582190990448,
+                -1.704227179288864e-05,
+                0.0013112081214785576,
+                -0.0005230423994362354,
+                0.0031982501968741417,
+                0.0011323741637170315,
+                -0.0018923329189419746,
+                0.004540957976132631,
+                0.00014737481251358986
+              ],
+              "seconds": 0.0006398744881153107,
+              "shipped": true,
+              "threadgroups": 320
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k5",
+              "family": "lut23",
+              "reference_samples": [
+                0.18424829188734293,
+                0.18380662519484758,
+                0.18652941705659032,
+                0.1841287910938263,
+                0.18679337482899427,
+                0.18468150030821562,
+                0.18637137487530708,
+                0.18359429109841585,
+                0.1883954582735896,
+                0.18924533296376467
+              ],
+              "reference_seconds": 0.18552643759176135,
+              "samples": [
+                0.005281123798340559,
+                0.004444333724677563,
+                0.0013641668483614922,
+                0.00699399970471859,
+                0.003825250081717968,
+                0.004110999405384064,
+                0.003071666695177555,
+                0.00623633386567235,
+                0.01275966688990593,
+                0.00040183402597904205
+              ],
+              "seconds": 0.004277666565030813,
+              "shipped": false,
+              "threadgroups": 800
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_qkv",
+          "modules": [
+            "linear_attn.in_proj_qkv"
+          ],
+          "rows": 10240,
+          "shipped": "gemm_16x32"
+        },
+        "linear_attn.in_proj_z": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.18167100008577108,
+                0.18506545899435878,
+                0.1860292088240385,
+                0.18442887486889958,
+                0.18732995819300413,
+                0.19431779207661748,
+                0.18446320900693536,
+                0.18583674961701035,
+                0.18959433399140835,
+                0.18514941725879908
+              ],
+              "reference_seconds": 0.18549308343790472,
+              "samples": [
+                0.010828583035618067,
+                0.008736748713999987,
+                0.0077100833877921104,
+                0.009358166251331568,
+                0.006014874670654535,
+                0.005401957780122757,
+                0.010664290748536587,
+                0.005917709320783615,
+                0.006205874960869551,
+                0.007340457756072283
+              ],
+              "seconds": 0.007525270571932197,
+              "shipped": false,
+              "threadgroups": 48
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.18302162503823638,
+                0.18462316691875458,
+                0.1822705827653408,
+                0.1856605000793934,
+                0.1854066252708435,
+                0.18624329194426537,
+                0.185053083114326,
+                0.1862151250243187,
+                0.18125649960711598,
+                0.18280200008302927
+              ],
+              "reference_seconds": 0.1848381250165403,
+              "samples": [
+                0.004891041666269302,
+                -0.000326541718095541,
+                0.0020152083598077297,
+                0.0011387080885469913,
+                -0.0007476252503693104,
+                -0.0013279169797897339,
+                -0.0004363330081105232,
+                -0.001562916673719883,
+                0.0016437503509223461,
+                0.002971624955534935
+              ],
+              "seconds": 0.0004060831852257252,
+              "shipped": true,
+              "threadgroups": 192
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k8",
+              "family": "lut23",
+              "reference_samples": [
+                0.1900511672720313,
+                0.18609899980947375,
+                0.18147654086351395,
+                0.18582220887765288,
+                0.1856577917933464,
+                0.18274995777755976,
+                0.18733966583386064,
+                0.18526283372193575,
+                0.18233579117804766,
+                0.18602183321490884
+              ],
+              "reference_seconds": 0.18574000033549964,
+              "samples": [
+                -0.006491292268037796,
+                -0.0016601667739450932,
+                0.0020772931165993214,
+                -0.002038167789578438,
+                -0.0010524168610572815,
+                0.0027096252888441086,
+                -0.003144832793623209,
+                -0.0005019167438149452,
+                0.0067343334667384624,
+                8.349958807229996e-05
+              ],
+              "seconds": -0.0007771668024361134,
+              "shipped": false,
+              "threadgroups": 768
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_z",
+          "modules": [
+            "linear_attn.in_proj_z"
+          ],
+          "rows": 6144,
+          "shipped": "gemm_16x32"
+        },
+        "linear_attn.out_proj": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1817455836571753,
+                0.183251874987036,
+                0.18228766601532698,
+                0.18437320925295353,
+                0.1829594997689128,
+                0.18380608409643173,
+                0.1835636249743402,
+                0.18338558403775096,
+                0.18283841712400317,
+                0.18368483427911997
+              ],
+              "reference_seconds": 0.18331872951239347,
+              "samples": [
+                0.014365291222929955,
+                0.01247516693547368,
+                0.013027584180235863,
+                0.012661499436944723,
+                0.012790833599865437,
+                0.013785332906991243,
+                0.013128125108778477,
+                0.012700540944933891,
+                0.012624082621186972,
+                0.01785491593182087
+              ],
+              "seconds": 0.01290920889005065,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.17981800017878413,
+                0.18334675021469593,
+                0.18054929189383984,
+                0.180587416049093,
+                0.18436875008046627,
+                0.18077579187229276,
+                0.17951333289965987,
+                0.18425024999305606,
+                0.18276266567409039,
+                0.18087083334103227
+              ],
+              "reference_seconds": 0.1808233126066625,
+              "samples": [
+                0.0019158748909831047,
+                0.0004564998671412468,
+                0.0012833750806748867,
+                0.0013874592259526253,
+                0.0021445835009217262,
+                0.0021273749880492687,
+                0.0032627079635858536,
+                -0.0008464576676487923,
+                0.001468584407120943,
+                0.0004633339121937752
+              ],
+              "seconds": 0.0014280218165367842,
+              "shipped": true,
+              "threadgroups": 160
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k8",
+              "family": "lut23",
+              "reference_samples": [
+                0.1836396250873804,
+                0.18641583295539021,
+                0.17948850011453032,
+                0.18477333337068558,
+                0.18325008312240243,
+                0.17981483275070786,
+                0.18371662497520447,
+                0.18300375016406178,
+                0.18072300031781197,
+                0.18206933280453086
+              ],
+              "reference_seconds": 0.1831269166432321,
+              "samples": [
+                0.007904666941612959,
+                0.0007626260630786419,
+                0.007275166921317577,
+                0.0029525007121264935,
+                0.003429749980568886,
+                0.005609750282019377,
+                0.0018336251378059387,
+                0.003534833900630474,
+                0.007416584063321352,
+                0.006187208462506533
+              ],
+              "seconds": 0.004572292091324925,
+              "shipped": false,
+              "threadgroups": 640
+            }
+          },
+          "columns": 6144,
+          "dispatches_per_token": 64,
+          "label": "linear_attn.out_proj",
+          "modules": [
+            "linear_attn.out_proj",
+            "self_attn.o_proj"
+          ],
+          "rows": 5120,
+          "shipped": "gemm_16x32"
+        },
+        "lm_head": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1854097917675972,
+                0.1913375831209123,
+                0.1904287082143128,
+                0.18842054205015302,
+                0.1858624592423439,
+                0.1898320410400629,
+                0.18953399965539575,
+                0.18725254200398922,
+                0.18766866717487574,
+                0.18767066672444344
+              ],
+              "reference_seconds": 0.18804560438729823,
+              "samples": [
+                0.0015032081864774227,
+                -0.0020191241055727005,
+                -0.0026692491956055164,
+                0.001575792208313942,
+                0.0003774575889110565,
+                0.0016277092508971691,
+                -0.00356579152867198,
+                0.0031678332015872,
+                0.0009718327783048153,
+                0.0010085003450512886
+              ],
+              "seconds": 0.000990166561678052,
+              "shipped": true,
+              "threadgroups": 1940
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1890123337507248,
+                0.187780583743006,
+                0.18713991716504097,
+                0.1875883750617504,
+                0.20120450016111135,
+                0.189687707927078,
+                0.18667449988424778,
+                0.18900925014168024,
+                0.18765629176050425,
+                0.18793575000017881
+              ],
+              "reference_seconds": 0.1878581668715924,
+              "samples": [
+                -0.0014619180001318455,
+                0.00032233307138085365,
+                0.0015184576623141766,
+                0.0033223326317965984,
+                -0.009249625261873007,
+                0.002528834156692028,
+                -0.0005521667189896107,
+                -0.00011750031262636185,
+                0.0006220005452632904,
+                -0.0008872919715940952
+              ],
+              "seconds": 0.0001024163793772459,
+              "shipped": false,
+              "threadgroups": 7760
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed",
+              "family": "lut23",
+              "reference_samples": [
+                0.18745279219001532,
+                0.18682395806536078,
+                0.18918033270165324,
+                0.19202249962836504,
+                0.18965754192322493,
+                0.18829358369112015,
+                0.187091417144984,
+                0.1880394578911364,
+                0.1896604998037219,
+                0.1880061668343842
+              ],
+              "reference_seconds": 0.18816652079112828,
+              "samples": [
+                -0.00102554215118289,
+                0.0012729167938232422,
+                -0.00032216543331742287,
+                0.0045456672087311745,
+                -0.0014935419894754887,
+                0.0005614990368485451,
+                -0.0005319593474268913,
+                0.000876166857779026,
+                0.0002895002253353596,
+                0.0012172083370387554
+              ],
+              "seconds": 0.0004254996310919523,
+              "shipped": false,
+              "threadgroups": 3880
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 1,
+          "label": "lm_head",
+          "modules": [
+            "lm_head"
+          ],
+          "rows": 248320,
+          "shipped": "gemm_16x128"
+        },
+        "mlp.down_proj": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1794472080655396,
+                0.18432345893234015,
+                0.18493583425879478,
+                0.18663062481209636,
+                0.18388304207473993,
+                0.1846226672641933,
+                0.1864026659168303,
+                0.18457158422097564,
+                0.19191420823335648,
+                0.1866775411181152
+              ],
+              "reference_seconds": 0.18477925076149404,
+              "samples": [
+                0.04612570907920599,
+                0.04073670832440257,
+                0.05036070756614208,
+                0.04229841707274318,
+                0.0482607907615602,
+                0.04145187372341752,
+                0.03947154199704528,
+                0.04005691595375538,
+                0.042876791674643755,
+                0.039902166929095984
+              ],
+              "seconds": 0.04187514539808035,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1745290830731392,
+                0.18468804191797972,
+                0.18172366684302688,
+                0.17701666709035635,
+                0.1845773342065513,
+                0.17585424985736609,
+                0.1756811672821641,
+                0.18538829078897834,
+                0.17541683372110128,
+                0.1755517078563571
+              ],
+              "reference_seconds": 0.17643545847386122,
+              "samples": [
+                0.010348542127758265,
+                -0.001065084245055914,
+                0.005348457954823971,
+                0.006849457509815693,
+                2.9624905437231064e-05,
+                0.01140708290040493,
+                0.01142641669139266,
+                0.0041343760676681995,
+                0.0063410005532205105,
+                0.010644875932484865
+              ],
+              "seconds": 0.006595229031518102,
+              "shipped": true,
+              "threadgroups": 160
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k8",
+              "family": "lut23",
+              "reference_samples": [
+                0.18703962536528707,
+                0.18395120883360505,
+                0.17716387519612908,
+                0.18382829194888473,
+                0.18472979124635458,
+                0.17533129174262285,
+                0.18645541602745652,
+                0.1839084173552692,
+                0.17589312512427568,
+                0.1850252910517156
+              ],
+              "reference_seconds": 0.18392981309443712,
+              "samples": [
+                0.007685458287596703,
+                0.01335912523791194,
+                0.018980458844453096,
+                0.010362666100263596,
+                0.008696000557392836,
+                0.015867166221141815,
+                0.007678668014705181,
+                0.006465791258960962,
+                0.01656579226255417,
+                0.006727584172040224
+              ],
+              "seconds": 0.009529333328828216,
+              "shipped": false,
+              "threadgroups": 640
+            }
+          },
+          "columns": 17408,
+          "dispatches_per_token": 64,
+          "label": "mlp.down_proj",
+          "modules": [
+            "mlp.down_proj"
+          ],
+          "rows": 5120,
+          "shipped": "gemm_16x32"
+        },
+        "mlp.gate_proj": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.18460758263245225,
+                0.1891064578667283,
+                0.18663945840671659,
+                0.1938044996932149,
+                0.18642258318141103,
+                0.18861533282324672,
+                0.18787083309143782,
+                0.18688316689804196,
+                0.1878915410488844,
+                0.18827362498268485
+              ],
+              "reference_seconds": 0.1878811870701611,
+              "samples": [
+                0.0009079175069928169,
+                -0.0032235407270491123,
+                0.003034749533981085,
+                -0.0024265414103865623,
+                -0.0008383751846849918,
+                -0.00023350026458501816,
+                -0.0012725829146802425,
+                0.0022014579735696316,
+                -0.0029093753546476364,
+                -0.0008647502399981022
+              ],
+              "seconds": -0.000851562712341547,
+              "shipped": true,
+              "threadgroups": 136
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1878681667149067,
+                0.18990291701629758,
+                0.19144191686064005,
+                0.191535749938339,
+                0.18851066706702113,
+                0.18600862519815564,
+                0.18635062500834465,
+                0.1858402080833912,
+                0.18546145921573043,
+                0.1918444582261145
+              ],
+              "reference_seconds": 0.1881894168909639,
+              "samples": [
+                0.01804225007072091,
+                0.018130582757294178,
+                0.01872700033709407,
+                0.014803166035562754,
+                0.012454125098884106,
+                0.017026042100042105,
+                0.020754165947437286,
+                0.01711716689169407,
+                0.017875541001558304,
+                0.01499137468636036
+              ],
+              "seconds": 0.017496353946626186,
+              "shipped": false,
+              "threadgroups": 544
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k2",
+              "family": "lut23",
+              "reference_samples": [
+                0.18969870917499065,
+                0.19518020888790488,
+                0.1841627093963325,
+                0.18799687502905726,
+                0.1858501248061657,
+                0.18558125011622906,
+                0.18708779197186232,
+                0.1867522499524057,
+                0.18749537505209446,
+                0.1979706659913063
+              ],
+              "reference_seconds": 0.1872915835119784,
+              "samples": [
+                0.030767332762479782,
+                0.03224299941211939,
+                0.033978831488639116,
+                0.03399370890110731,
+                0.03183841612190008,
+                0.03667341684922576,
+                0.032829790841788054,
+                0.03385029174387455,
+                0.037236041855067015,
+                0.024241375736892223
+              ],
+              "seconds": 0.0333400412928313,
+              "shipped": false,
+              "threadgroups": 544
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 128,
+          "label": "mlp.gate_proj",
+          "modules": [
+            "mlp.gate_proj",
+            "mlp.up_proj"
+          ],
+          "rows": 17408,
+          "shipped": "gemm_16x128"
+        },
+        "self_attn.k_proj": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.18210445903241634,
+                0.1822290001437068,
+                0.18584691686555743,
+                0.18456700025126338,
+                0.18265399988740683,
+                0.18351058289408684,
+                0.18381745787337422,
+                0.18347270786762238,
+                0.1829288750886917,
+                0.18313787505030632
+              ],
+              "reference_seconds": 0.18330529145896435,
+              "samples": [
+                0.006805082783102989,
+                0.005024624522775412,
+                0.005736332852393389,
+                0.003571624867618084,
+                0.004816249944269657,
+                0.005524416919797659,
+                0.004418584052473307,
+                0.006336501333862543,
+                0.007576499599963427,
+                0.004694166127592325
+              ],
+              "seconds": 0.005274520721286535,
+              "shipped": false,
+              "threadgroups": 8
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.18318404164165258,
+                0.18475820822641253,
+                0.1840702909976244,
+                0.1823776252567768,
+                0.18499308312311769,
+                0.18361783307045698,
+                0.1822453336790204,
+                0.18455395800992846,
+                0.1830117921344936,
+                0.1848771250806749
+              ],
+              "reference_seconds": 0.1838440620340407,
+              "samples": [
+                0.0021303752437233925,
+                0.006080291699618101,
+                0.0012074168771505356,
+                0.0007609170861542225,
+                0.00029195891693234444,
+                0.0015110000967979431,
+                0.0013639992102980614,
+                -0.0015290002338588238,
+                0.0019435826689004898,
+                0.0035272501409053802
+              ],
+              "seconds": 0.0014374996535480022,
+              "shipped": false,
+              "threadgroups": 32
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k40",
+              "family": "lut23",
+              "reference_samples": [
+                0.18728179205209017,
+                0.18678158288821578,
+                0.1808589999563992,
+                0.1829204591922462,
+                0.18279420817270875,
+                0.1850179578177631,
+                0.18233341723680496,
+                0.1843347088433802,
+                0.182089667301625,
+                0.19406520808115602
+              ],
+              "reference_seconds": 0.1836275840178132,
+              "samples": [
+                -0.000972250010818243,
+                -0.0027740001678466797,
+                0.0039530000649392605,
+                0.0008041239343583584,
+                0.000868458766490221,
+                -0.0018082489259541035,
+                0.001741915475577116,
+                0.0005605411715805531,
+                0.0009914580732584,
+                -0.004365790635347366
+              ],
+              "seconds": 0.0006823325529694557,
+              "shipped": true,
+              "threadgroups": 640
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 32,
+          "label": "self_attn.k_proj",
+          "modules": [
+            "self_attn.k_proj",
+            "self_attn.v_proj"
+          ],
+          "rows": 1024,
+          "shipped": "lut23"
+        },
+        "self_attn.q_proj": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.18479329207912087,
+                0.18589350022375584,
+                0.18498304160311818,
+                0.18624529195949435,
+                0.1849558330141008,
+                0.18529487494379282,
+                0.1844853749498725,
+                0.18631362495943904,
+                0.18633520789444447,
+                0.18716329243034124
+              ],
+              "reference_seconds": 0.18559418758377433,
+              "samples": [
+                0.0008315830491483212,
+                -0.001213709358125925,
+                0.001883708406239748,
+                -0.0010813339613378048,
+                0.011867041699588299,
+                0.0001899166963994503,
+                0.0003230827860534191,
+                -0.0002975417301058769,
+                -0.00031804153695702553,
+                -0.0018090005032718182
+              ],
+              "seconds": -5.381251685321331e-05,
+              "shipped": false,
+              "threadgroups": 96
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1863514999859035,
+                0.18540304200723767,
+                0.1859881659038365,
+                0.18944175029173493,
+                0.18584983376786113,
+                0.18647033302113414,
+                0.18555324990302324,
+                0.18560929084196687,
+                0.18620908306911588,
+                0.1888306657783687
+              ],
+              "reference_seconds": 0.18609862448647618,
+              "samples": [
+                -0.00018645916134119034,
+                -0.0006729592569172382,
+                0.0005332501605153084,
+                -0.0037575005553662777,
+                0.0025133751332759857,
+                -0.0005760830827057362,
+                -0.00045733386650681496,
+                0.00020691752433776855,
+                -0.0003331657499074936,
+                -0.0012529580853879452
+              ],
+              "seconds": -0.0003952498082071543,
+              "shipped": true,
+              "threadgroups": 384
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k4",
+              "family": "lut23",
+              "reference_samples": [
+                0.1854574168100953,
+                0.1849712496623397,
+                0.1851452081464231,
+                0.18496858282014728,
+                0.18643274996429682,
+                0.20368433371186256,
+                0.1856643338687718,
+                0.18721883418038487,
+                0.18581033358350396,
+                0.18643320770934224
+              ],
+              "reference_seconds": 0.18573733372613788,
+              "samples": [
+                0.00327729107812047,
+                0.0018002083525061607,
+                0.0020640837028622627,
+                0.001598208211362362,
+                0.0005742078647017479,
+                -0.016261958982795477,
+                0.0069352914579212666,
+                0.005276998970657587,
+                0.00037116603925824165,
+                0.00102591747418046
+              ],
+              "seconds": 0.0016992082819342613,
+              "shipped": false,
+              "threadgroups": 768
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 16,
+          "label": "self_attn.q_proj",
+          "modules": [
+            "self_attn.q_proj"
+          ],
+          "rows": 12288,
+          "shipped": "gemm_16x32"
+        }
+      }
+    },
+    "31": {
+      "shapes": {
+        "linear_attn.in_proj_a": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.34485966712236404,
+                0.34359487518668175,
+                0.35181749984622,
+                0.3461910830810666,
+                0.34096812503412366,
+                0.3449870413169265,
+                0.3435643329285085,
+                0.339199208188802,
+                0.3366377088241279,
+                0.3367232922464609
+              ],
+              "reference_seconds": 0.34357960405759513,
+              "samples": [
+                0.013442832976579666,
+                0.011969832703471184,
+                0.0045204171910882,
+                0.015736792236566544,
+                0.010761541780084372,
+                0.010381876025348902,
+                0.009073041845113039,
+                0.010786708910018206,
+                0.014406290836632252,
+                0.011618665885180235
+              ],
+              "seconds": 0.01120268739759922,
+              "shipped": false,
+              "threadgroups": 2
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.343084332998842,
+                0.3514702091924846,
+                0.34324737498536706,
+                0.3482872499153018,
+                0.34247645922005177,
+                0.33877274999395013,
+                0.3415939169935882,
+                0.33702029194682837,
+                0.3390838326886296,
+                0.33955574966967106
+              ],
+              "reference_seconds": 0.34203518810682,
+              "samples": [
+                0.008755082730203867,
+                -0.001010166946798563,
+                0.00746579235419631,
+                0.019278458319604397,
+                0.010704999323934317,
+                0.012305667158216238,
+                0.012939624954015017,
+                0.008505833335220814,
+                0.006966876331716776,
+                0.009610750246793032
+              ],
+              "seconds": 0.00918291648849845,
+              "shipped": false,
+              "threadgroups": 4
+            },
+            "lut23": {
+              "config": "lut23_bt1_padded_k20",
+              "family": "lut23",
+              "reference_samples": [
+                0.3447539168410003,
+                0.3587150410749018,
+                0.3430866659618914,
+                0.34818441700190306,
+                0.3448225832544267,
+                0.3421432920731604,
+                0.3606456248089671,
+                0.33861812483519316,
+                0.3376694591715932,
+                0.3406072920188308
+              ],
+              "reference_seconds": 0.34392029140144587,
+              "samples": [
+                0.0010283333249390125,
+                -0.014709916431456804,
+                -0.0023320410400629044,
+                -0.0023270417004823685,
+                0.006688249763101339,
+                0.0004119998775422573,
+                -0.02474579168483615,
+                0.012895375024527311,
+                0.003038040827959776,
+                -0.0029259594157338142
+              ],
+              "seconds": -0.0009575209114700556,
+              "shipped": true,
+              "threadgroups": 620
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 96,
+          "label": "linear_attn.in_proj_a",
+          "modules": [
+            "linear_attn.in_proj_a",
+            "linear_attn.in_proj_b"
+          ],
+          "rows": 48,
+          "shipped": "lut23"
+        },
+        "linear_attn.in_proj_qkv": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.33251270931214094,
+                0.34057316603139043,
+                0.33388495817780495,
+                0.33419766603037715,
+                0.33211720921099186,
+                0.3346019578166306,
+                0.33335120836272836,
+                0.3366908337920904,
+                0.3353922078385949,
+                0.3366835839115083
+              ],
+              "reference_seconds": 0.3343998119235039,
+              "samples": [
+                0.0028400816954672337,
+                -0.008580207824707031,
+                -0.0009087081998586655,
+                0.005980833899229765,
+                0.00498679094016552,
+                0.0072707501240074635,
+                0.0014221244491636753,
+                -0.00015237601473927498,
+                0.00013729184865951538,
+                -0.0003649168647825718
+              ],
+              "seconds": 0.0007797081489115953,
+              "shipped": true,
+              "threadgroups": 160
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.3334212093614042,
+                0.33145354175940156,
+                0.3339258749037981,
+                0.33259062515571713,
+                0.3372030407190323,
+                0.3307920419611037,
+                0.334882500115782,
+                0.33539741579443216,
+                0.3357053748331964,
+                0.3408372080884874
+              ],
+              "reference_seconds": 0.33440418750979006,
+              "samples": [
+                0.013788540847599506,
+                0.015127708204090595,
+                0.01315691601485014,
+                0.013217916712164879,
+                0.022524376399815083,
+                0.01456370810046792,
+                0.02642787480726838,
+                0.016178543213754892,
+                0.013423333875834942,
+                0.0071825007908046246
+              ],
+              "seconds": 0.014176124474033713,
+              "shipped": false,
+              "threadgroups": 640
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k2",
+              "family": "lut23",
+              "reference_samples": [
+                0.3388921660371125,
+                0.3337961253710091,
+                0.33680979209020734,
+                0.33805333357304335,
+                0.3461636668071151,
+                0.33566349977627397,
+                0.3356996248476207,
+                0.3328205421566963,
+                0.3346569170244038,
+                0.33428625017404556
+              ],
+              "reference_seconds": 0.33568156231194735,
+              "samples": [
+                0.005738875828683376,
+                0.013432124629616737,
+                0.014501582831144333,
+                0.01615641638636589,
+                0.006351124495267868,
+                0.01663075014948845,
+                0.013087959494441748,
+                0.01643099868670106,
+                0.016436166130006313,
+                0.014297292102128267
+              ],
+              "seconds": 0.0143994374666363,
+              "shipped": false,
+              "threadgroups": 640
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_qkv",
+          "modules": [
+            "linear_attn.in_proj_qkv"
+          ],
+          "rows": 10240,
+          "shipped": "gemm_16x128"
+        },
+        "linear_attn.in_proj_z": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.3324706251733005,
+                0.33410870796069503,
+                0.3360285828821361,
+                0.34438720904290676,
+                0.3365347911603749,
+                0.33295095805078745,
+                0.33342745807021856,
+                0.33267233427613974,
+                0.33222387498244643,
+                0.3319669160991907
+              ],
+              "reference_seconds": 0.333189208060503,
+              "samples": [
+                -0.004054875113070011,
+                -0.005511125084012747,
+                -0.009084207937121391,
+                -0.015675874892622232,
+                -0.006785583216696978,
+                -0.003616957925260067,
+                -0.00441124988719821,
+                -0.002480084542185068,
+                -0.004648958332836628,
+                -0.0023142490535974503
+              ],
+              "seconds": -0.004530104110017419,
+              "shipped": false,
+              "threadgroups": 96
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.3413802497088909,
+                0.33158899983391166,
+                0.3315489166416228,
+                0.3317864169366658,
+                0.3454668326303363,
+                0.33111316710710526,
+                0.3322818330489099,
+                0.34863679204136133,
+                0.33138795802369714,
+                0.3343420000746846
+              ],
+              "reference_seconds": 0.33203412499278784,
+              "samples": [
+                -0.011037500109523535,
+                0.00392062496393919,
+                0.0022043753415346146,
+                -0.00030729174613952637,
+                -0.014080832712352276,
+                0.00789662403985858,
+                0.0036142091266810894,
+                -0.008873499929904938,
+                0.0076857092790305614,
+                0.002244916744530201
+              ],
+              "seconds": 0.0022246460430324078,
+              "shipped": true,
+              "threadgroups": 384
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k4",
+              "family": "lut23",
+              "reference_samples": [
+                0.3329658331349492,
+                0.33301004208624363,
+                0.3350244592875242,
+                0.33604420768097043,
+                0.3314927080646157,
+                0.33166829217225313,
+                0.3351432499475777,
+                0.3341770828701556,
+                0.3415913339704275,
+                0.34370529232546687
+              ],
+              "reference_seconds": 0.3346007710788399,
+              "samples": [
+                0.000900832936167717,
+                -0.0015752501785755157,
+                -0.0011821682564914227,
+                -0.003594499547034502,
+                0.004351749550551176,
+                -0.0007044589146971703,
+                0.0027314997278153896,
+                -0.0020684576593339443,
+                0.0010206238366663456,
+                -0.011274917051196098
+              ],
+              "seconds": -0.0009433135855942965,
+              "shipped": false,
+              "threadgroups": 768
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_z",
+          "modules": [
+            "linear_attn.in_proj_z"
+          ],
+          "rows": 6144,
+          "shipped": "gemm_16x32"
+        },
+        "linear_attn.out_proj": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.3306069578975439,
+                0.33148820931091905,
+                0.3346059159375727,
+                0.33338274993002415,
+                0.3389464155770838,
+                0.33586133318021894,
+                0.3349349172785878,
+                0.3319343328475952,
+                0.33291383273899555,
+                0.3425232907757163
+              ],
+              "reference_seconds": 0.33399433293379843,
+              "samples": [
+                0.006596875376999378,
+                -0.002139084506779909,
+                -0.0006767488084733486,
+                -3.062514588236809e-05,
+                -0.007599415257573128,
+                -0.004067415837198496,
+                -0.002706209197640419,
+                0.0016247089952230453,
+                -0.0020909993909299374,
+                -0.011592083144932985
+              ],
+              "seconds": -0.0021150419488549232,
+              "shipped": false,
+              "threadgroups": 80
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.33276004204526544,
+                0.33346833288669586,
+                0.3289246251806617,
+                0.3301243749447167,
+                0.3340982077643275,
+                0.33042729180306196,
+                0.33553399983793497,
+                0.3309892090037465,
+                0.3309744577854872,
+                0.3313152501359582
+              ],
+              "reference_seconds": 0.33115222956985235,
+              "samples": [
+                3.158301115036011e-05,
+                0.0014808764681220055,
+                0.0033097919076681137,
+                0.012248334009200335,
+                0.0006150421686470509,
+                0.008686208631843328,
+                -0.0033961250446736813,
+                0.007554956711828709,
+                0.0006565423682332039,
+                -0.0009087081998586655
+              ],
+              "seconds": 0.0010687094181776047,
+              "shipped": true,
+              "threadgroups": 320
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k4",
+              "family": "lut23",
+              "reference_samples": [
+                0.338189042173326,
+                0.3387183747254312,
+                0.3364436668343842,
+                0.3452717079780996,
+                0.33209437504410744,
+                0.3363436246290803,
+                0.33062783256173134,
+                0.3291394589468837,
+                0.3293310417793691,
+                0.3328263331204653
+              ],
+              "reference_seconds": 0.3345849788747728,
+              "samples": [
+                -0.006169124972075224,
+                0.0061365412548184395,
+                -0.0022308342158794403,
+                -0.012211165856570005,
+                0.012496541254222393,
+                0.012968958355486393,
+                0.00547195877879858,
+                0.007066791411489248,
+                0.012168623972684145,
+                0.0033020838163793087
+              ],
+              "seconds": 0.00580425001680851,
+              "shipped": false,
+              "threadgroups": 640
+            }
+          },
+          "columns": 6144,
+          "dispatches_per_token": 64,
+          "label": "linear_attn.out_proj",
+          "modules": [
+            "linear_attn.out_proj",
+            "self_attn.o_proj"
+          ],
+          "rows": 5120,
+          "shipped": "gemm_16x32"
+        },
+        "lm_head": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.3415208328515291,
+                0.34331595804542303,
+                0.3557375413365662,
+                0.3426735829561949,
+                0.3451307499781251,
+                0.34772316692397,
+                0.34443779196590185,
+                0.3493597502820194,
+                0.33505529072135687,
+                0.3464225409552455
+              ],
+              "reference_seconds": 0.3447842709720135,
+              "samples": [
+                0.0042117503471672535,
+                -0.0017832079902291298,
+                -0.009324291255325079,
+                0.0011513750068843365,
+                -0.003676292020827532,
+                -0.008792083710432053,
+                -0.002117583528161049,
+                -0.012299000285565853,
+                0.008181500248610973,
+                -0.005341832991689444
+              ],
+              "seconds": -0.0028969377744942904,
+              "shipped": true,
+              "threadgroups": 3880
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.3427807088010013,
+                0.33928625006228685,
+                0.3386078327894211,
+                0.3422085829079151,
+                0.33922600001096725,
+                0.3393722088076174,
+                0.3394717089831829,
+                0.3392071658745408,
+                0.3416559579782188,
+                0.35010787518694997
+              ],
+              "reference_seconds": 0.33942195889540017,
+              "samples": [
+                -0.002192168030887842,
+                0.006363249849528074,
+                0.003520501311868429,
+                0.0047599999234080315,
+                0.002481750212609768,
+                0.003292875364422798,
+                0.0022982489317655563,
+                -0.0010790405794978142,
+                -0.0023272912949323654,
+                0.009336041752249002
+              ],
+              "seconds": 0.002887312788516283,
+              "shipped": false,
+              "threadgroups": 15520
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed",
+              "family": "lut23",
+              "reference_samples": [
+                0.34079916682094336,
+                0.3436640831641853,
+                0.34407654218375683,
+                0.33754250034689903,
+                0.34258158365264535,
+                0.3412588331848383,
+                0.35000354098156095,
+                0.343364333268255,
+                0.34218129189684987,
+                0.3538096249103546
+              ],
+              "reference_seconds": 0.3429729584604502,
+              "samples": [
+                0.001169458031654358,
+                -0.0023728744126856327,
+                0.010820208117365837,
+                -0.0005456251092255116,
+                0.006817958317697048,
+                0.00042616669088602066,
+                -0.012567083351314068,
+                -0.0038463743403553963,
+                0.009279000107198954,
+                -0.012616666965186596
+              ],
+              "seconds": -5.9729209169745445e-05,
+              "shipped": false,
+              "threadgroups": 7760
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 1,
+          "label": "lm_head",
+          "modules": [
+            "lm_head"
+          ],
+          "rows": 248320,
+          "shipped": "gemm_16x128"
+        },
+        "mlp.down_proj": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.33616808289662004,
+                0.3314149999059737,
+                0.34406733280047774,
+                0.3316111247986555,
+                0.3310910416767001,
+                0.33163374988362193,
+                0.3317972500808537,
+                0.3316711247898638,
+                0.331383959390223,
+                0.3326813750900328
+              ],
+              "reference_seconds": 0.3316524373367429,
+              "samples": [
+                -0.0004918328486382961,
+                0.005649583879858255,
+                0.0024148342199623585,
+                0.008178250398486853,
+                0.005417375359684229,
+                0.006745833903551102,
+                0.003865374717861414,
+                0.003919166978448629,
+                0.004707165528088808,
+                0.00310608372092247
+              ],
+              "seconds": 0.004313166253268719,
+              "shipped": false,
+              "threadgroups": 80
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.3318138332106173,
+                0.33358895778656006,
+                0.33333066711202264,
+                0.3339916253462434,
+                0.332032416947186,
+                0.33369741681963205,
+                0.3316894588060677,
+                0.3309599165804684,
+                0.3340458329766989,
+                0.3443331248126924
+              ],
+              "reference_seconds": 0.33345981244929135,
+              "samples": [
+                0.00010899966582655907,
+                -9.645754471421242e-05,
+                -0.0012382087297737598,
+                -0.0003882921300828457,
+                0.0006427918560802937,
+                -0.0030169165693223476,
+                0.0012848740443587303,
+                0.010173708200454712,
+                0.001789124682545662,
+                -0.012392249889671803
+              ],
+              "seconds": 6.271060556173325e-06,
+              "shipped": true,
+              "threadgroups": 320
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k4",
+              "family": "lut23",
+              "reference_samples": [
+                0.33113662526011467,
+                0.33433254109695554,
+                0.3343771672807634,
+                0.3324485830962658,
+                0.33226962480694056,
+                0.33214295795187354,
+                0.3324642078951001,
+                0.33496183389797807,
+                0.33307833410799503,
+                0.3414696669206023
+              ],
+              "reference_seconds": 0.3327712710015476,
+              "samples": [
+                0.011849749833345413,
+                0.007669250946491957,
+                0.011123957578092813,
+                0.0103604169562459,
+                0.012282500509172678,
+                0.02016858384013176,
+                0.009797375183552504,
+                0.007162874098867178,
+                0.010370957665145397,
+                0.013468208257108927
+              ],
+              "seconds": 0.010747457621619105,
+              "shipped": false,
+              "threadgroups": 640
+            }
+          },
+          "columns": 17408,
+          "dispatches_per_token": 64,
+          "label": "mlp.down_proj",
+          "modules": [
+            "mlp.down_proj"
+          ],
+          "rows": 5120,
+          "shipped": "gemm_16x32"
+        },
+        "mlp.gate_proj": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.33710870798677206,
+                0.33539229119196534,
+                0.331386208999902,
+                0.3456695838831365,
+                0.3374293749220669,
+                0.3525060839019716,
+                0.3449358749203384,
+                0.3458390003070235,
+                0.3480953327380121,
+                0.3458420420065522
+              ],
+              "reference_seconds": 0.34530272940173745,
+              "samples": [
+                0.0029934169724583626,
+                0.004032417666167021,
+                0.008932041004300117,
+                -0.009068833664059639,
+                0.004406750202178955,
+                0.0004624160937964916,
+                -0.0030747922137379646,
+                -0.005972083657979965,
+                -0.0008804155513644218,
+                -0.008283042348921299
+              ],
+              "seconds": -0.0002089997287839651,
+              "shipped": true,
+              "threadgroups": 272
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.34487208304926753,
+                0.3392566251568496,
+                0.3393365000374615,
+                0.3398468750528991,
+                0.3391988333314657,
+                0.3423630828037858,
+                0.3420717502012849,
+                0.3370304577983916,
+                0.33767512533813715,
+                0.3611602080054581
+              ],
+              "reference_seconds": 0.3395916875451803,
+              "samples": [
+                0.04373012622818351,
+                0.05125179188326001,
+                0.053059165831655264,
+                0.05412854114547372,
+                0.05253291642293334,
+                0.0474396669305861,
+                0.054328957572579384,
+                0.05469512613490224,
+                0.05518299946561456,
+                0.025515291839838028
+              ],
+              "seconds": 0.0527960411272943,
+              "shipped": false,
+              "threadgroups": 1088
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed",
+              "family": "lut23",
+              "reference_samples": [
+                0.33950983406975865,
+                0.3425191668793559,
+                0.33957220800220966,
+                0.3382845423184335,
+                0.3423804575577378,
+                0.3480187081731856,
+                0.34273333428427577,
+                0.34219695813953876,
+                0.3400079160928726,
+                0.3405927079729736
+              ],
+              "reference_seconds": 0.3413948330562562,
+              "samples": [
+                0.06500508263707161,
+                0.06458837492391467,
+                0.0690753748640418,
+                0.06303558265790343,
+                0.0622145002707839,
+                0.05813095811754465,
+                0.0711260405369103,
+                0.061506500001996756,
+                0.061419709119945765,
+                0.06702437484636903
+              ],
+              "seconds": 0.06381197879090905,
+              "shipped": false,
+              "threadgroups": 544
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 128,
+          "label": "mlp.gate_proj",
+          "modules": [
+            "mlp.gate_proj",
+            "mlp.up_proj"
+          ],
+          "rows": 17408,
+          "shipped": "gemm_16x128"
+        },
+        "self_attn.k_proj": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.33911074977368116,
+                0.3393142498098314,
+                0.34006554121151567,
+                0.3376864157617092,
+                0.330912624951452,
+                0.33331291656941175,
+                0.341041165869683,
+                0.34157237503677607,
+                0.3370600841008127,
+                0.3347279578447342
+              ],
+              "reference_seconds": 0.3383985827676952,
+              "samples": [
+                0.0039527080953121185,
+                -0.0021225418895483017,
+                -0.0005747908726334572,
+                1.834239810705185e-06,
+                0.006418833043426275,
+                0.0017659584991633892,
+                -0.00043458258733153343,
+                0.00907041598111391,
+                -0.005318501032888889,
+                -0.000781540758907795
+              ],
+              "seconds": -0.00021637417376041412,
+              "shipped": false,
+              "threadgroups": 16
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.34157295897603035,
+                0.3355975830927491,
+                0.32960129203274846,
+                0.33316208329051733,
+                0.33447145903483033,
+                0.33901545871049166,
+                0.32939991680905223,
+                0.33810775028541684,
+                0.3331030001863837,
+                0.33192062517628074
+              ],
+              "reference_seconds": 0.33381677116267383,
+              "samples": [
+                0.014763582963496447,
+                0.0009668339043855667,
+                0.007323874160647392,
+                0.0035139587707817554,
+                0.00038074934855103493,
+                -0.0034118336625397205,
+                0.0034491252154111862,
+                -0.00570216728374362,
+                0.008041915483772755,
+                0.002441166900098324
+              ],
+              "seconds": 0.002945146057754755,
+              "shipped": false,
+              "threadgroups": 64
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k20",
+              "family": "lut23",
+              "reference_samples": [
+                0.34319754084572196,
+                0.33874116698279977,
+                0.3339837919920683,
+                0.3324497500434518,
+                0.3346303328871727,
+                0.3460138328373432,
+                0.3325732918456197,
+                0.3351578339934349,
+                0.34342570835724473,
+                0.33110862458124757
+              ],
+              "reference_seconds": 0.3348940834403038,
+              "samples": [
+                -0.0059568327851593494,
+                0.0023420420475304127,
+                -0.0012933327816426754,
+                0.0015076659619808197,
+                -0.0025108749978244305,
+                -0.014928542077541351,
+                0.004638958256691694,
+                -9.037507697939873e-05,
+                -0.00861591612920165,
+                0.01026820857077837
+              ],
+              "seconds": -0.0006918539293110371,
+              "shipped": true,
+              "threadgroups": 640
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 32,
+          "label": "self_attn.k_proj",
+          "modules": [
+            "self_attn.k_proj",
+            "self_attn.v_proj"
+          ],
+          "rows": 1024,
+          "shipped": "lut23"
+        },
+        "self_attn.q_proj": {
+          "best": "gemm_16x128",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.33388483291491866,
+                0.3356130002066493,
+                0.3389471252448857,
+                0.3356883330270648,
+                0.3454178753308952,
+                0.33862283267080784,
+                0.3454546248540282,
+                0.3424573331139982,
+                0.3434255002066493,
+                0.338810124900192
+              ],
+              "reference_seconds": 0.33887862507253885,
+              "samples": [
+                0.0006255842745304108,
+                -0.0021055415272712708,
+                0.0020881667733192444,
+                0.0014397921040654182,
+                -0.007076500449329615,
+                -0.0015588323585689068,
+                -0.0034961667843163013,
+                -0.0025574988685548306,
+                0.000985665712505579,
+                0.00048612477257847786
+              ],
+              "seconds": -0.0005363537929952145,
+              "shipped": true,
+              "threadgroups": 192
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.3391596246510744,
+                0.3362576253712177,
+                0.3378225420601666,
+                0.33768283296376467,
+                0.3395705418661237,
+                0.33483058400452137,
+                0.3372403336688876,
+                0.3369849161244929,
+                0.3534858343191445,
+                0.346798375248909
+              ],
+              "reference_seconds": 0.33775268751196563,
+              "samples": [
+                -0.0001805839128792286,
+                0.008709124755114317,
+                -0.00184187525883317,
+                0.002486417070031166,
+                0.0011902488768100739,
+                0.005719583015888929,
+                0.008745166007429361,
+                0.004215208813548088,
+                -0.006754292640835047,
+                0.0010867496021091938
+              ],
+              "seconds": 0.00183833297342062,
+              "shipped": false,
+              "threadgroups": 768
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k2",
+              "family": "lut23",
+              "reference_samples": [
+                0.3370715407654643,
+                0.3540916657075286,
+                0.3380314582027495,
+                0.3388625830411911,
+                0.33422941621392965,
+                0.3352408749051392,
+                0.3356248331256211,
+                0.33768833288922906,
+                0.3399767498485744,
+                0.341109249740839
+              ],
+              "reference_seconds": 0.3378598955459893,
+              "samples": [
+                0.014046709053218365,
+                -0.0010557067580521107,
+                0.005038582719862461,
+                0.004807957913726568,
+                0.005920874886214733,
+                0.0050949580036103725,
+                0.004343791864812374,
+                0.0099976253695786,
+                0.008537542074918747,
+                0.0023339162580668926
+              ],
+              "seconds": 0.005066770361736417,
+              "shipped": false,
+              "threadgroups": 768
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 16,
+          "label": "self_attn.q_proj",
+          "modules": [
+            "self_attn.q_proj"
+          ],
+          "rows": 12288,
+          "shipped": "gemm_16x128"
+        }
+      }
+    },
+    "8": {
+      "shapes": {
+        "linear_attn.in_proj_a": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.10526795918121934,
+                0.09874208318069577,
+                0.09956179186701775,
+                0.09929462475702167,
+                0.09926345804706216,
+                0.1000332091934979,
+                0.1019004168920219,
+                0.10344500001519918,
+                0.10479737492278218,
+                0.106111875269562
+              ],
+              "reference_seconds": 0.1009668130427599,
+              "samples": [
+                0.005511290859431028,
+                0.010758375748991966,
+                0.010555750224739313,
+                0.010260208044201136,
+                0.010489957872778177,
+                0.009742582682520151,
+                0.009174708276987076,
+                0.009254457894712687,
+                0.009068083018064499,
+                0.007778541650623083
+              ],
+              "seconds": 0.009498520288616419,
+              "shipped": false,
+              "threadgroups": 1
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1005782918073237,
+                0.09926845878362656,
+                0.09882595809176564,
+                0.0992585001513362,
+                0.09892304101958871,
+                0.1005887920036912,
+                0.10214087460190058,
+                0.10364470817148685,
+                0.10501950001344085,
+                0.10477870795875788
+              ],
+              "reference_seconds": 0.10058354190550745,
+              "samples": [
+                0.006082458421587944,
+                0.007541125174611807,
+                0.008741542231291533,
+                0.006832582410424948,
+                0.007176958955824375,
+                0.006697040982544422,
+                0.006806500256061554,
+                0.0065324995666742325,
+                0.004423792008310556,
+                0.005696374922990799
+              ],
+              "seconds": 0.006751770619302988,
+              "shipped": false,
+              "threadgroups": 2
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.100016666110605,
+                0.09872312471270561,
+                0.09921883326023817,
+                0.09861687524244189,
+                0.09913066634908319,
+                0.09947695815935731,
+                0.10244308318942785,
+                0.10215191589668393,
+                0.10543691599741578,
+                0.1047784578986466
+              ],
+              "reference_seconds": 0.09974681213498116,
+              "samples": [
+                0.01890858355909586,
+                0.016420625150203705,
+                0.0161854587495327,
+                0.01631349977105856,
+                0.016409958247095346,
+                0.015999166760593653,
+                0.013348208740353584,
+                0.014592292252928019,
+                0.013004667591303587,
+                0.013648709282279015
+              ],
+              "seconds": 0.016092312755063176,
+              "shipped": false,
+              "threadgroups": 1
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.10031912522390485,
+                0.09886987507343292,
+                0.09933591680601239,
+                0.10004216711968184,
+                0.09908795775845647,
+                0.09979016659781337,
+                0.10138095822185278,
+                0.10229329206049442,
+                0.10429950011894107,
+                0.10488591715693474
+              ],
+              "reference_seconds": 0.10018064617179334,
+              "samples": [
+                0.019627082627266645,
+                0.018600333016365767,
+                0.01850008312612772,
+                0.01721408311277628,
+                0.018922417424619198,
+                0.017563875298947096,
+                0.016761625185608864,
+                0.01751845795661211,
+                0.016168166883289814,
+                0.01572274975478649
+              ],
+              "seconds": 0.017541166627779603,
+              "shipped": false,
+              "threadgroups": 1
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.10021720919758081,
+                0.09915520809590816,
+                0.09930679108947515,
+                0.09880437469109893,
+                0.098900374956429,
+                0.0993104581721127,
+                0.10098195821046829,
+                0.10494508314877748,
+                0.10499587515369058,
+                0.10562233300879598
+              ],
+              "reference_seconds": 0.09976383368484676,
+              "samples": [
+                0.0071302070282399654,
+                0.007279791869223118,
+                0.00720083387568593,
+                0.007214083336293697,
+                0.00736920814961195,
+                0.007589625660330057,
+                0.006563958711922169,
+                0.004994874820113182,
+                0.00625558290630579,
+                0.004990291781723499
+              ],
+              "seconds": 0.007165520451962948,
+              "shipped": false,
+              "threadgroups": 2
+            },
+            "lut23": {
+              "config": "lut23_bt1_padded_k40",
+              "family": "lut23",
+              "reference_samples": [
+                0.09947529202327132,
+                0.09906441625207663,
+                0.0991122080013156,
+                0.09923662478104234,
+                0.09865737473592162,
+                0.09910833276808262,
+                0.1023387499153614,
+                0.10378887504339218,
+                0.10481512499973178,
+                0.1059274161234498
+              ],
+              "reference_seconds": 0.09935595840215683,
+              "samples": [
+                -0.0006537088192999363,
+                5.4792966693639755e-05,
+                -0.000177707988768816,
+                3.0250288546085358e-05,
+                0.0004381672479212284,
+                0.00034679193049669266,
+                -0.0002483748830854893,
+                -0.0003865421749651432,
+                -0.0010438752360641956,
+                -7.395818829536438e-05
+              ],
+              "seconds": -0.0001258330885320902,
+              "shipped": true,
+              "threadgroups": 320
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 96,
+          "label": "linear_attn.in_proj_a",
+          "modules": [
+            "linear_attn.in_proj_a",
+            "linear_attn.in_proj_b"
+          ],
+          "rows": 48,
+          "shipped": "lut23"
+        },
+        "linear_attn.in_proj_qkv": {
+          "best": "gemm_8x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.13108854182064533,
+                0.1274449578486383,
+                0.12807929096743464,
+                0.1276478748768568,
+                0.12492712493985891,
+                0.12645937502384186,
+                0.12522329203784466,
+                0.12451429106295109,
+                0.12726974999532104,
+                0.12464099982753396
+              ],
+              "reference_seconds": 0.12686456250958145,
+              "samples": [
+                0.010219166055321693,
+                0.011140375398099422,
+                0.011604167055338621,
+                0.011463542003184557,
+                0.012684041168540716,
+                0.010021875146776438,
+                0.01118941605091095,
+                0.011708708945661783,
+                0.009921707678586245,
+                0.011445708107203245
+              ],
+              "seconds": 0.011317562079057097,
+              "shipped": false,
+              "threadgroups": 80
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.13224304234609008,
+                0.13085566693916917,
+                0.13298470806330442,
+                0.13162808306515217,
+                0.1266410001553595,
+                0.1285505830310285,
+                0.1280606659129262,
+                0.1275807498022914,
+                0.13005775026977062,
+                0.12743995804339647
+              ],
+              "reference_seconds": 0.12930416665039957,
+              "samples": [
+                0.008871040306985378,
+                0.00905199907720089,
+                0.010168291628360748,
+                0.00793783413246274,
+                0.01060729194432497,
+                0.008712667040526867,
+                0.009392125066369772,
+                0.008546459022909403,
+                0.013852416537702084,
+                0.008621041662991047
+              ],
+              "seconds": 0.008961519692093134,
+              "shipped": false,
+              "threadgroups": 320
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.13586108293384314,
+                0.1327192923054099,
+                0.13143337471410632,
+                0.13059474993497133,
+                0.1304571251384914,
+                0.1294113746844232,
+                0.12929833307862282,
+                0.12952483305707574,
+                0.12816333398222923,
+                0.13070662505924702
+              ],
+              "reference_seconds": 0.13052593753673136,
+              "samples": [
+                0.014457999728620052,
+                0.017392625100910664,
+                0.012966792564839125,
+                0.014853499829769135,
+                0.013953540474176407,
+                0.01570833334699273,
+                0.01463170861825347,
+                0.0153443762101233,
+                0.014956457074731588,
+                0.015056499745696783
+              ],
+              "seconds": 0.014904978452250361,
+              "shipped": false,
+              "threadgroups": 80
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.1313115837983787,
+                0.12817725026980042,
+                0.13160541700199246,
+                0.1274945419281721,
+                0.12665404099971056,
+                0.130235250107944,
+                0.12631375016644597,
+                0.13037779089063406,
+                0.1302925841882825,
+                0.1263505406677723
+              ],
+              "reference_seconds": 0.12920625018887222,
+              "samples": [
+                0.02103208238258958,
+                0.019587207585573196,
+                0.01819179207086563,
+                0.01873350003734231,
+                0.018835751339793205,
+                0.01664049969986081,
+                0.019282374996691942,
+                0.016195917036384344,
+                0.016323416028171778,
+                0.018021709751337767
+              ],
+              "seconds": 0.01846264605410397,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1285626250319183,
+                0.13277620915323496,
+                0.13125783391296864,
+                0.1317312498576939,
+                0.13082558428868651,
+                0.1333395829424262,
+                0.12989412480965257,
+                0.13072550017386675,
+                0.1318742921575904,
+                0.1292685833759606
+              ],
+              "reference_seconds": 0.13104170910082757,
+              "samples": [
+                0.0022880001924932003,
+                -0.0030722511000931263,
+                -0.002425792161375284,
+                -0.004376084078103304,
+                -0.003036709502339363,
+                -0.003944708034396172,
+                -0.0017019589431583881,
+                -0.0025197500362992287,
+                -0.00491562532261014,
+                -0.0009495834819972515
+              ],
+              "seconds": -0.002778229769319296,
+              "shipped": false,
+              "threadgroups": 320
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k10",
+              "family": "lut23",
+              "reference_samples": [
+                0.13309758342802525,
+                0.13299650000408292,
+                0.13390233321115375,
+                0.13600333407521248,
+                0.13010429171845317,
+                0.12899083318188787,
+                0.12968824990093708,
+                0.12967458367347717,
+                0.13843675004318357,
+                0.1295230840332806
+              ],
+              "reference_seconds": 0.13155039586126804,
+              "samples": [
+                -0.0003382083959877491,
+                -0.00022887485101819038,
+                -0.0010746661573648453,
+                -0.004004959017038345,
+                0.0003518741577863693,
+                0.0011291666887700558,
+                -0.00017179222777485847,
+                -0.00032583344727754593,
+                -0.0031415000557899475,
+                -0.0004627928137779236
+              ],
+              "seconds": -0.0003320209216326475,
+              "shipped": true,
+              "threadgroups": 800
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_qkv",
+          "modules": [
+            "linear_attn.in_proj_qkv"
+          ],
+          "rows": 10240,
+          "shipped": "lut23"
+        },
+        "linear_attn.in_proj_z": {
+          "best": "gemm_8x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.14107637479901314,
+                0.1484110001474619,
+                0.14064487488940358,
+                0.136676459107548,
+                0.13470999989658594,
+                0.13424945762380958,
+                0.13369037490338087,
+                0.13075787527486682,
+                0.129269499797374,
+                0.13120304187759757
+              ],
+              "reference_seconds": 0.13447972876019776,
+              "samples": [
+                0.017144042532891035,
+                0.005221208557486534,
+                0.01520987506955862,
+                0.01672699861228466,
+                0.017402042169123888,
+                0.015921584330499172,
+                0.013856375124305487,
+                0.016363166738301516,
+                0.017735667061060667,
+                0.01418854109942913
+              ],
+              "seconds": 0.016142375534400344,
+              "shipped": false,
+              "threadgroups": 48
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.14531795773655176,
+                0.14696604199707508,
+                0.14174554077908397,
+                0.14048633305355906,
+                0.13977737491950393,
+                0.13581704068928957,
+                0.13407858414575458,
+                0.13374445773661137,
+                0.13625233294442296,
+                0.1349501251243055
+              ],
+              "reference_seconds": 0.13801485393196344,
+              "samples": [
+                0.01657075062394142,
+                0.008672707714140415,
+                0.011884376406669617,
+                0.01241600001230836,
+                0.013503708876669407,
+                0.01254958426579833,
+                0.014560915995389223,
+                0.019693500362336636,
+                0.012430333998054266,
+                0.011622624937444925
+              ],
+              "seconds": 0.012489959131926298,
+              "shipped": false,
+              "threadgroups": 192
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.15161170763894916,
+                0.1551923337392509,
+                0.1416297908872366,
+                0.14790379209443927,
+                0.13971012504771352,
+                0.1428731670603156,
+                0.13649949990212917,
+                0.13864179188385606,
+                0.13496366702020168,
+                0.13700283272191882
+              ],
+              "reference_seconds": 0.14066995796747506,
+              "samples": [
+                0.014591792598366737,
+                0.019104457460343838,
+                0.01884287502616644,
+                0.01968158269301057,
+                0.01942933304235339,
+                0.02312954096123576,
+                0.0205077501013875,
+                0.020594416186213493,
+                0.019430375192314386,
+                0.017719751223921776
+              ],
+              "seconds": 0.01942985411733389,
+              "shipped": false,
+              "threadgroups": 48
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.14244891703128815,
+                0.14601437514647841,
+                0.14651333261281252,
+                0.14085870794951916,
+                0.13579624984413385,
+                0.13557974994182587,
+                0.1338891671039164,
+                0.13668983383104205,
+                0.1357387499883771,
+                0.12929358379915357
+              ],
+              "reference_seconds": 0.13624304183758795,
+              "samples": [
+                0.02568308310583234,
+                0.02109279064461589,
+                0.021400584373623133,
+                0.025263875257223845,
+                0.025655209086835384,
+                0.024421667214483023,
+                0.02945033274590969,
+                0.020699250511825085,
+                0.018714542035013437,
+                0.024165041279047728
+              ],
+              "seconds": 0.024293354246765375,
+              "shipped": false,
+              "threadgroups": 24
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.14323991583660245,
+                0.14846958359703422,
+                0.14220324996858835,
+                0.14572183415293694,
+                0.1399462502449751,
+                0.1556209996342659,
+                0.13869970804080367,
+                0.13942304207012057,
+                0.13445254182443023,
+                0.14284362504258752
+              ],
+              "reference_seconds": 0.14252343750558794,
+              "samples": [
+                0.010822834447026253,
+                -0.0006059585139155388,
+                0.0018547922372817993,
+                0.0015903329476714134,
+                0.0014977497048676014,
+                -0.004646957386285067,
+                0.0011906251311302185,
+                -0.0012793750502169132,
+                0.0023644580505788326,
+                -0.0007265419699251652
+              ],
+              "seconds": 0.00134418741799891,
+              "shipped": false,
+              "threadgroups": 192
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k10",
+              "family": "lut23",
+              "reference_samples": [
+                0.14861270831897855,
+                0.14543212484568357,
+                0.1490009999834001,
+                0.14340870827436447,
+                0.14296350022777915,
+                0.13833016576245427,
+                0.13809308409690857,
+                0.1421463331207633,
+                0.1353827496059239,
+                0.13544637523591518
+              ],
+              "reference_seconds": 0.14255491667427123,
+              "samples": [
+                0.006242375820875168,
+                0.0016018333844840527,
+                -0.00447158282622695,
+                0.0013532084412872791,
+                -0.0015650000423192978,
+                0.011702167335897684,
+                0.0016338331624865532,
+                -0.002693583257496357,
+                -0.0011637075804173946,
+                0.006090208422392607
+              ],
+              "seconds": 0.001477520912885666,
+              "shipped": true,
+              "threadgroups": 480
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "label": "linear_attn.in_proj_z",
+          "modules": [
+            "linear_attn.in_proj_z"
+          ],
+          "rows": 6144,
+          "shipped": "lut23"
+        },
+        "linear_attn.out_proj": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1013552499935031,
+                0.10291329212486744,
+                0.10188583424314857,
+                0.10356720816344023,
+                0.10821495903655887,
+                0.10747491708025336,
+                0.10986266611143947,
+                0.11327699990943074,
+                0.11550304107367992,
+                0.11599020892754197
+              ],
+              "reference_seconds": 0.10784493805840611,
+              "samples": [
+                0.018040625378489494,
+                0.017375416588038206,
+                0.018609081394970417,
+                0.01830583345144987,
+                0.020475707948207855,
+                0.023291416931897402,
+                0.021882376167923212,
+                0.02232749992981553,
+                0.02025650069117546,
+                0.021794374100863934
+              ],
+              "seconds": 0.020366104319691658,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.10236995806917548,
+                0.10225608432665467,
+                0.10320799984037876,
+                0.10563975013792515,
+                0.10379183385521173,
+                0.11265870835632086,
+                0.11460541700944304,
+                0.11593033280223608,
+                0.11752675008028746,
+                0.12248354172334075
+              ],
+              "reference_seconds": 0.109149229247123,
+              "samples": [
+                0.013448916841298342,
+                0.01329374872148037,
+                0.020832375157624483,
+                0.012739458587020636,
+                0.016216624062508345,
+                0.013421583455055952,
+                0.012914000079035759,
+                0.01575500052422285,
+                0.015146583318710327,
+                0.01265791617333889
+              ],
+              "seconds": 0.013435250148177147,
+              "shipped": false,
+              "threadgroups": 160
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1033100406639278,
+                0.10430187499150634,
+                0.113409667275846,
+                0.10767908301204443,
+                0.11047462513670325,
+                0.1131939166225493,
+                0.114933708216995,
+                0.11654804227873683,
+                0.12082216702401638,
+                0.12362612504512072
+              ],
+              "reference_seconds": 0.11330179194919765,
+              "samples": [
+                0.028487584553658962,
+                0.02862324984744191,
+                0.020401582587510347,
+                0.027750874869525433,
+                0.026331957895308733,
+                0.02356020826846361,
+                0.027855457738041878,
+                0.02676670765504241,
+                0.027519208379089832,
+                0.027491542045027018
+              ],
+              "seconds": 0.027505375212058425,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.10196879226714373,
+                0.10216258419677615,
+                0.10327012510970235,
+                0.10486170882359147,
+                0.10919325007125735,
+                0.10883783316239715,
+                0.11290987487882376,
+                0.11411070777103305,
+                0.11886995891109109,
+                0.11835904140025377
+              ],
+              "reference_seconds": 0.10901554161682725,
+              "samples": [
+                0.03180854069069028,
+                0.03074349882081151,
+                0.03219408402219415,
+                0.034222790971398354,
+                0.03411595895886421,
+                0.03291779151186347,
+                0.03070787526667118,
+                0.033180542290210724,
+                0.03132320800796151,
+                0.038730083499103785
+              ],
+              "seconds": 0.03255593776702881,
+              "shipped": false,
+              "threadgroups": 20
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.10165683412924409,
+                0.10401612473651767,
+                0.10739779099822044,
+                0.10597420763224363,
+                0.11331208376213908,
+                0.11824241606518626,
+                0.114741291385144,
+                0.11774487467482686,
+                0.12102383282035589,
+                0.1235435837879777
+              ],
+              "reference_seconds": 0.11402668757364154,
+              "samples": [
+                0.0019609988667070866,
+                0.00812237523496151,
+                0.0011689183302223682,
+                0.002159625757485628,
+                -0.0016757086850702763,
+                -0.003817373886704445,
+                0.0038127913139760494,
+                0.00148108322173357,
+                1.0667368769645691e-05,
+                0.0006719161756336689
+              ],
+              "seconds": 0.0013250007759779692,
+              "shipped": false,
+              "threadgroups": 160
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k16",
+              "family": "lut23",
+              "reference_samples": [
+                0.10351004172116518,
+                0.10381562495604157,
+                0.10522291716188192,
+                0.10676445811986923,
+                0.11453799996525049,
+                0.11096950015053153,
+                0.11555729201063514,
+                0.11681425012648106,
+                0.11961554223671556,
+                0.1253786669112742
+              ],
+              "reference_seconds": 0.11275375005789101,
+              "samples": [
+                4.337448626756668e-05,
+                0.00012866593897342682,
+                0.000533123966306448,
+                0.0005995007231831551,
+                -0.0015541668981313705,
+                0.0018731248565018177,
+                0.0010968330316245556,
+                0.0002564997412264347,
+                0.001303957775235176,
+                -0.0010646670125424862
+              ],
+              "seconds": 0.00039481185376644135,
+              "shipped": true,
+              "threadgroups": 640
+            }
+          },
+          "columns": 6144,
+          "dispatches_per_token": 64,
+          "label": "linear_attn.out_proj",
+          "modules": [
+            "linear_attn.out_proj",
+            "self_attn.o_proj"
+          ],
+          "rows": 5120,
+          "shipped": "lut23"
+        },
+        "lm_head": {
+          "best": "gemm_16x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1303203753195703,
+                0.13134774984791875,
+                0.13020670833066106,
+                0.13192620920017362,
+                0.13147654198110104,
+                0.1369035830721259,
+                0.13270025001838803,
+                0.1311572501435876,
+                0.13089491706341505,
+                0.13110150024294853
+              ],
+              "reference_seconds": 0.13125249999575317,
+              "samples": [
+                -0.0003105415962636471,
+                -0.0006295000202953815,
+                0.001985791604965925,
+                0.002325665671378374,
+                -0.0008126669563353062,
+                -0.0026425831019878387,
+                -0.0026747090741991997,
+                -0.001325374934822321,
+                -2.5830231606960297e-06,
+                0.0013725417666137218
+              ],
+              "seconds": -0.0004700208082795143,
+              "shipped": false,
+              "threadgroups": 1940
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.13164937496185303,
+                0.13100783294066787,
+                0.1340391249395907,
+                0.13105825008824468,
+                0.13122379081323743,
+                0.13294004229828715,
+                0.12993354070931673,
+                0.13080229191109538,
+                0.1309799589216709,
+                0.12993737496435642
+              ],
+              "reference_seconds": 0.13103304151445627,
+              "samples": [
+                -0.00046387501060962677,
+                -0.0002630408853292465,
+                -0.0030069155618548393,
+                -0.0010537919588387012,
+                -0.0008450406603515148,
+                -0.0015075011178851128,
+                0.0010318341664969921,
+                -0.0010714586824178696,
+                -0.0009093340486288071,
+                0.00014733336865901947
+              ],
+              "seconds": -0.0008771873544901609,
+              "shipped": false,
+              "threadgroups": 7760
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.13415104104205966,
+                0.129892208147794,
+                0.1325253751128912,
+                0.13161408295854926,
+                0.13259820779785514,
+                0.13215620815753937,
+                0.13050741609185934,
+                0.13173625012859702,
+                0.13008512509986758,
+                0.13096179207786918
+              ],
+              "reference_seconds": 0.13167516654357314,
+              "samples": [
+                0.0018057920970022678,
+                0.0009434167295694351,
+                -0.0010724999010562897,
+                -0.0007116249762475491,
+                -0.0010630828328430653,
+                0.006433541886508465,
+                -0.00033391593024134636,
+                0.00027179205790162086,
+                0.0014971247874200344,
+                0.0031272917985916138
+              ],
+              "seconds": 0.000607604393735528,
+              "shipped": false,
+              "threadgroups": 1940
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.1329802917316556,
+                0.1343309166841209,
+                0.13096545869484544,
+                0.13029866619035602,
+                0.13139374973252416,
+                0.13856545789167285,
+                0.1305679171346128,
+                0.1306608747690916,
+                0.12976962514221668,
+                0.13184420904144645
+              ],
+              "reference_seconds": 0.1311796042136848,
+              "samples": [
+                -0.0006971671245992184,
+                -0.0012351255863904953,
+                -2.4166423827409744e-05,
+                0.00016395887359976768,
+                -0.0009960406459867954,
+                -0.0006544995121657848,
+                0.00010812468826770782,
+                -0.0008882079273462296,
+                -4.045851528644562e-05,
+                -0.001456167083233595
+              ],
+              "seconds": -0.0006758333183825016,
+              "shipped": false,
+              "threadgroups": 970
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.12710266700014472,
+                0.13064133375883102,
+                0.13255137531086802,
+                0.13030374981462955,
+                0.13594275014474988,
+                0.13194337487220764,
+                0.13091120775789022,
+                0.13056062487885356,
+                0.13145716721192002,
+                0.12971662497147918
+              ],
+              "reference_seconds": 0.13077627075836062,
+              "samples": [
+                0.0029713748954236507,
+                -9.345868602395058e-05,
+                -0.001130958553403616,
+                -0.0004008747637271881,
+                0.00030962470918893814,
+                0.0006474172696471214,
+                -0.0001492910087108612,
+                -0.0009983330965042114,
+                0.00037895794957876205,
+                0.0004943329840898514
+              ],
+              "seconds": 0.00010808301158249378,
+              "shipped": false,
+              "threadgroups": 7760
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed",
+              "family": "lut23",
+              "reference_samples": [
+                0.13160479115322232,
+                0.13026458397507668,
+                0.13042891724035144,
+                0.1300802081823349,
+                0.13262487528845668,
+                0.12989658256992698,
+                0.13041175017133355,
+                0.13499866612255573,
+                0.13008941570296884,
+                0.1315302080474794
+              ],
+              "reference_seconds": 0.1304203337058425,
+              "samples": [
+                -0.0006864569149911404,
+                0.0008011236786842346,
+                0.0007922076620161533,
+                0.001709125004708767,
+                0.00035724975168704987,
+                0.0023814584128558636,
+                0.00026516709476709366,
+                -0.0018252911977469921,
+                0.00022187642753124237,
+                -0.0004116673953831196
+              ],
+              "seconds": 0.00031120842322707176,
+              "shipped": true,
+              "threadgroups": 1940
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 1,
+          "label": "lm_head",
+          "modules": [
+            "lm_head"
+          ],
+          "rows": 248320,
+          "shipped": "lut23"
+        },
+        "mlp.down_proj": {
+          "best": "gemm_8x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.11476291576400399,
+                0.11431387532502413,
+                0.11626612488180399,
+                0.12059170892462134,
+                0.12207733327522874,
+                0.12201674981042743,
+                0.12275445880368352,
+                0.12396837491542101,
+                0.12290366599336267,
+                0.1270703342743218
+              ],
+              "reference_seconds": 0.12204704154282808,
+              "samples": [
+                0.06406641704961658,
+                0.06606833264231682,
+                0.06635450012981892,
+                0.06677349889650941,
+                0.07008166704326868,
+                0.07419050019234419,
+                0.07491654111072421,
+                0.07528008427470922,
+                0.07362229283899069,
+                0.06751012476161122
+              ],
+              "seconds": 0.06879589590243995,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1222845409065485,
+                0.125471459235996,
+                0.12776483409106731,
+                0.12989329220727086,
+                0.12024575006216764,
+                0.13788587506860495,
+                0.13891624985262752,
+                0.14264849992468953,
+                0.13851316692307591,
+                0.13590470887720585
+              ],
+              "reference_seconds": 0.13289900054223835,
+              "samples": [
+                0.04448504187166691,
+                0.044961373787373304,
+                0.04855987476184964,
+                0.0470567075535655,
+                0.05457124998793006,
+                0.051723333075642586,
+                0.0503475833684206,
+                0.04709558328613639,
+                0.05109670804813504,
+                0.05039599910378456
+              ],
+              "seconds": 0.04945372906513512,
+              "shipped": false,
+              "threadgroups": 160
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.12757287500426173,
+                0.1291032498702407,
+                0.13488387502729893,
+                0.14821420889347792,
+                0.14324166579172015,
+                0.1436776672489941,
+                0.14559279195964336,
+                0.14670595759525895,
+                0.14957695826888084,
+                0.1456498336046934
+              ],
+              "reference_seconds": 0.14463522960431874,
+              "samples": [
+                0.08162066712975502,
+                0.07956162514165044,
+                0.08355862461030483,
+                0.08142445748671889,
+                0.08342604199424386,
+                0.08133262395858765,
+                0.08090895786881447,
+                0.08341145841404796,
+                0.08464445872232318,
+                0.08499733218923211
+              ],
+              "seconds": 0.08251606277190149,
+              "shipped": false,
+              "threadgroups": 40
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.1156934997998178,
+                0.11694274982437491,
+                0.13310645893216133,
+                0.1237699999473989,
+                0.12347041722387075,
+                0.12357154209166765,
+                0.12504416704177856,
+                0.1253269580192864,
+                0.1452702502720058,
+                0.12645433330908418
+              ],
+              "reference_seconds": 0.12440708349458873,
+              "samples": [
+                0.09540754137560725,
+                0.10195020819082856,
+                0.08834645804017782,
+                0.10210816701874137,
+                0.11390312388539314,
+                0.10447908286005259,
+                0.10704166581854224,
+                0.10488254204392433,
+                0.09185354178771377,
+                0.1069567077793181
+              ],
+              "seconds": 0.10329362493939698,
+              "shipped": false,
+              "threadgroups": 20
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.11736679216846824,
+                0.13268912490457296,
+                0.13876866595819592,
+                0.14216758403927088,
+                0.14353683311492205,
+                0.14687033323571086,
+                0.14519437495619059,
+                0.14838266698643565,
+                0.14802933391183615,
+                0.14934387523680925
+              ],
+              "reference_seconds": 0.14436560403555632,
+              "samples": [
+                0.00999233266338706,
+                0.0030583329498767853,
+                -1.5818513929843903e-06,
+                0.0029617082327604294,
+                0.0027207089588046074,
+                7.183244451880455e-05,
+                0.0007984996773302555,
+                -0.001326624769717455,
+                -0.00021320907399058342,
+                -0.0003987918607890606
+              ],
+              "seconds": 0.00043516606092453003,
+              "shipped": false,
+              "threadgroups": 160
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k17",
+              "family": "lut23",
+              "reference_samples": [
+                0.12912999978289008,
+                0.12992291618138552,
+                0.1363909998908639,
+                0.1392020001076162,
+                0.13933420926332474,
+                0.13470245897769928,
+                0.14766712486743927,
+                0.14575441740453243,
+                0.14781304076313972,
+                0.14489979203790426
+              ],
+              "reference_seconds": 0.13926810468547046,
+              "samples": [
+                -0.00032966677099466324,
+                0.0014810836873948574,
+                0.001105625182390213,
+                0.00134733272716403,
+                0.002596749458462,
+                0.008475415874272585,
+                0.0006126658990979195,
+                0.0008902908302843571,
+                -0.0014694160781800747,
+                0.0025829998776316643
+              ],
+              "seconds": 0.0012264789547771215,
+              "shipped": true,
+              "threadgroups": 680
+            }
+          },
+          "columns": 17408,
+          "dispatches_per_token": 64,
+          "label": "mlp.down_proj",
+          "modules": [
+            "mlp.down_proj"
+          ],
+          "rows": 5120,
+          "shipped": "lut23"
+        },
+        "mlp.gate_proj": {
+          "best": "gemm_8x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1271766247227788,
+                0.12615404184907675,
+                0.12680687522515655,
+                0.12601150013506413,
+                0.12780958274379373,
+                0.1261994168162346,
+                0.131415749900043,
+                0.12653741613030434,
+                0.12779995892196894,
+                0.12709550000727177
+              ],
+              "reference_seconds": 0.12695118761621416,
+              "samples": [
+                0.018760417122393847,
+                0.018465583212673664,
+                0.01816337462514639,
+                0.01900183316320181,
+                0.019911333918571472,
+                0.019445457961410284,
+                0.022456791251897812,
+                0.027757791802287102,
+                0.0186015828512609,
+                0.02137945918366313
+              ],
+              "seconds": 0.019223645562306046,
+              "shipped": false,
+              "threadgroups": 136
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.13233720883727074,
+                0.1316581661812961,
+                0.1297689168713987,
+                0.13140208320692182,
+                0.12700608326122165,
+                0.1315169590525329,
+                0.13687158282846212,
+                0.13301979238167405,
+                0.13097599986940622,
+                0.13136729085817933
+              ],
+              "reference_seconds": 0.13145952112972736,
+              "samples": [
+                0.03839829098433256,
+                0.04724879190325737,
+                0.03918966604396701,
+                0.03874016646295786,
+                0.04253158392384648,
+                0.03924145782366395,
+                0.03955012513324618,
+                0.038609415758401155,
+                0.03991050040349364,
+                0.03722062613815069
+              ],
+              "seconds": 0.03921556193381548,
+              "shipped": false,
+              "threadgroups": 544
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1309940000064671,
+                0.12946758372709155,
+                0.12966012489050627,
+                0.13037508307024837,
+                0.13154574995860457,
+                0.1319192503578961,
+                0.13037929218262434,
+                0.13037704210728407,
+                0.12990779103711247,
+                0.13129054196178913
+              ],
+              "reference_seconds": 0.1303781671449542,
+              "samples": [
+                0.024044083897024393,
+                0.022520957048982382,
+                0.023745084181427956,
+                0.026693041902035475,
+                0.024095791392028332,
+                0.023293541744351387,
+                0.024708582554012537,
+                0.02377966558560729,
+                0.024808709044009447,
+                0.026284208055585623
+              ],
+              "seconds": 0.024069937644526362,
+              "shipped": false,
+              "threadgroups": 136
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.12578962463885546,
+                0.125322375446558,
+                0.13064191723242402,
+                0.1263530422002077,
+                0.13359174970537424,
+                0.12785629089921713,
+                0.1270765420049429,
+                0.12531287502497435,
+                0.13118241727352142,
+                0.1271777912043035
+              ],
+              "reference_seconds": 0.1271271666046232,
+              "samples": [
+                0.015203125774860382,
+                0.01360437460243702,
+                0.010594749823212624,
+                0.014014957938343287,
+                0.009509040974080563,
+                0.012571376282721758,
+                0.013270375318825245,
+                0.013344916049391031,
+                0.00977112352848053,
+                0.012222375720739365
+              ],
+              "seconds": 0.012920875800773501,
+              "shipped": false,
+              "threadgroups": 68
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1265239999629557,
+                0.13328266609460115,
+                0.1301243333145976,
+                0.12965941708534956,
+                0.12992029218003154,
+                0.12945958320051432,
+                0.13220454193651676,
+                0.13072012504562736,
+                0.1288893329910934,
+                0.13154108403250575
+              ],
+              "reference_seconds": 0.13002231274731457,
+              "samples": [
+                -0.005485708825290203,
+                -0.011113333515822887,
+                -0.0094996253028512,
+                -0.005998792126774788,
+                -0.008064833469688892,
+                -0.007009624037891626,
+                -0.009925001300871372,
+                -0.009047082625329494,
+                -0.007252790965139866,
+                -0.010018541943281889
+              ],
+              "seconds": -0.008555958047509193,
+              "shipped": false,
+              "threadgroups": 544
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k5",
+              "family": "lut23",
+              "reference_samples": [
+                0.13016495807096362,
+                0.13321291701868176,
+                0.1311534158885479,
+                0.1304886662401259,
+                0.1316267503425479,
+                0.13041900005191565,
+                0.1329551669768989,
+                0.13252416672185063,
+                0.131009291857481,
+                0.13129762466996908
+              ],
+              "reference_seconds": 0.1312255202792585,
+              "samples": [
+                -0.0009095002897083759,
+                0.0039542922750115395,
+                -0.0007239580154418945,
+                0.001446375623345375,
+                -0.0014784173108637333,
+                -0.0006186249665915966,
+                -0.00212479243054986,
+                -0.001728791743516922,
+                -0.001724374946206808,
+                -4.3499283492565155e-05
+              ],
+              "seconds": -0.0008167291525751352,
+              "shipped": true,
+              "threadgroups": 680
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 128,
+          "label": "mlp.gate_proj",
+          "modules": [
+            "mlp.gate_proj",
+            "mlp.up_proj"
+          ],
+          "rows": 17408,
+          "shipped": "lut23"
+        },
+        "self_attn.k_proj": {
+          "best": "lut23",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1049625831656158,
+                0.10444337502121925,
+                0.10696129221469164,
+                0.10505637479946017,
+                0.10269904183223844,
+                0.10458562523126602,
+                0.102743208874017,
+                0.10248366603627801,
+                0.10218425001949072,
+                0.10302641708403826
+              ],
+              "reference_seconds": 0.10373489605262876,
+              "samples": [
+                0.005619999952614307,
+                0.005481500178575516,
+                0.0049461666494607925,
+                0.006262042094022036,
+                0.006760290823876858,
+                0.006820499897003174,
+                0.007702833041548729,
+                0.007923792582005262,
+                0.007453625090420246,
+                0.008247875142842531
+              ],
+              "seconds": 0.006790395360440016,
+              "shipped": false,
+              "threadgroups": 8
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.1045055422000587,
+                0.10727025009691715,
+                0.11149924993515015,
+                0.10507170809432864,
+                0.10492245806381106,
+                0.10314462473616004,
+                0.10349825024604797,
+                0.10358516685664654,
+                0.10241762502118945,
+                0.10365324979647994
+              ],
+              "reference_seconds": 0.10407939599826932,
+              "samples": [
+                0.004131374880671501,
+                0.004620708990842104,
+                0.002742582932114601,
+                0.003211250063031912,
+                0.004761832766234875,
+                0.0036962912417948246,
+                0.004421957768499851,
+                0.004610832780599594,
+                0.004828667268157005,
+                0.004554834216833115
+              ],
+              "seconds": 0.004488395992666483,
+              "shipped": false,
+              "threadgroups": 32
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.1053003747947514,
+                0.10358512494713068,
+                0.10714229196310043,
+                0.10462945839390159,
+                0.10439479211345315,
+                0.10297595942392945,
+                0.10280633298680186,
+                0.10379904229193926,
+                0.10435225022956729,
+                0.11324637476354837
+              ],
+              "reference_seconds": 0.10437352117151022,
+              "samples": [
+                0.010929124895483255,
+                0.01215049996972084,
+                0.011083416175097227,
+                0.012624957598745823,
+                0.017398290801793337,
+                0.0117462077178061,
+                0.012558624614030123,
+                0.011962790507823229,
+                0.012104874476790428,
+                0.0004210001789033413
+              ],
+              "seconds": 0.012033832492306828,
+              "shipped": false,
+              "threadgroups": 8
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.10413000034168363,
+                0.10435720905661583,
+                0.105661166831851,
+                0.10478279227390885,
+                0.10234091710299253,
+                0.10251183388754725,
+                0.10243112500756979,
+                0.10235466714948416,
+                0.10410883324220777,
+                0.10178583301603794
+              ],
+              "reference_seconds": 0.10331033356487751,
+              "samples": [
+                0.012670041993260384,
+                0.012704581953585148,
+                0.013379041105508804,
+                0.01627054065465927,
+                0.013696915470063686,
+                0.0131331249140203,
+                0.014359334018081427,
+                0.01392941689118743,
+                0.014711749739944935,
+                0.014203417114913464
+              ],
+              "seconds": 0.013813166180625558,
+              "shipped": false,
+              "threadgroups": 4
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.10346024995669723,
+                0.10971091594547033,
+                0.10912541672587395,
+                0.10429941629990935,
+                0.10514145903289318,
+                0.1029587909579277,
+                0.10295175015926361,
+                0.10396099975332618,
+                0.10381537536159158,
+                0.1039428748190403
+              ],
+              "reference_seconds": 0.10395193728618324,
+              "samples": [
+                0.002131042070686817,
+                -0.0019102911464869976,
+                0.0008255424909293652,
+                0.001337958499789238,
+                0.0004677502438426018,
+                0.0006758342497050762,
+                0.00020674988627433777,
+                0.0007999581284821033,
+                0.0012140418402850628,
+                0.005242250394076109
+              ],
+              "seconds": 0.0008127503097057343,
+              "shipped": false,
+              "threadgroups": 32
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k40",
+              "family": "lut23",
+              "reference_samples": [
+                0.10523212468251586,
+                0.10894358297809958,
+                0.10852729203179479,
+                0.10664220806211233,
+                0.10389391612261534,
+                0.10432004183530807,
+                0.10367745766416192,
+                0.10408395808190107,
+                0.10312058264389634,
+                0.10349762486293912
+              ],
+              "reference_seconds": 0.10420199995860457,
+              "samples": [
+                -0.0005662497133016586,
+                -0.0040413751266896725,
+                0.001712373923510313,
+                0.0007903343066573143,
+                0.000608501024544239,
+                -0.0008458336815237999,
+                0.00013754237443208694,
+                0.00010149972513318062,
+                0.0007162503898143768,
+                0.0004065828397870064
+              ],
+              "seconds": 0.00027206260710954666,
+              "shipped": true,
+              "threadgroups": 320
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 32,
+          "label": "self_attn.k_proj",
+          "modules": [
+            "self_attn.k_proj",
+            "self_attn.v_proj"
+          ],
+          "rows": 1024,
+          "shipped": "lut23"
+        },
+        "self_attn.q_proj": {
+          "best": "gemm_8x32",
+          "candidates": {
+            "gemm_16x128": {
+              "config": "gemm_16x128k64s2x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.12709412490949035,
+                0.12863529101014137,
+                0.12723587499931455,
+                0.12772945826873183,
+                0.1281371251679957,
+                0.1287190830335021,
+                0.12873933324590325,
+                0.1299492083489895,
+                0.1273859590291977,
+                0.13372808322310448
+              ],
+              "reference_seconds": 0.12838620808906853,
+              "samples": [
+                0.006119125057011843,
+                0.003611417021602392,
+                0.0029903752729296684,
+                0.004280416760593653,
+                0.003687791060656309,
+                0.00733308307826519,
+                0.002354041673243046,
+                0.003302916418761015,
+                0.003541457001119852,
+                -0.0007920833304524422
+              ],
+              "seconds": 0.003576437011361122,
+              "shipped": false,
+              "threadgroups": 96
+            },
+            "gemm_16x32": {
+              "config": "gemm_16x32k32s2x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.12907395884394646,
+                0.12967987498268485,
+                0.1316976249217987,
+                0.12937200022861362,
+                0.12821458326652646,
+                0.12899154145270586,
+                0.12837183335795999,
+                0.13072337489575148,
+                0.12784079182893038,
+                0.12940283305943012
+              ],
+              "reference_seconds": 0.12922297953628004,
+              "samples": [
+                0.0016114157624542713,
+                0.0037410841323435307,
+                0.0016790828667581081,
+                0.002819458022713661,
+                0.0035735839046537876,
+                0.003607125487178564,
+                0.0027416665107011795,
+                0.007354749832302332,
+                0.004264958202838898,
+                0.0034827920608222485
+              ],
+              "seconds": 0.003528187982738018,
+              "shipped": false,
+              "threadgroups": 384
+            },
+            "gemm_8x128": {
+              "config": "gemm_8x128k64s1x4",
+              "family": "gemm",
+              "reference_samples": [
+                0.12972083315253258,
+                0.12839112477377057,
+                0.12873025005683303,
+                0.12935716705396771,
+                0.12932583317160606,
+                0.12752429163083434,
+                0.12783558387309313,
+                0.1300966669805348,
+                0.130600375123322,
+                0.12943483423441648
+              ],
+              "reference_seconds": 0.1293415001127869,
+              "samples": [
+                0.0033758757635951042,
+                0.004170375410467386,
+                0.0033187917433679104,
+                0.004451249726116657,
+                0.0033512511290609837,
+                0.0046028331853449345,
+                0.00658829091116786,
+                0.005256167147308588,
+                0.007031208835542202,
+                0.004581165965646505
+              ],
+              "seconds": 0.004516207845881581,
+              "shipped": false,
+              "threadgroups": 96
+            },
+            "gemm_8x256": {
+              "config": "gemm_8x256k32s1x8",
+              "family": "gemm",
+              "reference_samples": [
+                0.1287453337572515,
+                0.12954708375036716,
+                0.12716458411887288,
+                0.1271476661786437,
+                0.12706683296710253,
+                0.1274077082052827,
+                0.12917187483981252,
+                0.129228541161865,
+                0.1294076251797378,
+                0.12890804186463356
+              ],
+              "reference_seconds": 0.12882668781094253,
+              "samples": [
+                0.005146874580532312,
+                0.004092666320502758,
+                0.0058694155886769295,
+                0.005927750840783119,
+                0.0063702501356601715,
+                0.005435791797935963,
+                0.004973041359335184,
+                0.005603834055364132,
+                0.004541708156466484,
+                0.005642375443130732
+              ],
+              "seconds": 0.005519812926650047,
+              "shipped": false,
+              "threadgroups": 48
+            },
+            "gemm_8x32": {
+              "config": "gemm_8x32k32s1x2_frag_epi_tgt",
+              "family": "gemm",
+              "reference_samples": [
+                0.12382304202765226,
+                0.12820504093542695,
+                0.12748295813798904,
+                0.12761883297935128,
+                0.13277962477877736,
+                0.12912616599351168,
+                0.12819516705349088,
+                0.13445341680198908,
+                0.13018012512475252,
+                0.12943095806986094
+              ],
+              "reference_seconds": 0.1286656034644693,
+              "samples": [
+                0.003840208053588867,
+                -0.0004945411346852779,
+                5.8833975344896317e-05,
+                0.002170833759009838,
+                -0.002293124794960022,
+                -0.0024593318812549114,
+                -0.0010982919484376907,
+                -0.002435749862343073,
+                0.00022208411246538162,
+                -0.0009142500348389149
+              ],
+              "seconds": -0.0007043955847620964,
+              "shipped": false,
+              "threadgroups": 384
+            },
+            "lut23": {
+              "config": "lut23_bt4_packed_k8",
+              "family": "lut23",
+              "reference_samples": [
+                0.12659541610628366,
+                0.12795783299952745,
+                0.1274432921782136,
+                0.1277632499113679,
+                0.12760599981993437,
+                0.13183112489059567,
+                0.12875299993902445,
+                0.13686150033026934,
+                0.12853799993172288,
+                0.12835199991241097
+              ],
+              "reference_seconds": 0.12815491645596921,
+              "samples": [
+                0.0015774997882544994,
+                0.00014529190957546234,
+                -6.958423182368279e-05,
+                0.00017025042325258255,
+                0.0011931671760976315,
+                -0.0013496656902134418,
+                0.002402834128588438,
+                3.245752304792404e-05,
+                0.0024210410192608833,
+                0.0007184166461229324
+              ],
+              "seconds": 0.0004443335346877575,
+              "shipped": true,
+              "threadgroups": 768
+            }
+          },
+          "columns": 5120,
+          "dispatches_per_token": 16,
+          "label": "self_attn.q_proj",
+          "modules": [
+            "self_attn.q_proj"
+          ],
+          "rows": 12288,
+          "shipped": "lut23"
+        }
+      }
+    }
+  },
+  "mode": "whole-pass",
+  "rounds": 10,
+  "schema_version": 2,
+  "seed": 20260809,
+  "warmup_passes": 2
+}

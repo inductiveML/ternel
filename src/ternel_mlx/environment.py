@@ -211,6 +211,43 @@ def _mlx() -> dict[str, object]:
     }
 
 
+def sampled_gpu_usage() -> tuple[float, dict[int, tuple[str, int]]]:
+    """The client counters, with the instant they were read.
+
+    ``gpu_client_usage`` shells out to ``ioreg``, which is not free -- a few
+    hundred milliseconds on a busy desktop. The counters therefore accumulate
+    over the interval between the two registry *reads*, not over the interval
+    between the calls returning, and dividing by the latter overstates every
+    share by the sampling overhead. Over a forty-minute benchmark that is
+    nothing; over a block that lasts ten milliseconds it reported 210% of the
+    device in use and voided a run that had the machine to itself.
+
+    The instant returned is the midpoint of the call. Where inside it the
+    registry was actually read is not observable, so the midpoint is the
+    estimator with the smallest worst-case error -- half the call, in either
+    direction, instead of a whole call in one.
+    """
+    started = time.perf_counter()
+    usage = gpu_client_usage()
+    return (started + time.perf_counter()) / 2.0, usage
+
+
+class GpuContentionError(FormatError):
+    """A timed block shared the GPU, so its numbers mean nothing.
+
+    Distinct from every other :class:`FormatError` because it is the one failure
+    a caller can legitimately answer by measuring again: the block is void, not
+    wrong. Everything else -- a shape that does not match, an arm that produced
+    two different continuations -- is a fact about the run that repeating it
+    would only repeat. A caller that retried on the message text would also
+    retry on those.
+    """
+
+    def __init__(self, message: str, *, share: dict[str, object]) -> None:
+        super().__init__(message)
+        self.share = share
+
+
 @contextmanager
 def exclusive_gpu(
     label: str, *, max_foreign_share: float, record: list[dict[str, object]]
@@ -231,35 +268,73 @@ def exclusive_gpu(
     tok/s against its true 20.9, and nothing in the harness objected, because the
     only contention signal was CPU pressure and a GPU-bound competitor barely
     shows up there.
+
+    The window the share is apportioned over is the one the counters cover --
+    see :func:`sampled_gpu_usage` -- which is wider than the block itself. The
+    block's own duration is recorded beside it so a reader can see how much of
+    the window was the sampling rather than the measurement.
     """
-    before = gpu_client_usage()
+    first_at, before = sampled_gpu_usage()
     started = time.perf_counter()
     yield
     elapsed = time.perf_counter() - started
+    second_at, after = sampled_gpu_usage()
     share = foreign_gpu_share(
-        before, gpu_client_usage(), seconds=elapsed, own_pids=frozenset({os.getpid()})
+        before, after, seconds=second_at - first_at, own_pids=frozenset({os.getpid()})
     )
-    record.append({"label": label} | share)
+    record.append({"label": label, "timed_seconds": elapsed} | share)
     total = float(share["total_share"])
     if total > max_foreign_share:
         busiest = share["clients"][0]
-        raise FormatError(
+        raise GpuContentionError(
             f"{label} was timed while other processes used {total:.1%} of the GPU, over "
             f"the {max_foreign_share:.1%} this run allows; the busiest was pid "
             f"{busiest['pid']} ({busiest['command']}) at "
-            f"{float(busiest['gpu_share']):.1%}; the measurement is void"
+            f"{float(busiest['gpu_share']):.1%}; the measurement is void",
+            share=share,
         )
 
 
 def measure_gpu_contention(*, seconds: float) -> dict[str, object]:
     """Sample GPU occupancy over a short window, excluding this process."""
-    before = gpu_client_usage()
-    started = time.perf_counter()
+    first_at, before = sampled_gpu_usage()
     time.sleep(seconds)
-    elapsed = time.perf_counter() - started
+    second_at, after = sampled_gpu_usage()
     return foreign_gpu_share(
-        before, gpu_client_usage(), seconds=elapsed, own_pids=frozenset({os.getpid()})
+        before, after, seconds=second_at - first_at, own_pids=frozenset({os.getpid()})
     )
+
+
+# How long one occupancy sample covers. Two seconds is long enough that the two
+# ``ioreg`` reads bracketing it dominate nothing -- see :func:`sampled_gpu_usage`
+# -- and short enough to notice a display that has just gone back to sleep.
+CONTENTION_SAMPLE_SECONDS = 2.0
+
+
+def await_quiet_gpu(
+    *, max_foreign_share: float, timeout_seconds: float, sample_seconds: float
+) -> dict[str, object]:
+    """Poll until nobody else is on the GPU, or the budget runs out.
+
+    An efficiency device and nothing more: no measurement's validity rests on
+    this, because :func:`exclusive_gpu` still voids any block that shared the
+    device whatever this returned. What it buys is not re-timing a twenty-minute
+    benchmark straight back into the contention that just voided it -- on this
+    machine the usual competitor is a display that woke up, which goes away on
+    its own in a minute or two if something waits for it.
+
+    Returns the last sample taken, with ``settled`` saying whether it came in
+    under the bar or the budget simply expired.
+    """
+    if timeout_seconds < 0.0:
+        raise FormatError(f"a wait cannot be negative, got {timeout_seconds} seconds")
+    deadline = time.perf_counter() + timeout_seconds
+    while True:
+        share = measure_gpu_contention(seconds=sample_seconds)
+        if float(share["total_share"]) <= max_foreign_share:
+            return share | {"settled": True}
+        if time.perf_counter() >= deadline:
+            return share | {"settled": False}
 
 
 def capture_environment() -> dict[str, object]:

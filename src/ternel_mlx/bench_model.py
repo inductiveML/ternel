@@ -67,7 +67,13 @@ from bonsai_tq1.format import FormatError, write_json_atomic
 from bonsai_tq1.lut23_reporting import paired_bootstrap_ratio, quantile_summary
 
 from . import LAYOUT_NAME, LAYOUT_VERSION
-from .environment import capture_environment, exclusive_gpu
+from .environment import (
+    CONTENTION_SAMPLE_SECONDS,
+    GpuContentionError,
+    await_quiet_gpu,
+    capture_environment,
+    exclusive_gpu,
+)
 from .graph_gate import PROMPTS, argmax_sampler, check_representation, parameter_census
 
 SCHEMA_VERSION = 1
@@ -473,15 +479,29 @@ def measure_isolated(
     rounds: int,
     trials_per_round: int,
     max_foreign_gpu_share: float,
+    round_attempts: int,
+    round_retry_wait_seconds: float,
 ) -> dict[str, object]:
     """The reported throughput: one model per process, arms alternating by round.
 
     Rounds alternate which arm runs first so a thermal ramp cannot land on one of
     them, and every round is a fresh process for both arms, so neither ever sees
     the other's weights in memory.
+
+    A round that shares the GPU is measured again rather than ending the run.
+    The bar per timed block is exactly what it was -- ``exclusive_gpu`` still
+    voids any block that another process touched -- but a desktop that wakes for
+    ten seconds during round four no longer discards rounds one through three
+    and the model loads that produced them. Both arms of a voided round are
+    thrown away together even if only one of them was hit, since the bootstrap
+    pairs them by position and a round that contributed one arm would misalign
+    every pair after it. Retries are counted into the payload, so a result that
+    took twenty attempts to collect six rounds says so.
     """
     if rounds < 2:
         raise FormatError(f"{rounds} rounds cannot alternate which arm goes first")
+    if round_attempts < 1:
+        raise FormatError(f"a round needs at least one attempt, got {round_attempts}")
     samples = rounds * trials_per_round
     if samples < TRIALS:
         raise FormatError(
@@ -491,17 +511,54 @@ def measure_isolated(
 
     before = capture_environment()
     contention: list[dict[str, object]] = []
+    voided: list[dict[str, object]] = []
     collected: dict[str, list[dict[str, object]]] = {"candidate": [], "reference": []}
     for index in range(rounds):
         order = ("candidate", "reference") if index % 2 == 0 else ("reference", "candidate")
-        for arm in order:
-            path = artifact_dir if arm == "candidate" else baseline_dir
-            print(f"  round {index + 1}/{rounds}, {arm}", file=sys.stderr, flush=True)
-            label = f"round {index + 1} {arm}"
-            with exclusive_gpu(
-                label, max_foreign_share=max_foreign_gpu_share, record=contention
-            ):
-                collected[arm].append(run_solo(path, trials=trials_per_round))
+        for attempt in range(1, round_attempts + 1):
+            produced: dict[str, dict[str, object]] = {}
+            try:
+                for arm in order:
+                    path = artifact_dir if arm == "candidate" else baseline_dir
+                    print(
+                        f"  round {index + 1}/{rounds} attempt {attempt}/{round_attempts}, {arm}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    label = f"round {index + 1} attempt {attempt} {arm}"
+                    with exclusive_gpu(
+                        label, max_foreign_share=max_foreign_gpu_share, record=contention
+                    ):
+                        produced[arm] = run_solo(path, trials=trials_per_round)
+            except GpuContentionError as error:
+                record: dict[str, object] = {
+                    "round": index + 1,
+                    "attempt": attempt,
+                    "reason": str(error),
+                    "share": error.share,
+                }
+                print(f"    voided: {error}", file=sys.stderr, flush=True)
+                if attempt < round_attempts:
+                    print(
+                        f"    waiting up to {round_retry_wait_seconds:.0f}s for a quiet GPU",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    record["waited_for"] = await_quiet_gpu(
+                        max_foreign_share=max_foreign_gpu_share,
+                        timeout_seconds=round_retry_wait_seconds,
+                        sample_seconds=CONTENTION_SAMPLE_SECONDS,
+                    )
+                voided.append(record)
+                continue
+            for arm, result in produced.items():
+                collected[arm].append(result)
+            break
+        else:
+            raise FormatError(
+                f"round {index + 1} shared the GPU on all {round_attempts} attempts; "
+                f"the last was: {voided[-1]['reason']}"
+            )
 
     measurements = []
     for workload in WORKLOADS:
@@ -575,6 +632,11 @@ def measure_isolated(
         "samples_per_arm": samples,
         "solo_warmup_rounds": SOLO_WARMUP_ROUNDS,
         "max_foreign_gpu_share": max_foreign_gpu_share,
+        "round_attempts": round_attempts,
+        "round_retry_wait_seconds": round_retry_wait_seconds,
+        # Every round that was thrown away and measured again, so the rounds that
+        # are reported cannot look like the only ones that ever ran.
+        "voided_rounds": voided,
         "gpu_contention": contention,
         "baseline": {
             "name": "prism-ml/Ternary-Bonsai-27B-mlx-2bit",
@@ -727,6 +789,16 @@ def main(argv: list[str] | None = None) -> int:
         "--trials-per-round", type=int, help="isolated trials per round, requires --isolated-output"
     )
     parser.add_argument(
+        "--round-attempts",
+        type=int,
+        help="how many times a round may be measured again after sharing the GPU",
+    )
+    parser.add_argument(
+        "--round-retry-wait-seconds",
+        type=float,
+        help="how long a voided round waits for a quiet GPU before measuring again",
+    )
+    parser.add_argument(
         "--max-foreign-gpu-share",
         type=float,
         help="void the run if another process exceeds this share of the GPU while timing",
@@ -785,7 +857,7 @@ def main(argv: list[str] | None = None) -> int:
         problems.extend(payload["representation_problems"])
 
     if args.isolated_output is not None:
-        for name in ("rounds", "trials_per_round"):
+        for name in ("rounds", "trials_per_round", "round_attempts", "round_retry_wait_seconds"):
             if getattr(args, name) is None:
                 parser.error(f"--isolated-output requires --{name.replace('_', '-')}")
         isolated = measure_isolated(
@@ -794,8 +866,16 @@ def main(argv: list[str] | None = None) -> int:
             rounds=args.rounds,
             trials_per_round=args.trials_per_round,
             max_foreign_gpu_share=args.max_foreign_gpu_share,
+            round_attempts=args.round_attempts,
+            round_retry_wait_seconds=args.round_retry_wait_seconds,
         )
         write_json_atomic(args.isolated_output, isolated)
+        voided = isolated["voided_rounds"]
+        if voided:
+            print(
+                f"{len(voided)} round(s) shared the GPU and were measured again; "
+                f"see voided_rounds in {args.isolated_output}"
+            )
         print("isolated, one model per process -- the reported result:")
         print_workloads(isolated)
 

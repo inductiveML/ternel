@@ -49,8 +49,9 @@ from bonsai_tq1.lut23_reporting import paired_bootstrap_ratio, quantile_summary
 
 from . import LAYOUT_NAME, LAYOUT_VERSION
 from .environment import capture_environment, exclusive_gpu
+from .kernel_gate import NARROWED_RELATIVE_TOLERANCE
 from .kernels import GemmConfig, MatmulConfig, tq1_gemm, tq1_get_rows, tq1_matmul
-from .layout import PackedTensorLayout
+from .layout import MODEL_LINEAR_SHAPES, PackedTensorLayout
 from .packing import pack_blocks
 from .reference import lut23_matmul
 
@@ -73,10 +74,22 @@ MAX_INNER = 256
 TRIALS = 40
 WARMUP_SAMPLES = 5
 
-# Relative tolerance for the pre-timing correctness check. The kernel is
-# bit-exact against this reference in the test suite; this is a tripwire for a
-# mis-shaped benchmark harness, not a substitute for the gate.
-BENCH_RTOL = 1.0e-5
+# The activation dtypes a sweep may be run in, by the name the emitted document
+# records. Keyed by name rather than held as dtype objects in a set because MLX
+# dtypes are not singletons, so the name is the only stable identity: two
+# ``mx.bfloat16`` references need not be the same object.
+#
+# Which one is swept is a required argument, never a default. A sweep picks the
+# kernel instantiation the model will run by picking the dtype, and the affine
+# baseline's too: MLX promotes bfloat16 activations against float16 scales to
+# float32, so a mismatched pair silently measures the wrong kernel on both
+# arms. ``results/mlx/a5_op_benchmarks*.json`` predate this argument and were
+# measured in float32; the model runs bfloat16.
+ACTIVATION_DTYPES: dict[str, mx.Dtype] = {
+    "float32": mx.float32,
+    "float16": mx.float16,
+    "bfloat16": mx.bfloat16,
+}
 
 
 @dataclass(frozen=True)
@@ -92,19 +105,17 @@ class OpCase:
         return PackedTensorLayout.for_tensor(self.rows, self.columns)
 
 
-# The distinct linear shapes of Ternary Bonsai 27B, named for the module they
-# come from. Both hybrid layer kinds are represented, plus the tied embedding.
-MODEL_SHAPES: tuple[tuple[str, int, int], ...] = (
-    ("linear_attn.in_proj_qkv", 10240, 5120),
-    ("linear_attn.in_proj_z", 6144, 5120),
-    ("linear_attn.in_proj_a", 48, 5120),
-    ("linear_attn.out_proj", 5120, 6144),
-    ("self_attn.q_proj", 12288, 5120),
-    ("self_attn.k_proj", 1024, 5120),
-    ("self_attn.o_proj", 5120, 12288),
-    ("mlp.gate_proj", 17408, 5120),
-    ("mlp.down_proj", 5120, 17408),
-    ("lm_head", 248320, 5120),
+# The distinct linear shapes of Ternary Bonsai 27B, taken from the census in
+# ``layout`` rather than restated, so this sweep and the split sweep cannot
+# drift apart about what the model contains.
+#
+# An earlier version of this list carried its own copy and had ``self_attn.o_proj``
+# at 5120x12288. The model has no such tensor: o_proj is 5120x6144, which
+# ``linear_attn.out_proj`` already covers. The committed ``a5_op_benchmarks*.json``
+# predate the correction and still hold that shape at eleven batches; the replay
+# test scores only the cases whose shape the census recognises.
+MODEL_SHAPES: tuple[tuple[str, int, int], ...] = tuple(
+    (shape.label, shape.rows, shape.columns) for shape in MODEL_LINEAR_SHAPES
 )
 
 # The configuration sweep the plan requires: batch tile against LUT padding.
@@ -259,11 +270,18 @@ def _configs() -> tuple[list[Variant], list[dict[str, object]]]:
     for batch_tile in BATCH_TILES:
         for padded in PADDINGS:
             try:
+                # This list is built once for every shape in the sweep, so it
+                # carries no split-K: a legal k_split has to divide the tensor's
+                # own groups_per_row, which is not known here. The split is swept
+                # per shape, and by a different harness -- ``bench_split_k`` --
+                # because it only shows up under a dependency chain, and this
+                # file deliberately enqueues its calls independent of each other.
                 config = MatmulConfig(
                     threads=BENCH_THREADS,
                     batch_tile=batch_tile,
                     padded_lut=padded,
                     safe_clamp=False,
+                    k_split=1,
                 )
             except FormatError as error:
                 rejected.append({
@@ -337,16 +355,23 @@ def build_packed_tensor(case: OpCase) -> tuple[PackedTensorLayout, mx.array, mx.
     return layout, mx.array(codes), mx.array(scales), codes, scales
 
 
-def build_affine_baseline(case: OpCase) -> tuple[mx.array, mx.array, mx.array]:
+def build_affine_baseline(case: OpCase, *, dtype: mx.Dtype) -> tuple[mx.array, mx.array, mx.array]:
     """The MLX 2-bit affine weight for the same logical shape.
 
     Quantised from a float tensor by MLX's own quantiser so the baseline is the
     code path a user actually runs, not a hand-built approximation of it.
+
+    ``dtype`` is the activation dtype, and it decides the scales' dtype because
+    ``mx.quantize`` returns them in its input's. It is required rather than
+    fixed at float16 because MLX promotes: bfloat16 activations against float16
+    scales come out float32, so a baseline built in the wrong dtype does not run
+    slightly differently, it runs an entirely different kernel from the one the
+    shipped 2-bit repo runs -- which stores its scales in the model's dtype.
     """
     generator = np.random.default_rng(SEED + 7 + case.rows)
     dense = mx.array(
-        generator.normal(0.0, 0.05, size=(case.rows, case.columns)).astype(np.float16)
-    )
+        generator.normal(0.0, 0.05, size=(case.rows, case.columns)).astype(np.float32)
+    ).astype(dtype)
     weight, scales, biases = mx.quantize(dense, group_size=BLOCK_SIZE, bits=2)
     mx.eval(weight, scales, biases)
     return weight, scales, biases
@@ -407,8 +432,18 @@ def measure_pair(
     return baseline_times, candidate_times
 
 
-def _relative_error(got: mx.array, want: np.ndarray) -> float:
-    left = np.asarray(got, dtype=np.float64)
+def relative_error(got: mx.array, want: np.ndarray) -> float:
+    """Worst elementwise error against the reference, as a fraction of its scale.
+
+    Normalised by the reference's magnitude rather than taken per element: a dot
+    product of a thousand terms cancels, so individual outputs land arbitrarily
+    close to zero and a per-element ratio there says nothing about the kernel.
+
+    ``got`` is cast through fp32 because numpy cannot view a bfloat16 buffer,
+    and the benchmarks that carry the model's own activation dtype hand this
+    function bfloat16 results.
+    """
+    left = np.asarray(got.astype(mx.float32), dtype=np.float64)
     right = np.asarray(want, dtype=np.float64)
     scale = float(np.abs(right).max())
     if scale == 0.0:
@@ -416,7 +451,10 @@ def _relative_error(got: mx.array, want: np.ndarray) -> float:
     return float(np.abs(left - right).max() / scale)
 
 
-def measure_case(case: OpCase, configs: list[Variant]) -> dict[str, object]:
+def measure_case(
+    case: OpCase, configs: list[Variant], *, activation_dtype_name: str
+) -> dict[str, object]:
+    dtype = ACTIVATION_DTYPES[activation_dtype_name]
     layout, codes, scales, codes_np, scales_np = build_packed_tensor(case)
     if codes.nbytes + scales.nbytes != layout.payload_bytes:
         raise FormatError(
@@ -426,11 +464,14 @@ def measure_case(case: OpCase, configs: list[Variant]) -> dict[str, object]:
 
     generator = np.random.default_rng(SEED + case.batch)
     activations = generator.normal(0.0, 1.0, size=(case.batch, case.columns)).astype(np.float32)
-    x = mx.array(activations)
+    # The reference stays in float32 whatever the kernel runs in: it is the
+    # thing being rounded towards, so rounding it first would hide exactly the
+    # error the tolerance is there to catch.
+    x = mx.array(activations).astype(dtype)
     mx.eval(x)
     expected = lut23_matmul(codes_np, scales_np, activations, layout=layout)
 
-    weight, affine_scales, affine_biases = build_affine_baseline(case)
+    weight, affine_scales, affine_biases = build_affine_baseline(case, dtype=dtype)
 
     def baseline() -> mx.array:
         return mx.quantized_matmul(
@@ -467,11 +508,15 @@ def measure_case(case: OpCase, configs: list[Variant]) -> dict[str, object]:
         first = candidate()
         mx.eval(first)
         mx.synchronize()
-        error = _relative_error(first, expected)
-        if not error <= BENCH_RTOL:
+        error = relative_error(first, expected)
+        # The gate's own per-dtype bound, reused rather than restated: a kernel
+        # made fast by being wrong does not get to post a number, and what
+        # counts as wrong depends on what it is accumulating in.
+        if not error <= NARROWED_RELATIVE_TOLERANCE[activation_dtype_name]:
             raise FormatError(
                 f"{case.label} batch {case.batch} {variant.name} disagrees with the "
-                f"LUT23 reference by {error:.3g} relative"
+                f"LUT23 reference by {error:.3g} relative, over the "
+                f"{activation_dtype_name} bound"
             )
         errors.append(error)
 
@@ -529,11 +574,18 @@ def measure_case(case: OpCase, configs: list[Variant]) -> dict[str, object]:
     }
 
 
-def measure_get_rows(rows: int, columns: int, token_counts: tuple[int, ...]) -> list[dict[str, object]]:
-    """Time the embedding gather against MLX's dequantise-then-gather equivalent."""
+def measure_get_rows(
+    rows: int, columns: int, token_counts: tuple[int, ...], *, activation_dtype_name: str
+) -> list[dict[str, object]]:
+    """Time the embedding gather against MLX's dequantise-then-gather equivalent.
+
+    The gather's output dtype is the model's activation dtype -- it is what the
+    first block reads -- so both arms are built in it rather than in float32.
+    """
+    dtype = ACTIVATION_DTYPES[activation_dtype_name]
     case = OpCase(label="embed_tokens", rows=rows, columns=columns, batch=1)
     layout, codes, scales, _, _ = build_packed_tensor(case)
-    weight, affine_scales, affine_biases = build_affine_baseline(case)
+    weight, affine_scales, affine_biases = build_affine_baseline(case, dtype=dtype)
     generator = np.random.default_rng(SEED + 3)
 
     results: list[dict[str, object]] = []
@@ -558,7 +610,7 @@ def measure_get_rows(rows: int, columns: int, token_counts: tuple[int, ...]) -> 
                 indices,
                 groups_per_row=layout.groups_per_row,
                 tile=layout.tile,
-                dtype=mx.float32,
+                dtype=dtype,
                 threads=BENCH_THREADS,
                 safe_clamp=False,
             )
@@ -586,7 +638,9 @@ def measure_get_rows(rows: int, columns: int, token_counts: tuple[int, ...]) -> 
     return results
 
 
-def measure_jit_cost(configs: list[Variant]) -> list[dict[str, object]]:
+def measure_jit_cost(
+    configs: list[Variant], *, activation_dtype_name: str
+) -> list[dict[str, object]]:
     """Cold-start cost of one Metal library per template tuple.
 
     Measured on a deliberately tiny tensor so the number is compilation, not
@@ -594,6 +648,10 @@ def measure_jit_cost(configs: list[Variant]) -> list[dict[str, object]]:
     cached by an earlier measurement. The batch is large enough that every
     prefill tiling has a full batch block to fill, since a tiling that runs
     ragged still compiles the same library but times differently.
+
+    In the sweep's dtype, because the dtype is a template parameter: probing in
+    another one would compile a different set of libraries and leave every
+    library the sweep goes on to use uncounted and cold.
     """
     case = OpCase(label="jit_probe", rows=512, columns=256, batch=512)
     layout, codes, scales, _, _ = build_packed_tensor(case)
@@ -601,7 +659,7 @@ def measure_jit_cost(configs: list[Variant]) -> list[dict[str, object]]:
         np.random.default_rng(SEED + 11)
         .normal(0.0, 1.0, size=(case.batch, case.columns))
         .astype(np.float32)
-    )
+    ).astype(ACTIVATION_DTYPES[activation_dtype_name])
     mx.eval(codes, scales, x)
     mx.synchronize()
 
@@ -636,13 +694,19 @@ def run(
     shapes: tuple[tuple[str, int, int], ...],
     batches: tuple[int, ...],
     max_foreign_gpu_share: float,
+    activation_dtype_name: str,
 ) -> dict[str, object]:
+    if activation_dtype_name not in ACTIVATION_DTYPES:
+        raise FormatError(
+            f"unknown activation dtype {activation_dtype_name!r}, "
+            f"expected one of {sorted(ACTIVATION_DTYPES)}"
+        )
     configs, unavailable = _configs()
 
     environment_before = capture_environment()
     contention: list[dict[str, object]] = []
     with exclusive_gpu("jit", max_foreign_share=max_foreign_gpu_share, record=contention):
-        jit = measure_jit_cost(configs)
+        jit = measure_jit_cost(configs, activation_dtype_name=activation_dtype_name)
 
     cases: list[dict[str, object]] = []
     for label, rows, columns in shapes:
@@ -654,7 +718,9 @@ def run(
                 max_foreign_share=max_foreign_gpu_share,
                 record=contention,
             ):
-                result = measure_case(case, configs)
+                result = measure_case(
+                    case, configs, activation_dtype_name=activation_dtype_name
+                )
             print(
                 f"  best={result['best_config']:<28s} "
                 f"{result['best_speedup_vs_affine_2bit']:.2f}x",
@@ -663,7 +729,9 @@ def run(
             cases.append(result)
 
     with exclusive_gpu("get_rows", max_foreign_share=max_foreign_gpu_share, record=contention):
-        get_rows = measure_get_rows(248320, 5120, (1, 8, 64, 512))
+        get_rows = measure_get_rows(
+            248320, 5120, (1, 8, 64, 512), activation_dtype_name=activation_dtype_name
+        )
     environment_after = capture_environment()
 
     return {
@@ -671,6 +739,7 @@ def run(
         "layout_name": LAYOUT_NAME,
         "layout_version": LAYOUT_VERSION,
         "seed": SEED,
+        "activation_dtype": activation_dtype_name,
         "trials_per_arm": TRIALS,
         "warmup_samples": WARMUP_SAMPLES,
         "min_sample_seconds": MIN_SAMPLE_SECONDS,
@@ -726,6 +795,17 @@ def main(argv: list[str] | None = None) -> int:
         required=True,
         help="void the run if another process exceeds this share of the GPU while timing",
     )
+    parser.add_argument(
+        "--activation-dtype",
+        choices=sorted(ACTIVATION_DTYPES),
+        required=True,
+        help=(
+            "the dtype both arms run in. It is a kernel template parameter, so it "
+            "selects which compiled kernel is measured on the packed side and, "
+            "through the scales it builds, which one MLX runs on the affine side. "
+            "The model runs bfloat16"
+        ),
+    )
     args = parser.parse_args(argv)
 
     if args.shape == ["all"]:
@@ -737,6 +817,7 @@ def main(argv: list[str] | None = None) -> int:
         shapes=shapes,
         batches=tuple(args.batches),
         max_foreign_gpu_share=args.max_foreign_gpu_share,
+        activation_dtype_name=args.activation_dtype,
     )
     write_json_atomic(args.output, result)
     json.dump({"matmul": result["matmul"], "get_rows": result["get_rows"]}, sys.stdout, indent=2)

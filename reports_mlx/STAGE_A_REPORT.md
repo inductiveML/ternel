@@ -1,13 +1,86 @@
 # Ternel MLX/Metal — Stage A report
 
-**Verdict: `STAGE_A_PASSED_WITH_A_POSITIVE_OP_LEVEL_PERFORMANCE_RESULT`**
+> **Three corrections, applied after Stage B measured the model.** This report is
+> left as the record of what Stage A found; all three are carried in
+> `FINAL_REPORT.md`, which supersedes it.
+>
+> 1. **The census below counts a tensor the model does not have.** The sweep's
+>    ten shapes include a 5120×12288 `self_attn.o_proj`; the model's `o_proj` is
+>    5120×6144, the same shape as `linear_attn.out_proj`. So the scope is 99
+>    measured points, not 110, and the real `out_proj` carries the weight the
+>    phantom was given. Re-weighting changes almost nothing here — the
+>    forward-pass ratios below move by at most 0.006 and the batch-1 figure not
+>    at all, because the two shapes ran at similar ratios — but the dispatch-rule
+>    scores restate as **43/99 exact, mean 2.04%, worst 14.52%** on the floor of
+>    the three sweeps, and **40/99, mean 2.46%** on the sweep this report used.
+>    `ternel_mlx.layout.MODEL_LINEAR_SHAPES` is now the one census, and it fails
+>    at import unless its nine shapes account for exactly the 497 quantised
+>    matmuls a decoded token issues.
+> 2. **Every ratio here is a throughput ratio, not a latency one.** A5 enqueues
+>    each configuration's calls with no dependency between them, so MLX overlaps
+>    them. Decode does not get that: its 497 matmuls form one read-after-write
+>    chain. Stage B's A6 sweep measured the same shapes with the chain forced and
+>    found the unsplit kernel paying up to 8.42× its own overlapped time, which
+>    is why the model was slower than this report's op-level numbers predict.
+>    Splitting the K axis removes it. The kernel that ships is the split one.
+> 3. **Everything here was measured in float32; the model runs bfloat16.** The
+>    sweep built its activations as float32 and never said so, and the dtype is
+>    not a detail: it is a kernel template parameter, so it selects which
+>    compiled kernel the packed arm runs, and — through the scales
+>    `build_affine_baseline` produced — which kernel MLX runs on the affine arm,
+>    since bfloat16 activations against float16 scales promote to float32. Both
+>    arms of every ratio below are therefore the float32 pair, not the pair a
+>    user gets. The dtype is now a required argument to `ternel_mlx.bench_ops`
+>    with no default, and the sweep records it.
+>
+>    **It has since been measured, and it reverses this report's headline.**
+>    Re-swept in bfloat16 with the affine control rebuilt in the same dtype, the
+>    weighted forward-pass ratio reads **0.86x at batch 1, 0.81x at 2 and 4,
+>    0.86x at 8, 1.17x at 16, and 0.88x–1.03x from 32 through 512** — against the
+>    1.09x/1.64x/1.77x/2.11x/1.27x below. The two arms move by very different
+>    amounts, which is the signature of the defect: across the nine dispatched
+>    shapes the packed arm's time changes by a median 0.93x, the affine arm's by
+>    0.76x, and at batches 4 and 8 the affine kernel runs 2x to 3x faster while
+>    the packed one stays within about 10% of itself. The reversal is about
+>    twenty times the scatter three repeats of the float32 sweep showed, and
+>    Stage B's A6 sweep corroborates it on a different harness with contention
+>    held constant — the same sweep run twice changing only the control's dtype,
+>    whose ledger moved from 0.90x/0.55x/0.47x/0.43x of affine to
+>    0.99x/1.07x/1.08x/1.09x. One bfloat16 sweep exists so far, two repeats are
+>    queued, and it ran on a quieter machine than the float32 ones (0.1% median
+>    foreign GPU share against 19.0% and 31.1%), so read the direction and not
+>    the third decimal; `FINAL_REPORT.md` sets out why contention does not
+>    account for it.
+>
+>    What survives is the *family crossover*, which compares packed
+>    configurations against each other and is therefore dtype-consistent within a
+>    sweep. The LUT23→GEMM crossover in bfloat16 falls inside the scatter the
+>    three float32 sweeps already show — GEMM is the faster family at batch 16 on
+>    every tile-256 shape and the slower one at batch 8, in bfloat16 exactly as in
+>    float32 — so the batch-16 threshold `select_gemm` and `select_lut23_tile`
+>    carry stands as measured, and it is still what ships. Scored on its own sweep
+>    the rule reads **38/99 exact, mean 2.63%, worst 29.9%**, inside the 33–40/99
+>    and 2.46%–6.07% the three float32 sweeps span. What did *not* survive is the
+>    other half of the rule — which row block to run at a given batch — for a
+>    reason no dtype re-sweep would have caught; see the superseded banner over
+>    "The dispatch rule" below. Decode is unaffected either way
+>    — batch 1 takes LUT23 at every threshold — and Stage B's model-level numbers
+>    do not depend on this at all, since they load both real checkpoints.
+
+**Verdict: `STAGE_A_PASSED_WITH_A_POSITIVE_OP_LEVEL_PERFORMANCE_RESULT`** —
+**withdrawn by correction 3 above.** The correctness half of that verdict stands;
+the positive op-level performance half was measured in the wrong dtype and does
+not survive re-measurement. `FINAL_REPORT.md` carries the verdict that supersedes
+it.
 
 Every Stage A correctness gate passes. The three Metal kernels decode packed
 TQ1_G128 storage directly and are bit-exact against their own algorithm's numpy
-reference in float32, with zero mismatches across **23,238,224** compared output
+reference in float32, with zero mismatches across **29,143,424** compared output
 elements. At op level the packed path is **at or above `mx.quantized_matmul` at
 every batch size measured**, weighted by the tensors the model actually holds:
-1.02x to 2.06x of MLX's own 2-bit kernel across batches 1 to 512.
+1.02x to 2.06x of MLX's own 2-bit kernel across batches 1 to 512. *(That second
+sentence is the one correction 3 withdraws; it is the float32 pair, and in
+bfloat16 the same weighting reads 0.81x to 1.17x.)*
 
 Two findings change the framing the plan assumed, and both are stated up front
 because they decide whether Stage B is worth running.
@@ -166,18 +239,17 @@ claim mechanical rather than numerical.
   `(batch_block, row_block, k_block, simd_rows, simd_columns)` plus three
   booleans that select which of six forms is compiled — see "the six forms"
   below. Never materialises a dequantized weight matrix: a decoded weight lives
-  for one K-block and is discarded. The three shipped tilings cost 20,480,
-  2,560 and **0** bytes of threadgroup memory respectively — the first stages a
-  K-block of weights and activations, the second holds only its trit table, and
-  the third holds nothing at all.
+  for one K-block and is discarded. The four shipped tilings cost 20,480, 2,560,
+  2,560 and 2,560 bytes of threadgroup memory — the first stages a K-block of
+  weights and activations, and the other three hold only their trit table.
 - **`tq1_get_rows`** — the embedding gather, decoding a single trit per output
   element straight from packed storage.
 
 30 template instantiations were compiled during the benchmark. **Total JIT
 compile cost 11.32 ms; total cold-call cost 21.98 ms; worst single compile
 5.38 ms.** That is the whole measured sweep; replaying the shipped dispatch over
-all 110 measured points reaches **six** of them — three LUT23 batch tiles and
-the three GEMM tilings. Cold start is not a concern on this platform.
+all 99 measured points reaches **seven** of them — three LUT23 batch tiles and
+the four GEMM tilings. Cold start is not a concern on this platform.
 
 `lut23_bt8_padded` is the one configuration that could not be built: its padded
 tables need 52,064 threadgroup bytes against the 32,768-byte limit. It is
@@ -230,12 +302,21 @@ pairing reorders the sum and is held to 1e-5. Each error is normalised *within*
 an activation case, never across cases, because one deliberate case uses 1e18
 activations and would otherwise dominate every statistic in the file.
 
-Fifteen GEMM tilings are gated. Twelve are chosen to walk the six kernel forms
+Sixteen GEMM tilings are gated. Twelve are chosen to walk the six kernel forms
 and the awkward corners of each — the smallest and largest threadgroups, the
 staged and register fragment builds, the staged and direct epilogues, the
-table-in-threadgroup arms. The other three are the tilings `select_gemm`
+table-in-threadgroup arms. The other four are the tilings `select_gemm`
 actually dispatches, on the principle that a gate covering everything except
-what runs proves the wrong thing.
+what runs proves the wrong thing. That set was three when this report was first
+written and is four now; the gate was re-run against the tilings that ship, and
+`results/mlx/a4_kernel_gate.json` is that run.
+
+The same principle later added the split-K LUT23 arms, which Stage B introduced
+and this section originally predates: `lut23_bt1_padded` and `lut23_bt4_packed`
+are each gated at k=2, 40 and 48 as well as unsplit. A K-axis split is a
+different summation order, so it is exactly the change a `lut23`-referenced arm
+is there to catch, and all six land between 1.985e-07 and 4.145e-07 against all
+three references — the same band as the unsplit kernels rather than a wider one.
 
 ### Shapes gated
 
@@ -247,15 +328,17 @@ what runs proves the wrong thing.
 | `mlp.gate_proj` | 17408 × 5120 | 256 | 68 | 138 | 1024 | no |
 | `lm_head` | 248320 × 5120 | 256 | 970 | 138 | 1024 | no |
 
-138 activation cases per shape = 128 deterministic random cases plus ten edge
-cases (`zeros`, `ones`, `alternating_signs`, `single_hot_first`,
+138 finite activation cases per shape = 128 deterministic random cases plus ten
+edge cases (`zeros`, `ones`, `alternating_signs`, `single_hot_first`,
 `single_hot_last`, `single_hot_tail`, `large_positive`, `large_alternating`,
-`small_normal`, `mixed_magnitudes`) and five non-finite cases (`all_nan`,
-`all_positive_inf`, `single_nan_first`, `single_nan_tail`, `single_inf_last`).
+`small_normal`, `mixed_magnitudes`). Five non-finite cases (`all_nan`,
+`all_positive_inf`, `single_nan_first`, `single_nan_tail`, `single_inf_last`)
+run as their own comparison, since a tolerance is meaningless against NaN and
+what is checked there is the propagation pattern instead.
 
 ### Results
 
-**275 matmul comparisons over 21,179,984 output elements: 0 mismatches, 0
+**350 matmul comparisons over 27,085,184 output elements: 0 mismatches, 0
 non-finite pattern mismatches, 10 bit-exact.**
 
 | Kernel | vs reference | activations | worst normalised error | tolerance | min cosine |
@@ -270,9 +353,10 @@ non-finite pattern mismatches, 10 bit-exact.**
 | `lut23_batched` | `lut23` | bfloat16 | 3.527e-03 | 1e-2 | 0.9999979446 |
 | `lut23_batched` | `oracle` | float32 | 4.152e-07 | 1e-5 | 1.0000000000 |
 | `lut23_batched` | `restored` | float32 | 3.752e-07 | 1e-5 | 1.0000000000 |
-| `gemm_*` (15 tilings) | `lut23` | float32 | 4.005e-06 | 1e-5 | 1.0000000000 |
-| `gemm_*` (15 tilings) | `oracle` | float32 | 3.943e-06 | 1e-5 | 1.0000000000 |
-| `gemm_*` (15 tilings) | `restored` | float32 | 2.861e-06 | 1e-5 | 1.0000000000 |
+| `lut23_*` split-K (6 arms) | all three | float32 | 4.145e-07 | 1e-5 | 1.0000000000 |
+| `gemm_*` (16 tilings) | `lut23` | float32 | 4.005e-06 | 1e-5 | 1.0000000000 |
+| `gemm_*` (16 tilings) | `oracle` | float32 | 3.943e-06 | 1e-5 | 1.0000000000 |
+| `gemm_*` (16 tilings) | `restored` | float32 | 2.861e-06 | 1e-5 | 1.0000000000 |
 
 The non-finite rows matter: NaN and Inf propagate through the kernel to exactly
 the output positions the reference puts them in, with zero pattern mismatches.
@@ -487,6 +571,15 @@ packed format costs throughput at prompt-processing sizes.
 
 ### The dispatch rule
 
+> **Superseded — this is the Stage A rule, not the shipped one.** Two changes
+> landed after this report. The 128×32 bucket was chosen on float32 and loses in
+> bfloat16, and the rule below never reads the row count, which cost a short
+> prompt up to 9.29× the affine baseline on a 1,024-row projection inside the
+> real graph. What ships is a two-ladder walk keyed on the row count, set out in
+> `FINAL_REPORT.md` under "What the kernels are, and how one is chosen"; §B8
+> there has the measurement that forced it. Everything below is left as measured
+> at Stage A.
+
 ```
 tile < 256                    → GEMM(128×32,  k32, s4×2, frag+epi)      at batch ≥ 64
 tile ≥ 256 and batch ≥ 32     → GEMM(32×64,   k32, s1×2, frag+epi+tgt)
@@ -507,6 +600,19 @@ tiling. The winning tilings now use 64- and 128-row blocks against a batch split
 several ways, so the same 1024 rows yield 8 to 16 row blocks *times* the batch
 blocks. `self_attn.k_proj` beats the fastest LUT23 by 1.14x at batch 16 and
 2.08x at 512, resolvably at every batch from 16 up.
+
+> This paragraph is wrong, and it is the reason the whole section is marked
+> superseded. The row count is back, and `self_attn.k_proj` is the tensor that
+> put it there. `bench_ops` times a shape by enqueueing many independent copies
+> of the same matmul, so a dispatch offering 8 threadgroups is submitted 128 at a
+> time and the GPU fills from the queue — the one regime in which a tiling that
+> cannot fill the machine on its own looks fine. Inside a real forward pass,
+> where each matmul waits on the one before it, that same 1024-row projection
+> cost **9.29x** the affine baseline. What ships walks a ladder of row blocks and
+> takes the first that offers three passes over the GPU's 40 cores, dropping to
+> LUT23's K-axis split below two; `k_proj` at batch 16 goes back to LUT23 and
+> gains 6.51x. The `select_gemm` docstring carries the rule and
+> `tests/test_mlx_modules.py` replays both sweeps through it.
 
 **The family crossover is at batch 16, not 128.** At batch 8 the two families
 are a genuine wash: geometric mean 0.956 across the nine wide shapes with six of
@@ -542,6 +648,14 @@ compiled out, and their p5/p95 bands sit inside one another.
 > regret 1.98% and the same 14.52% worst case, so the conclusions below stand;
 > see the Stage B report for why a steady competitor turned out to distort a
 > ranking less than a bursty one.
+>
+> The denominator is also wrong. Eleven of those 110 points are a 5120×12288
+> `self_attn.o_proj` the model has no instance of — `o_proj` is 5120×6144, the
+> same shape as `linear_attn.out_proj` — so the census is 99 points, not 110.
+> Recomputed on the real census, the rule as it stood here reads 43/99 exact,
+> mean 2.04%, worst 14.52%. `ternel_mlx.layout.MODEL_LINEAR_SHAPES` is now the
+> single census and fails at import unless its nine shapes account for exactly
+> the 497 quantised matmuls a decoded token issues.
 
 Rules were compared on **predicted whole-forward-pass matmul time**, not on
 unweighted per-case regret, for the reason the forward-pass table gives. The
@@ -551,14 +665,19 @@ points of worst per-case regret** (28.54% against 14.52%) and by **0.04 points
 of forward-pass geometric mean** (1.0304 against 1.0301), because those tensors
 are under 1% of the sum.
 Ranking on the per-case statistic would have made that the loudest decision in
-the sweep; it is the quietest. Against a per-case oracle the shipped rule
+the sweep; it is the quietest. Against a per-case oracle the rule chosen here
 predicts **1.030x** on the geometric mean over the eleven batches; the rule it
 replaces predicts 1.426x and LUT23-only predicts 1.570x.
 
-`tests/test_mlx_modules.py` replays all 110 measured points through
-`select_gemm` and `select_lut23`, so the thresholds are checked against the file
-rather than described by it, and it asserts that batch 8 is the *only* group
-where the resolvable family verdicts contradict each other.
+`tests/test_mlx_modules.py` replays the measured points through `select_gemm`
+and `select_lut23`, so the thresholds are checked against the file rather than
+described by it, and it asserts that batch 8 is the *only* group where the
+resolvable family verdicts contradict each other. The replay is now a partition
+rather than a sweep over everything, which is the same correction as above seen
+from the test side: of the 99 real points it scores 78, replays ten against the
+in-situ sweep that chose their row block, and excludes eleven that turn on
+occupancy A5's enqueue pattern supplied for free. All three sets are asserted
+exactly.
 
 ### Negative results, recorded so they are not re-run
 
@@ -675,7 +794,8 @@ unstarted and gated on review of this report.
    model-sized float array exists in the graph.
 
 **A5 has already answered the plan's risk 2 at op level, and the answer is
-positive.** Weighting each measured shape by how many tensors of that shape one
+positive.** *(Withdrawn by correction 3: in bfloat16 this answer is neutral, not
+positive.)* Weighting each measured shape by how many tensors of that shape one
 forward pass contains, the dispatch rule is at or above `mx.quantized_matmul` at
 every batch tested — 1.11x at batch 1, 2.06x at 8, 1.27x at 16, and 1.02x to
 1.07x from 32 through 512 — and within roughly 1% of the best of all thirty

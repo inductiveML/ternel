@@ -38,7 +38,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import ml_dtypes
@@ -52,9 +52,10 @@ from .environment import capture_environment
 from .kernels import GemmConfig, MatmulConfig, tq1_gemm, tq1_get_rows, tq1_matmul
 from .layout import PackedTensorLayout
 from .modules import (
-    GEMM_LARGE_BATCH,
-    GEMM_NARROW_TILE,
-    GEMM_SMALL_BATCH,
+    GEMM_LARGE_BATCH_NARROW_BLOCK,
+    GEMM_LARGE_BATCH_WIDE_BLOCK,
+    GEMM_SMALL_BATCH_NARROW_BLOCK,
+    GEMM_SMALL_BATCH_WIDE_BLOCK,
     GET_ROWS_THREADS,
 )
 from .packing import pack_blocks
@@ -112,8 +113,19 @@ SAME_ORDER_RELATIVE_TOLERANCE = 1e-6
 # bfloat16 result from the float32 one. bfloat16 carries 8 mantissa bits.
 NARROWED_RELATIVE_TOLERANCE = {"float32": 1e-5, "float16": 2e-3, "bfloat16": 1e-2}
 
-SINGLE = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=False)
-BATCHED = MatmulConfig(threads=256, batch_tile=4, padded_lut=False, safe_clamp=False)
+SINGLE = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=False, k_split=1)
+BATCHED = MatmulConfig(threads=256, batch_tile=4, padded_lut=False, safe_clamp=False, k_split=1)
+
+# Split-K, which is what decode dispatches. A split threadgroup starts its
+# accumulator part-way into the tensor and stops early, so the two things that
+# can go wrong are arithmetic in the group range -- a chunk reading a group its
+# neighbour already summed, or the last chunk stopping short of the tail -- and
+# both surface as a wrong dot product rather than a slow one.
+#
+# The gate takes the extremes each shape admits rather than the split the rule
+# picks, because the extremes are where a group range is most likely to be
+# miscomputed: two chunks give the longest range a split can have, and one group
+# per chunk the shortest. Anything the rule picks lies between them.
 
 # Structurally different prefill tilings: different output block, different
 # simdgroup grid, different register pressure. Agreement between them at the
@@ -177,14 +189,17 @@ GEMM_CONFIGS: tuple[GemmConfig, ...] = (
     GemmConfig(batch_block=128, row_block=256, k_block=32, simd_rows=4, simd_columns=8,
                direct_fragments=True, direct_epilogue=True, threadgroup_table=True,
                safe_clamp=False),
-    # The three tilings ``modules.select_gemm`` actually dispatches. The spread
-    # above is chosen to walk the kernel forms; these are here because they ship,
-    # and a gate that covers everything except what runs proves the wrong thing.
-    # One of them is also the smallest threadgroup in this list: 64 threads
-    # filling a 1280-entry table, where every other table arm has 256.
-    GEMM_SMALL_BATCH,
-    GEMM_LARGE_BATCH,
-    GEMM_NARROW_TILE,
+    # The four tilings ``modules.select_gemm`` actually dispatches -- two batch
+    # blocks times two row blocks. The spread above is chosen to walk the kernel
+    # forms; these are here because they ship, and a gate that covers everything
+    # except what runs proves the wrong thing. The two large-batch ones are also
+    # the smallest threadgroups in this list: 64 threads filling the 1280-entry
+    # trit table, twenty entries a thread where the other table arms fill ten or
+    # fewer.
+    GEMM_SMALL_BATCH_WIDE_BLOCK,
+    GEMM_SMALL_BATCH_NARROW_BLOCK,
+    GEMM_LARGE_BATCH_WIDE_BLOCK,
+    GEMM_LARGE_BATCH_NARROW_BLOCK,
 )
 
 # The batch the full-shape agreement is repeated at, so that ``MFIT`` -- the
@@ -466,10 +481,29 @@ def pair_tolerance(arm: str, reference: str) -> float:
     into the weight and reduce through the matrix units, ``restored`` decodes and
     dots, ``oracle`` works in float64. Holding those to the same-order bound
     would be gating on an accumulation order none of them claims to share.
+
+    A split LUT23 arm is in that second category despite its name. It walks slot
+    order identically inside each chunk, but the chunks are summed afterwards,
+    so it associates the group sum differently from the reference and cannot
+    claim the ULP-level bound the unsplit arms are held to.
     """
-    if reference == "lut23" and arm.startswith("lut23"):
+    if reference == "lut23" and arm.startswith("lut23") and "_k" not in arm:
         return SAME_ORDER_RELATIVE_TOLERANCE
     return ORACLE_RELATIVE_TOLERANCE
+
+
+def split_gate_cases(groups_per_row: int) -> tuple[int, ...]:
+    """The coarsest and finest splits of a tensor with this many groups.
+
+    Chunk counts, so the smallest divisor above one gives the longest chunks and
+    ``groups_per_row`` itself gives one group each. A prime group count collapses
+    the two into a single case, which is why the result is a deduplicated set
+    rather than a pair.
+    """
+    divisors = [k for k in range(2, groups_per_row + 1) if groups_per_row % k == 0]
+    if not divisors:
+        raise FormatError(f"{groups_per_row} groups admit no split at all")
+    return tuple(sorted({min(divisors), max(divisors)}))
 
 
 def reference_prefix(layout: PackedTensorLayout) -> PackedTensorLayout:
@@ -521,6 +555,17 @@ def gate_against_references(
             ]
         ),
     }
+    for base in (SINGLE, BATCHED):
+        for split in split_gate_cases(prefix.groups_per_row):
+            config = replace(base, k_split=split)
+            if base is SINGLE:
+                got = np.concatenate([
+                    matmul(sliced_codes, sliced_scales, row[None, :], layout=prefix, config=config)
+                    for row in x
+                ])
+            else:
+                got = matmul(sliced_codes, sliced_scales, x, layout=prefix, config=config)
+            arms[config.benchmark_name] = got
     for config in GEMM_CONFIGS:
         if prefix.tiles > 1 and prefix.tile % config.row_block:
             continue

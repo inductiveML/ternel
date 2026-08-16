@@ -1,0 +1,5286 @@
+{
+  "activation_dtype": "bfloat16",
+  "baseline": {
+    "bits": 2,
+    "bits_per_weight": 2.25,
+    "group_size": 128,
+    "mode": "affine",
+    "name": "mx.quantized_matmul",
+    "rationale": "already splits K, so its serialisation factor is the control for whatever part of the chained penalty belongs to MLX's encoder rather than to this kernel"
+  },
+  "dispatches_per_token": 497,
+  "enqueued_per_sample": 32,
+  "environment_after": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 9.3,
+          "pid": 592,
+          "rss_kib": 58736
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.1,
+          "pid": 1197,
+          "rss_kib": 97520
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.0,
+          "pid": 629,
+          "rss_kib": 164720
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.3,
+          "pid": 96633,
+          "rss_kib": 309216
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 166,
+          "rss_kib": 327632
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 164,
+          "rss_kib": 228000
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 165,
+          "rss_kib": 224592
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 0.9,
+          "pid": 48358,
+          "rss_kib": 8931376
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-14T12:31:31.933525+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.0018043092469865495,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0018043092469865495,
+          "pid": 1310
+        }
+      ],
+      "seconds": 3.042184708174318,
+      "total_share": 0.0018043092469865495
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 0,
+      "cache_memory_bytes": 14340326150,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 8264777730
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 1.06 1.44 1.25 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "environment_before": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 27.9,
+          "pid": 33607,
+          "rss_kib": 980416
+        },
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 14.4,
+          "pid": 592,
+          "rss_kib": 80752
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 8.0,
+          "pid": 1310,
+          "rss_kib": 260768
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 6.1,
+          "pid": 48358,
+          "rss_kib": 46688
+        },
+        {
+          "command": "/System/Library/CoreServices/Finder.app/Contents/MacOS/Finder",
+          "cpu_percent": 5.9,
+          "pid": 1216,
+          "rss_kib": 71824
+        },
+        {
+          "command": "/System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService",
+          "cpu_percent": 5.0,
+          "pid": 44859,
+          "rss_kib": 44240
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.5,
+          "pid": 1197,
+          "rss_kib": 138992
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 164,
+          "rss_kib": 346544
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-14T12:26:32.655572+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.08555507566462822,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.08555507566462822,
+          "pid": 1310
+        }
+      ],
+      "seconds": 3.0423531038686633,
+      "total_share": 0.08555507566462822
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 0,
+      "cache_memory_bytes": 0,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 0
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 2.02 1.39 1.14 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "gpu_contention": [
+    {
+      "busiest_share": 0.008705909150051046,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.008705909150051046,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.in_proj_a 48x5120 batch=16",
+      "seconds": 0.2642601663246751,
+      "timed_seconds": 0.24661274999380112,
+      "total_share": 0.008705909150051046
+    },
+    {
+      "busiest_share": 0.01693563745481083,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.01693563745481083,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.in_proj_a 48x5120 batch=32",
+      "seconds": 0.27796414587646723,
+      "timed_seconds": 0.2604999579489231,
+      "total_share": 0.01693563745481083
+    },
+    {
+      "busiest_share": 0.02031988698714657,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.02031988698714657,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.in_proj_a 48x5120 batch=64",
+      "seconds": 0.3487244788557291,
+      "timed_seconds": 0.33139179088175297,
+      "total_share": 0.02031988698714657
+    },
+    {
+      "busiest_share": 0.01802089248158303,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.01802089248158303,
+          "pid": 1310
+        }
+      ],
+      "label": "self_attn.k_proj 1024x5120 batch=16",
+      "seconds": 0.518733520526439,
+      "timed_seconds": 0.5001942501403391,
+      "total_share": 0.01802089248158303
+    },
+    {
+      "busiest_share": 0.021233147579315177,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.021233147579315177,
+          "pid": 1310
+        }
+      ],
+      "label": "self_attn.k_proj 1024x5120 batch=32",
+      "seconds": 0.7120607504621148,
+      "timed_seconds": 0.6941481246612966,
+      "total_share": 0.021233147579315177
+    },
+    {
+      "busiest_share": 0.02049924058753419,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.02049924058753419,
+          "pid": 1310
+        }
+      ],
+      "label": "self_attn.k_proj 1024x5120 batch=64",
+      "seconds": 1.1514775827527046,
+      "timed_seconds": 1.133421666920185,
+      "total_share": 0.02049924058753419
+    },
+    {
+      "busiest_share": 0.026009357894669176,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.026009357894669176,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.out_proj 5120x6144 batch=16",
+      "seconds": 1.7924542077817023,
+      "timed_seconds": 1.7717115837149322,
+      "total_share": 0.026009357894669176
+    },
+    {
+      "busiest_share": 0.03301721498097109,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.03301721498097109,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.out_proj 5120x6144 batch=32",
+      "seconds": 2.8316970421001315,
+      "timed_seconds": 2.812430249992758,
+      "total_share": 0.03301721498097109
+    },
+    {
+      "busiest_share": 0.06991204101185446,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.06991204101185446,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.out_proj 5120x6144 batch=64",
+      "seconds": 4.077030749991536,
+      "timed_seconds": 4.057529500219971,
+      "total_share": 0.06991204101185446
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.down_proj 5120x17408 batch=16",
+      "seconds": 2.699759729206562,
+      "timed_seconds": 2.6790367919020355,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.down_proj 5120x17408 batch=32",
+      "seconds": 3.9064928125590086,
+      "timed_seconds": 3.886114708147943,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.down_proj 5120x17408 batch=64",
+      "seconds": 7.63746418710798,
+      "timed_seconds": 7.61588866636157,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "linear_attn.in_proj_z 6144x5120 batch=16",
+      "seconds": 1.4415376875549555,
+      "timed_seconds": 1.4209990412928164,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "linear_attn.in_proj_z 6144x5120 batch=32",
+      "seconds": 2.2170624579302967,
+      "timed_seconds": 2.197271375451237,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "linear_attn.in_proj_z 6144x5120 batch=64",
+      "seconds": 2.929612707812339,
+      "timed_seconds": 2.9096642499789596,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0029035332265729464,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0029035332265729464,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.in_proj_qkv 10240x5120 batch=16",
+      "seconds": 1.9843781869858503,
+      "timed_seconds": 1.9640553328208625,
+      "total_share": 0.0029035332265729464
+    },
+    {
+      "busiest_share": 0.0003786302493959495,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0003786302493959495,
+          "pid": 1310
+        }
+      ],
+      "label": "linear_attn.in_proj_qkv 10240x5120 batch=32",
+      "seconds": 3.02922970848158,
+      "timed_seconds": 3.00811191694811,
+      "total_share": 0.0003786302493959495
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "linear_attn.in_proj_qkv 10240x5120 batch=64",
+      "seconds": 3.635422228835523,
+      "timed_seconds": 3.6147534996271133,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "self_attn.q_proj 12288x5120 batch=16",
+      "seconds": 2.331244229339063,
+      "timed_seconds": 2.3109305412508547,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "self_attn.q_proj 12288x5120 batch=32",
+      "seconds": 2.9047654159367085,
+      "timed_seconds": 2.8843926251865923,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.008185228716170754,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.008185228716170754,
+          "pid": 595
+        }
+      ],
+      "label": "self_attn.q_proj 12288x5120 batch=64",
+      "seconds": 3.0527807916514575,
+      "timed_seconds": 3.0326931667514145,
+      "total_share": 0.008185228716170754
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.gate_proj 17408x5120 batch=16",
+      "seconds": 2.706713458057493,
+      "timed_seconds": 2.686089333612472,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.gate_proj 17408x5120 batch=32",
+      "seconds": 3.0506907077506185,
+      "timed_seconds": 3.029475042130798,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0,
+      "clients": [],
+      "label": "mlp.gate_proj 17408x5120 batch=64",
+      "seconds": 4.1962025836110115,
+      "timed_seconds": 4.175401458051056,
+      "total_share": 0
+    },
+    {
+      "busiest_share": 0.0006783171217790744,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0006783171217790744,
+          "pid": 1310
+        }
+      ],
+      "label": "lm_head 248320x5120 batch=16",
+      "seconds": 16.215129541698843,
+      "timed_seconds": 16.18020141683519,
+      "total_share": 0.0006783171217790744
+    },
+    {
+      "busiest_share": 0.000495238442857855,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.000495238442857855,
+          "pid": 1310
+        }
+      ],
+      "label": "lm_head 248320x5120 batch=32",
+      "seconds": 24.567206313367933,
+      "timed_seconds": 24.545168249867857,
+      "total_share": 0.000495238442857855
+    },
+    {
+      "busiest_share": 0.0016196089186866689,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0016196089186866689,
+          "pid": 595
+        }
+      ],
+      "label": "lm_head 248320x5120 batch=64",
+      "seconds": 41.04388487432152,
+      "timed_seconds": 41.021815583109856,
+      "total_share": 0.0016196089186866689
+    }
+  ],
+  "layout_name": "TQ1_G128_MLX_TILED",
+  "layout_version": 1,
+  "matmul": [
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 96,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_a",
+      "modules": [
+        "linear_attn.in_proj_a",
+        "linear_attn.in_proj_b"
+      ],
+      "rows": 48,
+      "tile": 48,
+      "tiles": 1,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0007623855102186402,
+            "median": 0.0007016465533524752,
+            "p5": 0.0006766811013221741,
+            "p95": 0.0009779891930520534,
+            "per_call": 1.0388699593022466e-05,
+            "std": 0.00012065102367407101
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0005790105011935035,
+            "median": 0.00046835443936288357,
+            "p5": 0.00044788746163249016,
+            "p95": 0.0010006624972447751,
+            "per_call": 1.4636076230090111e-05,
+            "std": 0.00022218743283672476
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.7098008666875127,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.002183812476384143,
+            "median": 0.0019586249254643917,
+            "p5": 0.001841870555654168,
+            "p95": 0.0029651794815436006,
+            "per_call": 4.966927372151986e-05,
+            "std": 0.000413862825946768
+          },
+          "config": "lut23_bt1_padded",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.0004586912303542097,
+            "median": 0.00042306259274482727,
+            "p5": 0.00040517756715416906,
+            "p95": 0.000576859270222485,
+            "per_call": 1.3220706023275852e-05,
+            "std": 6.618864002172519e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 3.756930502355479,
+          "threadgroups": 16
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0015001387801021338,
+            "median": 0.0013247707393020391,
+            "p5": 0.001254291646182537,
+            "p95": 0.0021342874970287085,
+            "per_call": 2.986133040394634e-05,
+            "std": 0.00031336963193258463
+          },
+          "config": "lut23_bt1_padded_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.0005170137931903204,
+            "median": 0.00047116633504629135,
+            "p5": 0.00045595041010528805,
+            "p95": 0.0006930352887138724,
+            "per_call": 1.4723947970196605e-05,
+            "std": 8.599483220069665e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 2.028079049477082,
+          "threadgroups": 32
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.001101961825042963,
+            "median": 0.0010068747214972973,
+            "p5": 0.0009493335383012891,
+            "p95": 0.0014903308823704718,
+            "per_call": 1.9927079847548157e-05,
+            "std": 0.0001936251817855344
+          },
+          "config": "lut23_bt1_padded_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.00048406266917785007,
+            "median": 0.00044816709123551846,
+            "p5": 0.00041945658158510924,
+            "p95": 0.000626025116071105,
+            "per_call": 1.4005221601109952e-05,
+            "std": 7.298328284199389e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 1.4228321703934255,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010856250301003456,
+            "median": 0.0010006667580455542,
+            "p5": 0.000895856274291873,
+            "p95": 0.001481822645291686,
+            "per_call": 1.9733080989681184e-05,
+            "std": 0.0002017602731109949
+          },
+          "config": "lut23_bt1_padded_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.000474954800059398,
+            "median": 0.0004447710234671831,
+            "p5": 0.0004249124089255929,
+            "p95": 0.0006146170431748032,
+            "per_call": 1.3899094483349472e-05,
+            "std": 6.7407246512113e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 1.4197386033543826,
+          "threadgroups": 80
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010436146209637325,
+            "median": 0.0008600209839642048,
+            "p5": 0.0007996624102815985,
+            "p95": 0.0015918733086436984,
+            "per_call": 1.5337900549639016e-05,
+            "std": 0.0003088083441437787
+          },
+          "config": "lut23_bt1_padded_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.00047327411205818254,
+            "median": 0.0004356664139777422,
+            "p5": 0.00040867857169359925,
+            "p95": 0.0006325038382783532,
+            "per_call": 1.3614575436804444e-05,
+            "std": 7.939199028905753e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 1.1265794237090851,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0009610141860321164,
+            "median": 0.0008187503553926945,
+            "p5": 0.0007934399181976914,
+            "p95": 0.0013555980520322916,
+            "per_call": 1.4048193406779319e-05,
+            "std": 0.00022803754120700532
+          },
+          "config": "lut23_bt1_padded_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.00047044809131572646,
+            "median": 0.00043956260196864605,
+            "p5": 0.0004181125899776816,
+            "p95": 0.0005922151263803244,
+            "per_call": 1.3736331311520189e-05,
+            "std": 6.280227004783335e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 1.0227034488457323,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.000878704828210175,
+            "median": 0.0008081872947514057,
+            "p5": 0.0007672391133382916,
+            "p95": 0.0012290401384234429,
+            "per_call": 1.3718097761739045e-05,
+            "std": 0.0001634655749801549
+          },
+          "config": "lut23_bt1_padded_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.00046583354317893583,
+            "median": 0.00044289627112448215,
+            "p5": 0.0004279086133465171,
+            "p95": 0.000560866785235703,
+            "per_call": 1.3840508472640067e-05,
+            "std": 4.754639254512858e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 0.9911556203919095,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0008661701964835326,
+            "median": 0.000786791555583477,
+            "p5": 0.0007680608658120036,
+            "p95": 0.001243566838093102,
+            "per_call": 1.3049480912741274e-05,
+            "std": 0.00017012724227100358
+          },
+          "config": "lut23_bt1_padded_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.0005056699349855384,
+            "median": 0.0004687914624810219,
+            "p5": 0.0004556515719741583,
+            "p95": 0.0006693830713629722,
+            "per_call": 1.4649733202531934e-05,
+            "std": 7.66485565526374e-05
+          },
+          "relative_error": 0.0022504132900105275,
+          "serialisation_factor": 0.8907657724774068,
+          "threadgroups": 640
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 96,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_a",
+      "modules": [
+        "linear_attn.in_proj_a",
+        "linear_attn.in_proj_b"
+      ],
+      "rows": 48,
+      "tile": 48,
+      "tiles": 1,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0007189027577017745,
+            "median": 0.0007172080222517252,
+            "p5": 0.0006689624860882759,
+            "p95": 0.000767399906180799,
+            "per_call": 1.0326810297556221e-05,
+            "std": 3.221653892309901e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0005377950534845392,
+            "median": 0.0004762290045619011,
+            "p5": 0.00043877505231648684,
+            "p95": 0.0008367915404960508,
+            "per_call": 1.4882156392559409e-05,
+            "std": 0.00019717626456410825
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.6939055083925397,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0019219651585444808,
+            "median": 0.0019179375376552343,
+            "p5": 0.0018420182866975665,
+            "p95": 0.001999250054359436,
+            "per_call": 4.784960765391588e-05,
+            "std": 5.080199714208869e-05
+          },
+          "config": "lut23_bt1_padded",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.0005950796961163481,
+            "median": 0.0005921253468841314,
+            "p5": 0.0005774061195552349,
+            "p95": 0.0006226388504728675,
+            "per_call": 1.8503917090129107e-05,
+            "std": 1.5252629145511627e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 2.585917750325481,
+          "threadgroups": 32
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0013448367438589532,
+            "median": 0.0013629584573209286,
+            "p5": 0.0012362229637801648,
+            "p95": 0.001382266147993505,
+            "per_call": 3.0506511393468827e-05,
+            "std": 4.961739237262856e-05
+          },
+          "config": "lut23_bt1_padded_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.0006406562558064858,
+            "median": 0.0006261039525270462,
+            "p5": 0.0006134981755167246,
+            "p95": 0.0007002837024629115,
+            "per_call": 1.9565748516470194e-05,
+            "std": 3.992305237516788e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.5591793673412924,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0012638749709973733,
+            "median": 0.001186500070616603,
+            "p5": 0.001112185511738062,
+            "p95": 0.0016605060780420892,
+            "per_call": 2.499218680895865e-05,
+            "std": 0.00027366243645062053
+          },
+          "config": "lut23_bt1_padded_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.0006003680173307657,
+            "median": 0.0006075834389775991,
+            "p5": 0.0005657331319525837,
+            "p95": 0.0006273602601140737,
+            "per_call": 1.8986982468049973e-05,
+            "std": 2.1379366618818643e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.316280080366316,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010485836149503787,
+            "median": 0.0010597920045256615,
+            "p5": 0.0009895214112475514,
+            "p95": 0.0010998731711879372,
+            "per_call": 2.103255974361673e-05,
+            "std": 4.170533821579011e-05
+          },
+          "config": "lut23_bt1_padded_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.0005921490956097841,
+            "median": 0.0005951663479208946,
+            "p5": 0.0005666264332830906,
+            "p95": 0.0006090875715017319,
+            "per_call": 1.8598948372527957e-05,
+            "std": 1.3737482166462578e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.130846718983499,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.001165947721650203,
+            "median": 0.0010906665120273829,
+            "p5": 0.0010086016496643423,
+            "p95": 0.001595974690280854,
+            "per_call": 2.1997388103045523e-05,
+            "std": 0.0002884335070218034
+          },
+          "config": "lut23_bt1_padded_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.0005953716657434901,
+            "median": 0.0005908336024731398,
+            "p5": 0.0005715981125831604,
+            "p95": 0.0006327688228338957,
+            "per_call": 1.8463550077285618e-05,
+            "std": 2.4519629155583046e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.1913953714734056,
+          "threadgroups": 256
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010905206048240264,
+            "median": 0.0010608334559947252,
+            "p5": 0.0009640917647629976,
+            "p95": 0.0013355226721614595,
+            "per_call": 2.1065105102024972e-05,
+            "std": 0.00017170347355056594
+          },
+          "config": "lut23_bt1_padded_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.0005932569038122892,
+            "median": 0.0005977293476462364,
+            "p5": 0.0005708287237212062,
+            "p95": 0.0006065062247216701,
+            "per_call": 1.8679042113944888e-05,
+            "std": 1.2353648029811863e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.127740115019001,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010334063554182649,
+            "median": 0.0010391660034656525,
+            "p5": 0.0009715378284454346,
+            "p95": 0.0010980841238051652,
+            "per_call": 2.038799721049145e-05,
+            "std": 4.36906194481176e-05
+          },
+          "config": "lut23_bt1_padded_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.0006187499966472387,
+            "median": 0.0006084791384637356,
+            "p5": 0.0005831910762935877,
+            "p95": 0.0006871211808174849,
+            "per_call": 1.9014973076991737e-05,
+            "std": 3.555979029402612e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 1.0722075244566653,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0010883435606956482,
+            "median": 0.0010305829346179962,
+            "p5": 0.0009782518027350307,
+            "p95": 0.001391799584962427,
+            "per_call": 2.011977630900219e-05,
+            "std": 0.000211858192298724
+          },
+          "config": "lut23_bt1_padded_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.0006699547326813141,
+            "median": 0.0006709787994623184,
+            "p5": 0.0006446168292313815,
+            "p95": 0.0006884437752887607,
+            "per_call": 2.096808748319745e-05,
+            "std": 1.4079862996030403e-05
+          },
+          "relative_error": 0.00369271792489051,
+          "serialisation_factor": 0.9595427491956505,
+          "threadgroups": 1280
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 96,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_a",
+      "modules": [
+        "linear_attn.in_proj_a",
+        "linear_attn.in_proj_b"
+      ],
+      "rows": 48,
+      "tile": 48,
+      "tiles": 1,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0007996495114639401,
+            "median": 0.0008011881727725267,
+            "p5": 0.00078021299559623,
+            "p95": 0.0008125666528940201,
+            "per_call": 1.1751333659049124e-05,
+            "std": 1.170119686670561e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0006011006189510226,
+            "median": 0.0005293127615004778,
+            "p5": 0.0005157875129953027,
+            "p95": 0.0009399978211149569,
+            "per_call": 1.654102379688993e-05,
+            "std": 0.00021178994155911834
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.7104356902780484,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0019551145378500223,
+            "median": 0.0019853541161864996,
+            "p5": 0.001874707662500441,
+            "p95": 0.0020130045479163526,
+            "per_call": 4.8756519390735775e-05,
+            "std": 5.5938888082386187e-05
+          },
+          "config": "lut23_bt1_padded",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.0009950728078062336,
+            "median": 0.0010027920361608267,
+            "p5": 0.0009551495313644409,
+            "p95": 0.0010350581724196672,
+            "per_call": 3.1337251130025834e-05,
+            "std": 2.8613651802250837e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.5558645903060604,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0017494654360537727,
+            "median": 0.0016796872951090336,
+            "p5": 0.0015775111503899097,
+            "p95": 0.0021458212751895183,
+            "per_call": 3.920443123206496e-05,
+            "std": 0.000279640872230839
+          },
+          "config": "lut23_bt1_padded_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.0009396387419352928,
+            "median": 0.0009513953700661659,
+            "p5": 0.0009002912091091275,
+            "p95": 0.0009593311464414,
+            "per_call": 2.9731105314567685e-05,
+            "std": 2.1714233792120496e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.3186334923396046,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0015291422605514526,
+            "median": 0.001540520926937461,
+            "p5": 0.0014811288798227905,
+            "p95": 0.0015503938077017665,
+            "per_call": 3.4855482226703316e-05,
+            "std": 2.836864864096049e-05
+          },
+          "config": "lut23_bt1_padded_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.0010266217480724056,
+            "median": 0.0009507499635219574,
+            "p5": 0.000918331416323781,
+            "p95": 0.0013936793431639665,
+            "per_call": 2.971093636006117e-05,
+            "std": 0.00027038278360762725
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.1731532727308347,
+          "threadgroups": 256
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0014361355376119416,
+            "median": 0.001448062714189291,
+            "p5": 0.0013711124192923307,
+            "p95": 0.0014803646598011255,
+            "per_call": 3.196616307832301e-05,
+            "std": 3.9765765613348276e-05
+          },
+          "config": "lut23_bt1_padded_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.0009523020125925541,
+            "median": 0.000946499640122056,
+            "p5": 0.0009187874849885703,
+            "p95": 0.0010045624803751707,
+            "per_call": 2.957811375381425e-05,
+            "std": 3.568547379934389e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.0807370390277442,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0015897777241965134,
+            "median": 0.0014524373691529036,
+            "p5": 0.0013785896124318242,
+            "p95": 0.0023605706403031943,
+            "per_call": 3.21028710459359e-05,
+            "std": 0.0003486961353121942
+          },
+          "config": "lut23_bt1_padded_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.0009459582312653462,
+            "median": 0.0009567493107169867,
+            "p5": 0.0009113311534747481,
+            "p95": 0.0009712771046906709,
+            "per_call": 2.9898415959905833e-05,
+            "std": 2.166943663582563e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.0737315009927706,
+          "threadgroups": 512
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.001445951173081994,
+            "median": 0.0014512084890156984,
+            "p5": 0.0013739601243287324,
+            "p95": 0.001508402405306697,
+            "per_call": 3.206446854164824e-05,
+            "std": 4.908875693251941e-05
+          },
+          "config": "lut23_bt1_padded_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.0009429374476894736,
+            "median": 0.000943812308833003,
+            "p5": 0.000920407916419208,
+            "p95": 0.0009664601413533092,
+            "per_call": 2.9494134651031345e-05,
+            "std": 1.5477166597735425e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.0871472894875054,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0014207774850850303,
+            "median": 0.001425561960786581,
+            "p5": 0.001363051705993712,
+            "p95": 0.00148603159468621,
+            "per_call": 3.126301453448832e-05,
+            "std": 4.4183961334053195e-05
+          },
+          "config": "lut23_bt1_padded_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.0009801631482938926,
+            "median": 0.0009828959591686726,
+            "p5": 0.0009613608242943883,
+            "p95": 0.0009954161942005157,
+            "per_call": 3.071549872402102e-05,
+            "std": 1.2106921971999076e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 1.0178253921704719,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 1,
+          "chained_seconds": {
+            "mean": 0.0016291006080185373,
+            "median": 0.0014676246792078018,
+            "p5": 0.0014473662478849292,
+            "p95": 0.0024360500741750003,
+            "per_call": 3.257747448515147e-05,
+            "std": 0.0003624728065388955
+          },
+          "config": "lut23_bt1_padded_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.001049742956335346,
+            "median": 0.001044687582179904,
+            "p5": 0.0010166186140850187,
+            "p95": 0.001085016713477671,
+            "per_call": 3.2646486943122e-05,
+            "std": 2.35614964973201e-05
+          },
+          "relative_error": 0.003513672768014941,
+          "serialisation_factor": 0.9978860678611219,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 32,
+      "groups_per_row": 40,
+      "label": "self_attn.k_proj",
+      "modules": [
+        "self_attn.k_proj",
+        "self_attn.v_proj"
+      ],
+      "rows": 1024,
+      "tile": 256,
+      "tiles": 4,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0015874825573215883,
+            "median": 0.0015904167667031288,
+            "p5": 0.0015109436120837928,
+            "p95": 0.0016373498598113655,
+            "per_call": 3.817056131083518e-05,
+            "std": 4.342600090445135e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0014878194391106565,
+            "median": 0.0014404796529561281,
+            "p5": 0.0013605289859697223,
+            "p95": 0.0017580315005034206,
+            "per_call": 4.5014989154879004e-05,
+            "std": 0.00017687997297813172
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.8479522494053077,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005308895915125807,
+            "median": 0.0051715627778321505,
+            "p5": 0.005115641723386943,
+            "p95": 0.005858068587258458,
+            "per_call": 0.0001500813741586171,
+            "std": 0.00028954079736150513
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.001438951197390755,
+            "median": 0.0014243954792618752,
+            "p5": 0.001368823111988604,
+            "p95": 0.0015212268102914096,
+            "per_call": 4.45123587269336e-05,
+            "std": 5.1348134942696804e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 3.3716787528450087,
+          "threadgroups": 16
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0029927429665500918,
+            "median": 0.0030134788248687983,
+            "p5": 0.0028854250675067307,
+            "p95": 0.0030362809309735896,
+            "per_call": 8.264125062851235e-05,
+            "std": 5.23750525240409e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.0015540452441200614,
+            "median": 0.001553145470097661,
+            "p5": 0.0015087936306372284,
+            "p95": 0.001596802193671465,
+            "per_call": 4.853579594055191e-05,
+            "std": 2.9269486371465892e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.7026866259643465,
+          "threadgroups": 32
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0022841494840880236,
+            "median": 0.0021981876343488693,
+            "p5": 0.0021294459700584413,
+            "p95": 0.0026798875071108335,
+            "per_call": 5.7163400924764574e-05,
+            "std": 0.0002698508717931997
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.0014568992191925645,
+            "median": 0.0014548331964761019,
+            "p5": 0.0014407149283215404,
+            "p95": 0.0014852269319817423,
+            "per_call": 4.5463537389878184e-05,
+            "std": 1.5427919298171868e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.257346088900931,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0025026422614852586,
+            "median": 0.0024564999621361494,
+            "p5": 0.0023327520582824947,
+            "p95": 0.0028526749927550547,
+            "per_call": 6.523566116811708e-05,
+            "std": 0.00023638884134474558
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.0014398782902086775,
+            "median": 0.0014364165253937244,
+            "p5": 0.0014020542846992611,
+            "p95": 0.0014876891626045107,
+            "per_call": 4.488801641855389e-05,
+            "std": 3.264432579560942e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.4532979261064596,
+          "threadgroups": 80
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.002315739596573015,
+            "median": 0.0021797495428472757,
+            "p5": 0.0020531581016257406,
+            "p95": 0.003116366802714765,
+            "per_call": 5.6587210565339774e-05,
+            "std": 0.00036769623738602017
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.0014300728992869456,
+            "median": 0.0014155625831335783,
+            "p5": 0.0013898374047130347,
+            "p95": 0.0014912581536918879,
+            "per_call": 4.423633072292432e-05,
+            "std": 3.6543003411968745e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.2792021770470878,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0018704201793298125,
+            "median": 0.001869624713435769,
+            "p5": 0.0018321708077564836,
+            "p95": 0.001911675278097391,
+            "per_call": 4.689580964623019e-05,
+            "std": 2.901331388948817e-05
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.0014256630480910342,
+            "median": 0.0013396248687058687,
+            "p5": 0.0013242162764072417,
+            "p95": 0.0018114042934030288,
+            "per_call": 4.18632771470584e-05,
+            "std": 0.00028321420677447195
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.1202135342031008,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0018408472339312236,
+            "median": 0.0018419791013002396,
+            "p5": 0.0017834647558629512,
+            "p95": 0.001893235626630485,
+            "per_call": 4.6031884266994894e-05,
+            "std": 3.651230547934783e-05
+          },
+          "config": "lut23_bt4_packed_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.0013556876607860129,
+            "median": 0.001344479387626052,
+            "p5": 0.001326208491809666,
+            "p95": 0.0014145838096737862,
+            "per_call": 4.201498086331412e-05,
+            "std": 3.4545243705500376e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.0956064556294534,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.002035212043362359,
+            "median": 0.0019813335966318846,
+            "p5": 0.0018576207803562284,
+            "p95": 0.002465340145863592,
+            "per_call": 5.03867122461088e-05,
+            "std": 0.00028031056976300276
+          },
+          "config": "lut23_bt4_packed_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.0015848994565506775,
+            "median": 0.0015869580674916506,
+            "p5": 0.0015620484482496977,
+            "p95": 0.0016032189596444368,
+            "per_call": 4.959243960911408e-05,
+            "std": 1.3734484166492825e-05
+          },
+          "relative_error": 0.003290914902209216,
+          "serialisation_factor": 1.0160160025047194,
+          "threadgroups": 640
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 32,
+      "groups_per_row": 40,
+      "label": "self_attn.k_proj",
+      "modules": [
+        "self_attn.k_proj",
+        "self_attn.v_proj"
+      ],
+      "rows": 1024,
+      "tile": 256,
+      "tiles": 4,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0017106318846344948,
+            "median": 0.001648458419367671,
+            "p5": 0.0015723965363577009,
+            "p95": 0.002085473062470555,
+            "per_call": 3.866015322273597e-05,
+            "std": 0.000270359683951762
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0014878506384169061,
+            "median": 0.001483979169279337,
+            "p5": 0.001378668425604701,
+            "p95": 0.0016640043351799248,
+            "per_call": 4.637434903997928e-05,
+            "std": 0.0001155700434865066
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.8336538199039105,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005238260336530705,
+            "median": 0.005171499913558364,
+            "p5": 0.005101020541042089,
+            "p95": 0.00560896263923496,
+            "per_call": 0.00014875519991619512,
+            "std": 0.00017411350822289185
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.0025013540871441364,
+            "median": 0.0025163122918456793,
+            "p5": 0.002436383091844618,
+            "p95": 0.00253023118712008,
+            "per_call": 7.863475912017748e-05,
+            "std": 3.4977643922711424e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.8917232224092224,
+          "threadgroups": 32
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0036322013086949787,
+            "median": 0.003624146105721593,
+            "p5": 0.00356896233279258,
+            "p95": 0.0037127124378457665,
+            "per_call": 0.00010040039342129603,
+            "std": 5.4245852650850105e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.002609614826117953,
+            "median": 0.0025967289693653584,
+            "p5": 0.0025788401253521442,
+            "p95": 0.0026606460567563774,
+            "per_call": 8.114778029266745e-05,
+            "std": 3.13410996217196e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.2372537247376594,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0035638682699451842,
+            "median": 0.003563125152140856,
+            "p5": 0.003488066839054227,
+            "p95": 0.003612954285927117,
+            "per_call": 9.8493488621898e-05,
+            "std": 4.1609758269861445e-05
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.002559225424192846,
+            "median": 0.0024312499444931746,
+            "p5": 0.0023952409625053405,
+            "p95": 0.003225233359262347,
+            "per_call": 7.59765607654117e-05,
+            "std": 0.0003177613567352316
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.2963667692988956,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0030494584158683815,
+            "median": 0.0030495005194097757,
+            "p5": 0.002953729429282248,
+            "p95": 0.0031226453371345996,
+            "per_call": 8.244271884905174e-05,
+            "std": 5.7780397792758584e-05
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.0024304271986087165,
+            "median": 0.0024335836060345173,
+            "p5": 0.002413887227885425,
+            "p95": 0.0024473581928759814,
+            "per_call": 7.604948768857867e-05,
+            "std": 1.1638525491875652e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.0840667222723872,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.003321628551930189,
+            "median": 0.003202645806595683,
+            "p5": 0.0031264331890270116,
+            "p95": 0.003953410941176116,
+            "per_call": 8.722850907361135e-05,
+            "std": 0.0002975114652410004
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.002505607670173049,
+            "median": 0.0025000418536365032,
+            "p5": 0.002474862546660006,
+            "p95": 0.002563918847590685,
+            "per_call": 7.812630792614073e-05,
+            "std": 3.509680883126763e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.1165062242039607,
+          "threadgroups": 256
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.003067284938879311,
+            "median": 0.0029396256431937218,
+            "p5": 0.002822751854546368,
+            "p95": 0.003827095520682633,
+            "per_call": 7.900912896730006e-05,
+            "std": 0.00034883585335817463
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.0023782187684749565,
+            "median": 0.002378687262535095,
+            "p5": 0.002354687009938061,
+            "p95": 0.002399991895072162,
+            "per_call": 7.433397695422173e-05,
+            "std": 1.4827783777055753e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.062893877129129,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0030248058028519154,
+            "median": 0.0029708752408623695,
+            "p5": 0.002879985491745174,
+            "p95": 0.003388227219693362,
+            "per_call": 7.99856788944453e-05,
+            "std": 0.00025833050602784064
+          },
+          "config": "lut23_bt4_packed_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.002496076359724005,
+            "median": 0.0024776249192655087,
+            "p5": 0.002453218516893685,
+            "p95": 0.002562139485962689,
+            "per_call": 7.742577872704715e-05,
+            "std": 4.082127536695253e-05
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 1.0330626337827702,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.003401302034035325,
+            "median": 0.00338893779553473,
+            "p5": 0.003228889312595129,
+            "p95": 0.0036638169083744285,
+            "per_call": 9.305013372795656e-05,
+            "std": 0.0001689477618868188
+          },
+          "config": "lut23_bt4_packed_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.0030997464588532844,
+            "median": 0.003022728953510523,
+            "p5": 0.002962953527458012,
+            "p95": 0.003455233643762767,
+            "per_call": 9.446027979720384e-05,
+            "std": 0.00024050885640075026
+          },
+          "relative_error": 0.0031146670021187472,
+          "serialisation_factor": 0.9850715446505695,
+          "threadgroups": 1280
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 32,
+      "groups_per_row": 40,
+      "label": "self_attn.k_proj",
+      "modules": [
+        "self_attn.k_proj",
+        "self_attn.v_proj"
+      ],
+      "rows": 1024,
+      "tile": 256,
+      "tiles": 4,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0025880141959836087,
+            "median": 0.002604437991976738,
+            "p5": 0.002512106182985008,
+            "p95": 0.0026248965179547666,
+            "per_call": 6.783204298699275e-05,
+            "std": 4.009221363776306e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.00240515285016348,
+            "median": 0.002362792147323489,
+            "p5": 0.0022975437343120573,
+            "p95": 0.002653076569549739,
+            "per_call": 7.383725460385904e-05,
+            "std": 0.00015494701745375177
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.9186696248515118,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0064900972647592425,
+            "median": 0.006497874855995178,
+            "p5": 0.006425289320759475,
+            "p95": 0.00654321436304599,
+            "per_call": 0.000189501944987569,
+            "std": 3.9924020015616856e-05
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.004538767466632028,
+            "median": 0.004482979420572519,
+            "p5": 0.004405833827331662,
+            "p95": 0.004842866584658622,
+            "per_call": 0.00014009310689289123,
+            "std": 0.00017976199513387758
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.3526857187374217,
+          "threadgroups": 64
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0064090382074937224,
+            "median": 0.0064197080209851265,
+            "p5": 0.006358227645978332,
+            "p95": 0.006443037674762309,
+            "per_call": 0.0001870592313935049,
+            "std": 3.0973696560895663e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.004680715307282905,
+            "median": 0.004631812451407313,
+            "p5": 0.004535827017389238,
+            "p95": 0.005050368444062769,
+            "per_call": 0.00014474413910647854,
+            "std": 0.0002585127640546004
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.292344080722315,
+          "threadgroups": 128
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005593458151755233,
+            "median": 0.005560166202485561,
+            "p5": 0.00543813118711114,
+            "p95": 0.005910132662393152,
+            "per_call": 0.00016019854956539348,
+            "std": 0.00022283692962319946
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.004577861245100697,
+            "median": 0.004513937747105956,
+            "p5": 0.004419579496607184,
+            "p95": 0.005004029185511171,
+            "per_call": 0.00014106055459706113,
+            "std": 0.00028563309176430203
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.135672194278549,
+          "threadgroups": 256
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005238305505675574,
+            "median": 0.005180916981771588,
+            "p5": 0.005087354127317667,
+            "p95": 0.00559255180414766,
+            "per_call": 0.00014834701141808182,
+            "std": 0.00025058881059285
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.00474939588457346,
+            "median": 0.00461802096106112,
+            "p5": 0.0045318001648411155,
+            "p95": 0.0055497349472716445,
+            "per_call": 0.00014431315503316,
+            "std": 0.0003643057202518163
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.0279521044633453,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005426413263194263,
+            "median": 0.005330896703526378,
+            "p5": 0.0052104185102507476,
+            "p95": 0.006079675024375319,
+            "per_call": 0.000153033877722919,
+            "std": 0.0003100215302482854
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.004813284768412511,
+            "median": 0.004742916906252503,
+            "p5": 0.004681077459827066,
+            "p95": 0.005188166326843201,
+            "per_call": 0.00014821615332039073,
+            "std": 0.0002577156978503539
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.0325047189162577,
+          "threadgroups": 512
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005099854315631092,
+            "median": 0.005048520630225539,
+            "p5": 0.0049801958492025735,
+            "p95": 0.00540076692122966,
+            "per_call": 0.00014420962543226779,
+            "std": 0.00021132991194226504
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.004634579915242891,
+            "median": 0.004554062150418758,
+            "p5": 0.004461140581406653,
+            "p95": 0.005080500012263655,
+            "per_call": 0.0001423144422005862,
+            "std": 0.0002813425504596183
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.0133168721485792,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005142323090694845,
+            "median": 0.005092354258522391,
+            "p5": 0.0049834545003250245,
+            "p95": 0.005527904490008949,
+            "per_call": 0.00014557942631654441,
+            "std": 0.00027087157408573056
+          },
+          "config": "lut23_bt4_packed_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.0048550518695265055,
+            "median": 0.0047999166417866945,
+            "p5": 0.00469305005390197,
+            "p95": 0.005263878498226403,
+            "per_call": 0.0001499973950558342,
+            "std": 0.0002702356602242785
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 0.9705463635708789,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.005906270816922188,
+            "median": 0.005839707795530558,
+            "p5": 0.005801125359721482,
+            "p95": 0.0062268788926303385,
+            "per_call": 0.0001689342243480496,
+            "std": 0.00020685559647345967
+          },
+          "config": "lut23_bt4_packed_k40",
+          "family": "lut23",
+          "k_split": 40,
+          "overlapped_seconds": {
+            "mean": 0.0054788925141717,
+            "median": 0.005379333859309554,
+            "p5": 0.005361051694490015,
+            "p95": 0.005921189161017536,
+            "per_call": 0.00016810418310342357,
+            "std": 0.0002806304200699998
+          },
+          "relative_error": 0.0026575952945210295,
+          "serialisation_factor": 1.0049376596661808,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 6144,
+      "dispatches_per_token": 64,
+      "groups_per_row": 48,
+      "label": "linear_attn.out_proj",
+      "modules": [
+        "linear_attn.out_proj",
+        "self_attn.o_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.006234208626362185,
+            "median": 0.00605404214002192,
+            "p5": 0.005968139669857919,
+            "p95": 0.0070112126646563406,
+            "per_call": 0.00017675390699878335,
+            "std": 0.00037141830641179875
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.005767635613059004,
+            "median": 0.005734937032684684,
+            "p5": 0.005647184210829437,
+            "p95": 0.006002106214873492,
+            "per_call": 0.00017921678227139637,
+            "std": 0.00014974010485105404
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.9862575633743754,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007915041642263532,
+            "median": 0.007647104561328888,
+            "p5": 0.007541818427853286,
+            "p95": 0.008653583703562617,
+            "per_call": 0.0002265371076646261,
+            "std": 0.0004420145283605737
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.00662883340070645,
+            "median": 0.00650464603677392,
+            "p5": 0.006415643775835633,
+            "p95": 0.007362633477896452,
+            "per_call": 0.000203270188649185,
+            "std": 0.00033432979378485194
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.1144630167859806,
+          "threadgroups": 80
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.00760036101564765,
+            "median": 0.007499187486246228,
+            "p5": 0.007409591996110976,
+            "p95": 0.00813822243362665,
+            "per_call": 0.00022191469906829298,
+            "std": 0.00029527902498362646
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.006572309221761922,
+            "median": 0.006517103873193264,
+            "p5": 0.006448762607760727,
+            "p95": 0.006890828721225261,
+            "per_call": 0.0002036594960372895,
+            "std": 0.00021256760988836145
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.089635903977986,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.00831394421402365,
+            "median": 0.008264937438070774,
+            "p5": 0.008189802337437869,
+            "p95": 0.008606241131201385,
+            "per_call": 0.00024584438506281003,
+            "std": 0.00020109128906164154
+          },
+          "config": "lut23_bt4_packed_k3",
+          "family": "lut23",
+          "k_split": 3,
+          "overlapped_seconds": {
+            "mean": 0.006813229022858043,
+            "median": 0.006646562367677689,
+            "p5": 0.006571533135138452,
+            "p95": 0.007443560077808798,
+            "per_call": 0.00020770507398992777,
+            "std": 0.0003367038169176351
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.1836224331945389,
+          "threadgroups": 240
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007359159955133994,
+            "median": 0.007206375477835536,
+            "p5": 0.007155716395936906,
+            "p95": 0.008161360840313136,
+            "per_call": 0.00021276432380545884,
+            "std": 0.00036415086446038136
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.0065409479817996425,
+            "median": 0.006464145611971617,
+            "p5": 0.006401472771540284,
+            "p95": 0.006929687317460775,
+            "per_call": 0.00020200455037411302,
+            "std": 0.00022869717378414325
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.053265005225965,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007389583275653422,
+            "median": 0.0072372080758214,
+            "p5": 0.007155055971816182,
+            "p95": 0.008200285420753062,
+            "per_call": 0.00021372784249251708,
+            "std": 0.00036745265893316275
+          },
+          "config": "lut23_bt4_packed_k6",
+          "family": "lut23",
+          "k_split": 6,
+          "overlapped_seconds": {
+            "mean": 0.006706791658264895,
+            "median": 0.006700999801978469,
+            "p5": 0.006669923011213541,
+            "p95": 0.006761439400725067,
+            "per_call": 0.00020940624381182715,
+            "std": 3.2951610313430135e-05
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.020637391712987,
+          "threadgroups": 480
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007168385471838216,
+            "median": 0.007121021160855889,
+            "p5": 0.006993618723936379,
+            "p95": 0.007517745578661561,
+            "per_call": 0.00021009700139984488,
+            "std": 0.0002469143546070409
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.006704885357369979,
+            "median": 0.006626791786402464,
+            "p5": 0.00655143316835165,
+            "p95": 0.007104573049582541,
+            "per_call": 0.000207087243325077,
+            "std": 0.0002527612539218558
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 1.0145337686013005,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007077628436187903,
+            "median": 0.007028020918369293,
+            "p5": 0.006897631078027188,
+            "p95": 0.0074795271735638375,
+            "per_call": 0.00020719074382213876,
+            "std": 0.0002612248029211669
+          },
+          "config": "lut23_bt4_packed_k12",
+          "family": "lut23",
+          "k_split": 12,
+          "overlapped_seconds": {
+            "mean": 0.006649010581895709,
+            "median": 0.006637104554101825,
+            "p5": 0.006610301951877773,
+            "p95": 0.006715618795715273,
+            "per_call": 0.00020740951731568202,
+            "std": 3.631079498354175e-05
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 0.9989452099576979,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0077806735644117,
+            "median": 0.00761558348312974,
+            "p5": 0.00752141079865396,
+            "p95": 0.00852463124319911,
+            "per_call": 0.0002255520739709027,
+            "std": 0.000356798714144884
+          },
+          "config": "lut23_bt4_packed_k16",
+          "family": "lut23",
+          "k_split": 16,
+          "overlapped_seconds": {
+            "mean": 0.007465697941370308,
+            "median": 0.0073818122036755085,
+            "p5": 0.0073331332532688975,
+            "p95": 0.00785466656088829,
+            "per_call": 0.00023068163136485964,
+            "std": 0.000264410706830934
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 0.9777634770327954,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007229416669967274,
+            "median": 0.007109395926818252,
+            "p5": 0.006986751384101808,
+            "p95": 0.0079780942061916,
+            "per_call": 0.0002097337128361687,
+            "std": 0.0003392416432497705
+          },
+          "config": "lut23_bt4_packed_k24",
+          "family": "lut23",
+          "k_split": 24,
+          "overlapped_seconds": {
+            "mean": 0.0068979687833537655,
+            "median": 0.006823020521551371,
+            "p5": 0.006761060538701713,
+            "p95": 0.007298749522306024,
+            "per_call": 0.00021321939129848033,
+            "std": 0.0002810363104243055
+          },
+          "relative_error": 0.003125823857763473,
+          "serialisation_factor": 0.9836521507678816,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 6144,
+      "dispatches_per_token": 64,
+      "groups_per_row": 48,
+      "label": "linear_attn.out_proj",
+      "modules": [
+        "linear_attn.out_proj",
+        "self_attn.o_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0062201074324548244,
+            "median": 0.006131479050964117,
+            "p5": 0.006040695635601878,
+            "p95": 0.006687670527026056,
+            "per_call": 0.00017834438767749816,
+            "std": 0.0002937784355048996
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.005840503339034815,
+            "median": 0.005806312430649996,
+            "p5": 0.005725524853914976,
+            "p95": 0.006064901617355644,
+            "per_call": 0.00018144726345781237,
+            "std": 0.00014402850377083525
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.9828992969021236,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014245614719887575,
+            "median": 0.014083229005336761,
+            "p5": 0.013927512476220727,
+            "p95": 0.014855918963439763,
+            "per_call": 0.0004268365737516433,
+            "std": 0.0003370880861960325
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.012473895602549115,
+            "median": 0.012361187022179365,
+            "p5": 0.012340610241517424,
+            "p95": 0.012898139655590057,
+            "per_call": 0.00038628709444310516,
+            "std": 0.00026012625839913576
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.1049723894270833,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.013757346896454692,
+            "median": 0.01362875010818243,
+            "p5": 0.013531389087438584,
+            "p95": 0.014418512303382158,
+            "per_call": 0.00041263410821557045,
+            "std": 0.00031155315041760215
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.012664166861213744,
+            "median": 0.012587708421051502,
+            "p5": 0.012532210722565652,
+            "p95": 0.013060479331761599,
+            "per_call": 0.00039336588815785944,
+            "std": 0.00022908889145119667
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.0489829459995743,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.013613201561383903,
+            "median": 0.013459979090839624,
+            "p5": 0.013419999927282333,
+            "p95": 0.014281574939377605,
+            "per_call": 0.00040736001392360777,
+            "std": 0.00030644785635516094
+          },
+          "config": "lut23_bt4_packed_k3",
+          "family": "lut23",
+          "k_split": 3,
+          "overlapped_seconds": {
+            "mean": 0.012931815853031972,
+            "median": 0.012722603976726532,
+            "p5": 0.012619081512093544,
+            "p95": 0.013570410665124655,
+            "per_call": 0.0003975813742727041,
+            "std": 0.00037167290690252403
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.0245953162891288,
+          "threadgroups": 480
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.013505760735521713,
+            "median": 0.01336460467427969,
+            "p5": 0.013264956115745009,
+            "p95": 0.014138544257730246,
+            "per_call": 0.0004043795634061098,
+            "std": 0.0003055657181856393
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.012915458413772285,
+            "median": 0.012668083189055324,
+            "p5": 0.012526543764397501,
+            "p95": 0.013581237685866655,
+            "per_call": 0.00039587759965797886,
+            "std": 0.0004424433091939844
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.0214762435547662,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.013719319443528851,
+            "median": 0.013571396004408598,
+            "p5": 0.013509939424693584,
+            "p95": 0.014498662552796304,
+            "per_call": 0.0004108417924726382,
+            "std": 0.0003532856484924478
+          },
+          "config": "lut23_bt4_packed_k6",
+          "family": "lut23",
+          "k_split": 6,
+          "overlapped_seconds": {
+            "mean": 0.01328011458584418,
+            "median": 0.013086562510579824,
+            "p5": 0.013042575307190418,
+            "p95": 0.013913520704954862,
+            "per_call": 0.0004089550784556195,
+            "std": 0.00034614424076579754
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.0046134994194074,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01322823945277681,
+            "median": 0.01324916654266417,
+            "p5": 0.013128155912272631,
+            "p95": 0.013308351952582597,
+            "per_call": 0.0004007721217931248,
+            "std": 6.133235811348119e-05
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.013122937642037868,
+            "median": 0.01289729168638587,
+            "p5": 0.012847027182579041,
+            "p95": 0.0138735291082412,
+            "per_call": 0.00040304036519955844,
+            "std": 0.0004196945796075702
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 0.9943721681442241,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.013395666765669981,
+            "median": 0.013197374530136585,
+            "p5": 0.013105135783553124,
+            "p95": 0.014083479507826268,
+            "per_call": 0.0003991536214016378,
+            "std": 0.00038896503536077926
+          },
+          "config": "lut23_bt4_packed_k12",
+          "family": "lut23",
+          "k_split": 12,
+          "overlapped_seconds": {
+            "mean": 0.01315286806008468,
+            "median": 0.012860208516940475,
+            "p5": 0.01276353111024946,
+            "p95": 0.013862326950766146,
+            "per_call": 0.00040188151615438983,
+            "std": 0.00045929672571552564
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 0.9932121915462664,
+          "threadgroups": 1920
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014989163028076291,
+            "median": 0.014808562584221363,
+            "p5": 0.014658622350543738,
+            "p95": 0.015700203948654234,
+            "per_call": 0.0004495032480917871,
+            "std": 0.00039492341856024277
+          },
+          "config": "lut23_bt4_packed_k16",
+          "family": "lut23",
+          "k_split": 16,
+          "overlapped_seconds": {
+            "mean": 0.014597722523224851,
+            "median": 0.014380562817677855,
+            "p5": 0.014257071469910444,
+            "p95": 0.015211367141455412,
+            "per_call": 0.000449392588052433,
+            "std": 0.0003943314421706441
+          },
+          "relative_error": 0.0027191282436326326,
+          "serialisation_factor": 1.0002462435792137,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 6144,
+      "dispatches_per_token": 64,
+      "groups_per_row": 48,
+      "label": "linear_attn.out_proj",
+      "modules": [
+        "linear_attn.out_proj",
+        "self_attn.o_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.011668722378090024,
+            "median": 0.011546645546332002,
+            "p5": 0.011501389741897582,
+            "p95": 0.012238085549324752,
+            "per_call": 0.00034652537578949705,
+            "std": 0.00026108663709075407
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.010421722351262966,
+            "median": 0.010299311950802803,
+            "p5": 0.010111394268460572,
+            "p95": 0.01098426729440689,
+            "per_call": 0.0003218534984625876,
+            "std": 0.00033369011810088355
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.076655613329545,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026212732579248648,
+            "median": 0.02606918732635677,
+            "p5": 0.025995762529782952,
+            "p95": 0.026739531150087714,
+            "per_call": 0.000800354806415271,
+            "std": 0.0002808808715690941
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.024574416767184932,
+            "median": 0.024415979627519846,
+            "p5": 0.02435787527356297,
+            "p95": 0.025251973257400095,
+            "per_call": 0.0007629993633599952,
+            "std": 0.00032157659436976837
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.0489586818143266,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026605065950813394,
+            "median": 0.02663710410706699,
+            "p5": 0.025803891685791315,
+            "p95": 0.027227881411090494,
+            "per_call": 0.0008181022058124654,
+            "std": 0.0004508018411879551
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.02539597579743713,
+            "median": 0.025472978595644236,
+            "p5": 0.024784849816933276,
+            "p95": 0.026058121235109866,
+            "per_call": 0.0007960305811138824,
+            "std": 0.0004964416172541812
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.0277271064984692,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.02592460058319072,
+            "median": 0.02574010449461639,
+            "p5": 0.025643504271283746,
+            "p95": 0.026856324868276715,
+            "per_call": 0.0007900709679233842,
+            "std": 0.0004527408119845826
+          },
+          "config": "lut23_bt4_packed_k3",
+          "family": "lut23",
+          "k_split": 3,
+          "overlapped_seconds": {
+            "mean": 0.02530854152670751,
+            "median": 0.025074707809835672,
+            "p5": 0.025040623312816025,
+            "p95": 0.026079287147149445,
+            "per_call": 0.0007835846190573648,
+            "std": 0.00042481900686055206
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.008277789926278,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026458173291757703,
+            "median": 0.026401625014841557,
+            "p5": 0.026238924963399766,
+            "p95": 0.026894198008812962,
+            "per_call": 0.0008107434841804206,
+            "std": 0.00025987087835319827
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.02526522575256725,
+            "median": 0.02502468740567565,
+            "p5": 0.024861267022788524,
+            "p95": 0.02584078526124358,
+            "per_call": 0.000782021481427364,
+            "std": 0.00042098880676864604
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.0367278948663055,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026280246558599174,
+            "median": 0.0263031255453825,
+            "p5": 0.026086909952573477,
+            "p95": 0.0263575911289081,
+            "per_call": 0.0008076653757598251,
+            "std": 9.102280134730909e-05
+          },
+          "config": "lut23_bt4_packed_k6",
+          "family": "lut23",
+          "k_split": 6,
+          "overlapped_seconds": {
+            "mean": 0.026072697907996673,
+            "median": 0.02577181183733046,
+            "p5": 0.025677691446617246,
+            "p95": 0.026617054454982282,
+            "per_call": 0.0008053691199165769,
+            "std": 0.0004310728038431274
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.0028511843656063,
+          "threadgroups": 1920
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026946899364702404,
+            "median": 0.026851374888792634,
+            "p5": 0.026333001884631814,
+            "p95": 0.027784266672097147,
+            "per_call": 0.0008247981677413918,
+            "std": 0.0004858404159637247
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.025517767295241356,
+            "median": 0.025252395309507847,
+            "p5": 0.025228564348071813,
+            "p95": 0.026255083782598377,
+            "per_call": 0.0007891373534221202,
+            "std": 0.00042326973147864723
+          },
+          "relative_error": 0.0033709989089681825,
+          "serialisation_factor": 1.0451896164395555,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 17408,
+      "dispatches_per_token": 64,
+      "groups_per_row": 136,
+      "label": "mlp.down_proj",
+      "modules": [
+        "mlp.down_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.016321121520983677,
+            "median": 0.016346665797755122,
+            "p5": 0.016200981708243488,
+            "p95": 0.016373598319478332,
+            "per_call": 0.0004971581802237779,
+            "std": 5.825024048704097e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.015706715174019337,
+            "median": 0.01566589600406587,
+            "p5": 0.015563158062286675,
+            "p95": 0.016009803512133658,
+            "per_call": 0.0004895592501270585,
+            "std": 0.00019950043630335613
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.015521982466366,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.020570965444979567,
+            "median": 0.020574812311679125,
+            "p5": 0.020494910445995627,
+            "p95": 0.020622441731393337,
+            "per_call": 0.000629287758783903,
+            "std": 5.186942434242648e-05
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.018158465313414734,
+            "median": 0.018214625073596835,
+            "p5": 0.017948377155698837,
+            "p95": 0.01824450199492276,
+            "per_call": 0.0005692070335499011,
+            "std": 0.00011644384868907038
+          },
+          "relative_error": 0.0031260430875264603,
+          "serialisation_factor": 1.1055516212779453,
+          "threadgroups": 80
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.019974291518641014,
+            "median": 0.019992229528725147,
+            "p5": 0.019872202328406273,
+            "p95": 0.020014709909446537,
+            "per_call": 0.0006110820468165912,
+            "std": 5.154031465630787e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.018014902675834794,
+            "median": 0.01803462509997189,
+            "p5": 0.017853053659200667,
+            "p95": 0.018179292022250593,
+            "per_call": 0.0005635820343741216,
+            "std": 0.00011257279347652895
+          },
+          "relative_error": 0.0031260430875264603,
+          "serialisation_factor": 1.084282339651263,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01893153483979404,
+            "median": 0.01893393788486719,
+            "p5": 0.01884590422268957,
+            "p95": 0.01904274367261678,
+            "per_call": 0.00057801043294603,
+            "std": 6.728075885092114e-05
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.017699343773225944,
+            "median": 0.01768743759021163,
+            "p5": 0.0176724853226915,
+            "p95": 0.017764733149670066,
+            "per_call": 0.0005527324246941134,
+            "std": 4.252644842994627e-05
+          },
+          "relative_error": 0.0031260430875264603,
+          "serialisation_factor": 1.0457328123384577,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.018644982599653304,
+            "median": 0.018650604411959648,
+            "p5": 0.018532968359068036,
+            "p95": 0.01870953105390072,
+            "per_call": 0.0005691562619176693,
+            "std": 5.50727256336262e-05
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.017769013764336705,
+            "median": 0.017763103591278195,
+            "p5": 0.017755460063926875,
+            "p95": 0.017797777173109354,
+            "per_call": 0.0005550969872274436,
+            "std": 1.7566288355331665e-05
+          },
+          "relative_error": 0.0031260430875264603,
+          "serialisation_factor": 1.0253276004260947,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.018932378424021106,
+            "median": 0.018952145241200924,
+            "p5": 0.01882957327179611,
+            "p95": 0.01900931226555258,
+            "per_call": 0.0005785794128314592,
+            "std": 6.73510379376524e-05
+          },
+          "config": "lut23_bt4_packed_k17",
+          "family": "lut23",
+          "k_split": 17,
+          "overlapped_seconds": {
+            "mean": 0.01825965630511443,
+            "median": 0.018259479431435466,
+            "p5": 0.018243160494603217,
+            "p95": 0.018280399963259697,
+            "per_call": 0.0005706087322323583,
+            "std": 1.3234456936211293e-05
+          },
+          "relative_error": 0.0031260430875264603,
+          "serialisation_factor": 1.013968732248309,
+          "threadgroups": 1360
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 17408,
+      "dispatches_per_token": 64,
+      "groups_per_row": 136,
+      "label": "mlp.down_proj",
+      "modules": [
+        "mlp.down_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.016435982504238684,
+            "median": 0.01643316657282412,
+            "p5": 0.016333353519439698,
+            "p95": 0.01652915661688894,
+            "per_call": 0.0004982656246284023,
+            "std": 6.69356417827586e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.016030632037048537,
+            "median": 0.015998833579942584,
+            "p5": 0.01588006268721074,
+            "p95": 0.016349795926362275,
+            "per_call": 0.0004999635493732058,
+            "std": 0.00021346080043880249
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.9966039029306594,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.03868630214128643,
+            "median": 0.038685312727466226,
+            "p5": 0.038637012522667644,
+            "p95": 0.038727749953977764,
+            "per_call": 0.001193645191960968,
+            "std": 3.0500406732635954e-05
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.034998788265511394,
+            "median": 0.03503402112983167,
+            "p5": 0.03481571876909584,
+            "p95": 0.035063889971934256,
+            "per_call": 0.0010948131603072397,
+            "std": 8.703133159086676e-05
+          },
+          "relative_error": 0.003358801787262429,
+          "serialisation_factor": 1.0902729664173867,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.03701673952552179,
+            "median": 0.03701306181028485,
+            "p5": 0.03696914212778211,
+            "p95": 0.037085366202518344,
+            "per_call": 0.0011413873507990502,
+            "std": 4.108993940580635e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.03484441320567081,
+            "median": 0.03484041686169803,
+            "p5": 0.03481162744574249,
+            "p95": 0.03487929773982614,
+            "per_call": 0.0010887630269280635,
+            "std": 2.2959803067578093e-05
+          },
+          "relative_error": 0.003358801787262429,
+          "serialisation_factor": 1.0483340475102887,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.03612512159937372,
+            "median": 0.03613058337941766,
+            "p5": 0.03602216665167361,
+            "p95": 0.036233689403161407,
+            "per_call": 0.0011138098998344503,
+            "std": 7.267235526854372e-05
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.034842968840772905,
+            "median": 0.03483845852315426,
+            "p5": 0.03480394647922367,
+            "p95": 0.0349133750423789,
+            "per_call": 0.0010887018288485706,
+            "std": 4.2382759034073965e-05
+          },
+          "relative_error": 0.003358801787262429,
+          "serialisation_factor": 1.023062394422938,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.036011937617634736,
+            "median": 0.0360089794266969,
+            "p5": 0.035927371005527675,
+            "p95": 0.03615373999346048,
+            "per_call": 0.0011100097763119265,
+            "std": 8.187440449796507e-05
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.035074138858666025,
+            "median": 0.03507458348758519,
+            "p5": 0.035037172865122555,
+            "p95": 0.03510379341896623,
+            "per_call": 0.001096080733987037,
+            "std": 2.1911583492115072e-05
+          },
+          "relative_error": 0.003358801787262429,
+          "serialisation_factor": 1.0127080441184493,
+          "threadgroups": 1280
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 17408,
+      "dispatches_per_token": 64,
+      "groups_per_row": 136,
+      "label": "mlp.down_proj",
+      "modules": [
+        "mlp.down_proj"
+      ],
+      "rows": 5120,
+      "tile": 256,
+      "tiles": 20,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.032392239780165255,
+            "median": 0.03205291670747101,
+            "p5": 0.031711915088817474,
+            "p95": 0.033643781091086566,
+            "per_call": 0.0009831061179284006,
+            "std": 0.0007446003574630517
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.02895461112105598,
+            "median": 0.028858896112069488,
+            "p5": 0.02820296708960086,
+            "p95": 0.02996830428019166,
+            "per_call": 0.0009018405035021715,
+            "std": 0.0006522273580647352
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0901108501011492,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.07327333686407655,
+            "median": 0.0726525210775435,
+            "p5": 0.0725285897264257,
+            "p95": 0.0749675644794479,
+            "per_call": 0.0022518437544931658,
+            "std": 0.0009358403429394004
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.06968706951010972,
+            "median": 0.06905877101235092,
+            "p5": 0.06870424782391638,
+            "p95": 0.07146201899740845,
+            "per_call": 0.002158086594135966,
+            "std": 0.0011225170816851814
+          },
+          "relative_error": 0.003130172477752856,
+          "serialisation_factor": 1.0434445775308367,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.07212958321906626,
+            "median": 0.07151318737305701,
+            "p5": 0.07126147868111729,
+            "p95": 0.07388991257175803,
+            "per_call": 0.002216239576227963,
+            "std": 0.0010151205879319364
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.06980776371589552,
+            "median": 0.06921120779588819,
+            "p5": 0.06897620998788626,
+            "p95": 0.07147390632890165,
+            "per_call": 0.002162850243621506,
+            "std": 0.0009699015823247607
+          },
+          "relative_error": 0.003130172477752856,
+          "serialisation_factor": 1.0246847107255384,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.07153939230677982,
+            "median": 0.07090037455782294,
+            "p5": 0.07054794733412564,
+            "p95": 0.07343183737248182,
+            "per_call": 0.0021970891757518984,
+            "std": 0.001133988795024515
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.07016774988733232,
+            "median": 0.06950356182642281,
+            "p5": 0.06912877748254687,
+            "p95": 0.07212644785176962,
+            "per_call": 0.002171986307075713,
+            "std": 0.001182984805078337
+          },
+          "relative_error": 0.003130172477752856,
+          "serialisation_factor": 1.0115575630446692,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.07186777788835268,
+            "median": 0.07113366690464318,
+            "p5": 0.0707876835949719,
+            "p95": 0.07384952490683645,
+            "per_call": 0.002204379561590031,
+            "std": 0.001203377916235956
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.07098946526336174,
+            "median": 0.07038479181937873,
+            "p5": 0.06991268338169902,
+            "p95": 0.07287371489219367,
+            "per_call": 0.0021995247443555854,
+            "std": 0.0011904449523525273
+          },
+          "relative_error": 0.003130172477752856,
+          "serialisation_factor": 1.0022072119201677,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_z",
+      "modules": [
+        "linear_attn.in_proj_z"
+      ],
+      "rows": 6144,
+      "tile": 256,
+      "tiles": 24,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.0064230484422296286,
+            "median": 0.006443541496992111,
+            "p5": 0.006311543704941869,
+            "p95": 0.006495774909853935,
+            "per_call": 0.00018869141058530658,
+            "std": 6.440778210617634e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.006005777977406979,
+            "median": 0.005937438225373626,
+            "p5": 0.005886212643235922,
+            "p95": 0.006313727097585797,
+            "per_call": 0.0001855449445429258,
+            "std": 0.00019713148452914293
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0169579723669206,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.009116579894907773,
+            "median": 0.009125458309426904,
+            "p5": 0.009080729517154395,
+            "p95": 0.009137003868818282,
+            "per_call": 0.00027250131097389385,
+            "std": 1.8688076097474047e-05
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.006462451186962426,
+            "median": 0.006447437219321728,
+            "p5": 0.006414152611978352,
+            "p95": 0.006531747593544424,
+            "per_call": 0.000201482413103804,
+            "std": 4.164595111441096e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.352481870631065,
+          "threadgroups": 96
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007661350653506815,
+            "median": 0.0076664164662361145,
+            "p5": 0.007611393602564931,
+            "p95": 0.0077115293126553295,
+            "per_call": 0.0002269062533741817,
+            "std": 3.4229802637049727e-05
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.00657168422670414,
+            "median": 0.006574478931725025,
+            "p5": 0.006498816958628595,
+            "p95": 0.00665658360812813,
+            "per_call": 0.00020545246661640704,
+            "std": 4.777365288603052e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.1044221425573355,
+          "threadgroups": 192
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007451153011061251,
+            "median": 0.007451187819242477,
+            "p5": 0.007399727101437747,
+            "p95": 0.007498558750376106,
+            "per_call": 0.00022018035815563053,
+            "std": 3.4347291095679125e-05
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.006537840391198794,
+            "median": 0.006525270640850067,
+            "p5": 0.006503100041300058,
+            "p95": 0.006604918790981173,
+            "per_call": 0.0002039147075265646,
+            "std": 3.869868044402097e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.0797669320980536,
+          "threadgroups": 384
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007625979060928027,
+            "median": 0.00763120804913342,
+            "p5": 0.007548566884361207,
+            "p95": 0.007685206108726561,
+            "per_call": 0.00022580599033972248,
+            "std": 4.4513359807053806e-05
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.006719323185582955,
+            "median": 0.006702604470774531,
+            "p5": 0.006657958589494228,
+            "p95": 0.006810393882915378,
+            "per_call": 0.0002094563897117041,
+            "std": 5.642713273412848e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.078057301811236,
+          "threadgroups": 480
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0076084480388090014,
+            "median": 0.007627187529578805,
+            "p5": 0.00752907544374466,
+            "p95": 0.0076483266428112985,
+            "per_call": 0.00022568034910364076,
+            "std": 4.2048819422683564e-05
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.007017840204449992,
+            "median": 0.007029792061075568,
+            "p5": 0.006920228828676045,
+            "p95": 0.007093320623971522,
+            "per_call": 0.0002196810019086115,
+            "std": 5.696315772411005e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.0273093583100328,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.007070222209828596,
+            "median": 0.007053854176774621,
+            "p5": 0.007010996364988387,
+            "p95": 0.007163752079941332,
+            "per_call": 0.00020776368182851002,
+            "std": 5.175968426562478e-05
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.006642451393418014,
+            "median": 0.006639458471909165,
+            "p5": 0.00660821059718728,
+            "p95": 0.00668389790225774,
+            "per_call": 0.00020748307724716142,
+            "std": 2.611493848829042e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 1.0013524215327418,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.00714774988591671,
+            "median": 0.0071434995625168085,
+            "p5": 0.007054481212981046,
+            "p95": 0.007230469258502126,
+            "per_call": 0.00021056510013295338,
+            "std": 6.553556935859845e-05
+          },
+          "config": "lut23_bt4_packed_k20",
+          "family": "lut23",
+          "k_split": 20,
+          "overlapped_seconds": {
+            "mean": 0.006860673427581787,
+            "median": 0.006851667072623968,
+            "p5": 0.006800295249558985,
+            "p95": 0.006920557888224721,
+            "per_call": 0.000214114596019499,
+            "std": 4.368155513876168e-05
+          },
+          "relative_error": 0.002887982635277341,
+          "serialisation_factor": 0.9834224478268526,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_z",
+      "modules": [
+        "linear_attn.in_proj_z"
+      ],
+      "rows": 6144,
+      "tile": 256,
+      "tiles": 24,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.00667521854241689,
+            "median": 0.006668791640549898,
+            "p5": 0.006529841595329345,
+            "p95": 0.006811388814821839,
+            "per_call": 0.0001952819075086154,
+            "std": 9.693628434332929e-05
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.0062772467111547785,
+            "median": 0.006272854283452034,
+            "p5": 0.006097752344794571,
+            "p95": 0.006539126997813582,
+            "per_call": 0.00019602669635787606,
+            "std": 0.00014981876205530598
+          },
+          "relative_error": null,
+          "serialisation_factor": 0.9962005743957397,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014680541469715536,
+            "median": 0.014728353591635823,
+            "p5": 0.01434181046206504,
+            "p95": 0.014866206073202192,
+            "per_call": 0.00044714321848005056,
+            "std": 0.00018030706033899315
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.012781211912321547,
+            "median": 0.012839771108701825,
+            "p5": 0.012511704512871803,
+            "p95": 0.01296135843731463,
+            "per_call": 0.00040124284714693204,
+            "std": 0.0001594049857029689
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 1.1143954880678786,
+          "threadgroups": 192
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01446428483662506,
+            "median": 0.014506187988445163,
+            "p5": 0.01423093976918608,
+            "p95": 0.014627420832403005,
+            "per_call": 0.0004402005433803424,
+            "std": 0.0001474905621320245
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.013002815966804823,
+            "median": 0.012983146123588085,
+            "p5": 0.012774262111634016,
+            "p95": 0.013257771101780235,
+            "per_call": 0.00040572331636212766,
+            "std": 0.0001599621338690584
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 1.0849771892021167,
+          "threadgroups": 384
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014217111126830181,
+            "median": 0.014271625084802508,
+            "p5": 0.013903893646784127,
+            "p95": 0.01442451444454491,
+            "per_call": 0.0004328704526415095,
+            "std": 0.00018755848498535905
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.013137725841564437,
+            "median": 0.013181603979319334,
+            "p5": 0.01280510425567627,
+            "p95": 0.013308866880834103,
+            "per_call": 0.0004119251243537292,
+            "std": 0.0001701593727353593
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 1.0508474163129562,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014040052075870335,
+            "median": 0.01409920840524137,
+            "p5": 0.013673756225034594,
+            "p95": 0.01422548182308674,
+            "per_call": 0.0004274824314052239,
+            "std": 0.00018235649198964304
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.01343438537636151,
+            "median": 0.013443958479911089,
+            "p5": 0.013215753971599043,
+            "p95": 0.013634158042259514,
+            "per_call": 0.00042012370249722153,
+            "std": 0.00014365744782633528
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 1.0175156242417698,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014455597032792866,
+            "median": 0.014436270343139768,
+            "p5": 0.014222368458285927,
+            "p95": 0.01470782293472439,
+            "per_call": 0.0004380156169645488,
+            "std": 0.00016725052195724397
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.014075892278924584,
+            "median": 0.014092229073867202,
+            "p5": 0.013842781237326563,
+            "p95": 0.014227375038899481,
+            "per_call": 0.00044038215855835006,
+            "std": 0.00014116546370375257
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 0.9946261637811386,
+          "threadgroups": 1536
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01376981264911592,
+            "median": 0.013792312471196055,
+            "p5": 0.013557095895521343,
+            "p95": 0.013897267053835094,
+            "per_call": 0.0004178919334663078,
+            "std": 0.00011701499977495044
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.01323527772910893,
+            "median": 0.013205520808696747,
+            "p5": 0.013068183371797205,
+            "p95": 0.013451687549240888,
+            "per_call": 0.00041267252527177334,
+            "std": 0.00014746069816469115
+          },
+          "relative_error": 0.0033572394689337886,
+          "serialisation_factor": 1.0126478209110168,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_z",
+      "modules": [
+        "linear_attn.in_proj_z"
+      ],
+      "rows": 6144,
+      "tile": 256,
+      "tiles": 24,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.012661055622932812,
+            "median": 0.012711083749309182,
+            "p5": 0.012188435066491365,
+            "p95": 0.012920375354588032,
+            "per_call": 0.0003828457120107487,
+            "std": 0.0002732548166410539
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.010707711800932884,
+            "median": 0.010742312530055642,
+            "p5": 0.01049800799228251,
+            "p95": 0.010865454515442251,
+            "per_call": 0.0003356972665642388,
+            "std": 0.00012327644770033564
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.140449298050771,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.027990086857850354,
+            "median": 0.02811116655357182,
+            "p5": 0.027404458378441632,
+            "p95": 0.028331258124671875,
+            "per_call": 0.0008640982996439561,
+            "std": 0.00038166104894296377
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.025580260398176808,
+            "median": 0.025691979564726353,
+            "p5": 0.02489902519155294,
+            "p95": 0.02595790782943368,
+            "per_call": 0.0008028743613976985,
+            "std": 0.000399286489723812
+          },
+          "relative_error": 0.003152236284583163,
+          "serialisation_factor": 1.0762559388989266,
+          "threadgroups": 384
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.027985972274715703,
+            "median": 0.02806743746623397,
+            "p5": 0.02740569182205945,
+            "p95": 0.028312916541472076,
+            "per_call": 0.0008627317656646483,
+            "std": 0.0003149978474473722
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.02611790271475911,
+            "median": 0.02622745791450143,
+            "p5": 0.025536562572233377,
+            "p95": 0.02644673378672451,
+            "per_call": 0.0008196080598281696,
+            "std": 0.0003392040042725543
+          },
+          "relative_error": 0.003152236284583163,
+          "serialisation_factor": 1.0526150338803641,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.02713850004753719,
+            "median": 0.027247916674241424,
+            "p5": 0.026754008373245597,
+            "p95": 0.027425552206113934,
+            "per_call": 0.0008371217409148812,
+            "std": 0.0002454295616529013
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.02625034733985861,
+            "median": 0.026316853938624263,
+            "p5": 0.025811824831180274,
+            "p95": 0.026548323105089366,
+            "per_call": 0.0008224016855820082,
+            "std": 0.00025813326794806203
+          },
+          "relative_error": 0.003152236284583163,
+          "serialisation_factor": 1.0178988632817012,
+          "threadgroups": 1536
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.027493958245031536,
+            "median": 0.027475166833028197,
+            "p5": 0.02705834396183491,
+            "p95": 0.02782983281649649,
+            "per_call": 0.0008442233083769679,
+            "std": 0.00024262046657619397
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.026892805588431656,
+            "median": 0.02692787512205541,
+            "p5": 0.0265132311033085,
+            "p95": 0.027193316631019114,
+            "per_call": 0.0008414960975642316,
+            "std": 0.00023838899014358203
+          },
+          "relative_error": 0.003152236284583163,
+          "serialisation_factor": 1.0032409072610442,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_qkv",
+      "modules": [
+        "linear_attn.in_proj_qkv"
+      ],
+      "rows": 10240,
+      "tile": 256,
+      "tiles": 40,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.010167583590373397,
+            "median": 0.01018147962167859,
+            "p5": 0.00989951672963798,
+            "p95": 0.010339704505167902,
+            "per_call": 0.00030530404910678044,
+            "std": 0.0001604789586112146
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.00884069448026518,
+            "median": 0.008843021001666784,
+            "p5": 0.008701639738865197,
+            "p95": 0.00900445613078773,
+            "per_call": 0.000276344406302087,
+            "std": 0.0001148505237806075
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.1047954731279637,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.012292198021896183,
+            "median": 0.01231379178352654,
+            "p5": 0.01199148315936327,
+            "p95": 0.012520850263535976,
+            "per_call": 0.00037193880416452885,
+            "std": 0.00018250023055714363
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.010829677223227918,
+            "median": 0.010835666442289948,
+            "p5": 0.010568852466531099,
+            "p95": 0.011052142037078739,
+            "per_call": 0.0003386145763215609,
+            "std": 0.00016770795617665653
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 1.0984134475396063,
+          "threadgroups": 160
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.011933118104934692,
+            "median": 0.011940083699300885,
+            "p5": 0.01164067112840712,
+            "p95": 0.012195139471441508,
+            "per_call": 0.00036026042653247714,
+            "std": 0.00017237348075751092
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.010992003643574813,
+            "median": 0.010978813283145428,
+            "p5": 0.01080187747720629,
+            "p95": 0.01116660856641829,
+            "per_call": 0.0003430879150982946,
+            "std": 0.0001301673874629311
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 1.050052801857689,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.011946361162699759,
+            "median": 0.011731291888281703,
+            "p5": 0.01143734569195658,
+            "p95": 0.01319345156662166,
+            "per_call": 0.0003537356824381277,
+            "std": 0.0008425332503885406
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.011033961821037034,
+            "median": 0.011050666682422161,
+            "p5": 0.010826339526101948,
+            "p95": 0.011194645776413381,
+            "per_call": 0.00034533333382569253,
+            "std": 0.00013575070174158267
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 1.0243311252908944,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.012231781186225513,
+            "median": 0.012213249458000064,
+            "p5": 0.012022466328926385,
+            "p95": 0.012491381214931607,
+            "per_call": 0.0003687968564918265,
+            "std": 0.00014909172593369463
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.01142857305239886,
+            "median": 0.011477749794721603,
+            "p5": 0.01113880428019911,
+            "p95": 0.011619344027712942,
+            "per_call": 0.0003586796810850501,
+            "std": 0.00017722316616986883
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 1.0282067146267406,
+          "threadgroups": 800
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.012196590231421093,
+            "median": 0.012199853779748082,
+            "p5": 0.011961875529959799,
+            "p95": 0.012429260020144283,
+            "per_call": 0.00036837824154645205,
+            "std": 0.00014449475821295564
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.011831541739714643,
+            "median": 0.011835916666314006,
+            "p5": 0.011612202343530952,
+            "p95": 0.01198319997638464,
+            "per_call": 0.0003698723958223127,
+            "std": 0.0001344697920380357
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 0.9959603520221108,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.011585249953592816,
+            "median": 0.011602229438722134,
+            "p5": 0.011428235773928463,
+            "p95": 0.011726632877252997,
+            "per_call": 0.00034970248088939115,
+            "std": 0.00010858062383247771
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.011141461979908248,
+            "median": 0.01113408338278532,
+            "p5": 0.010977854509837926,
+            "p95": 0.011295710597187281,
+            "per_call": 0.00034794010571204126,
+            "std": 0.0001073575110001194
+          },
+          "relative_error": 0.0030344533627930104,
+          "serialisation_factor": 1.0050651682528615,
+          "threadgroups": 1600
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_qkv",
+      "modules": [
+        "linear_attn.in_proj_qkv"
+      ],
+      "rows": 10240,
+      "tile": 256,
+      "tiles": 40,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.010477982771893343,
+            "median": 0.010547021171078086,
+            "p5": 0.010086026950739324,
+            "p95": 0.010690133296884596,
+            "per_call": 0.0003164798326906748,
+            "std": 0.0002492606155183041
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.008978993049822748,
+            "median": 0.008956062374636531,
+            "p5": 0.00878406863193959,
+            "p95": 0.009258275222964584,
+            "per_call": 0.0002798769492073916,
+            "std": 0.0001662711302287025
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.1307820582829067,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.022956597230707605,
+            "median": 0.02306235395371914,
+            "p5": 0.022452046116814017,
+            "p95": 0.023165522795170545,
+            "per_call": 0.0007075839821482077,
+            "std": 0.0003288208365464654
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.021405805523196857,
+            "median": 0.02150062471628189,
+            "p5": 0.02087183096446097,
+            "p95": 0.02161342934705317,
+            "per_call": 0.0006718945223838091,
+            "std": 0.0003101565210007395
+          },
+          "relative_error": 0.002956977207238274,
+          "serialisation_factor": 1.0531176525115524,
+          "threadgroups": 320
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.022888354297416907,
+            "median": 0.022919228998944163,
+            "p5": 0.02255238944198936,
+            "p95": 0.023104093340225517,
+            "per_call": 0.0007031113273114897,
+            "std": 0.00020555254966470786
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.021895486240585644,
+            "median": 0.02194770914502442,
+            "p5": 0.021461131400428712,
+            "p95": 0.02217976041138172,
+            "per_call": 0.0006858659107820131,
+            "std": 0.0002746910698947433
+          },
+          "relative_error": 0.002956977207238274,
+          "serialisation_factor": 1.0251440059323165,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.022673208460522194,
+            "median": 0.022693375125527382,
+            "p5": 0.022339404677040875,
+            "p95": 0.02289893354754895,
+            "per_call": 0.0006960533937672153,
+            "std": 0.00018293549860260393
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.022135048755444586,
+            "median": 0.022172854747623205,
+            "p5": 0.02179113351739943,
+            "p95": 0.02235148553736508,
+            "per_call": 0.0006929017108632252,
+            "std": 0.00020961670972701396
+          },
+          "relative_error": 0.002956977207238274,
+          "serialisation_factor": 1.0045485281022957,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.02307627776948114,
+            "median": 0.023083541775122285,
+            "p5": 0.02284132505301386,
+            "p95": 0.0233155750669539,
+            "per_call": 0.000708246101567056,
+            "std": 0.00016134567642211157
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.02262420152934889,
+            "median": 0.022667395882308483,
+            "p5": 0.022395042120479047,
+            "p95": 0.022797927260398865,
+            "per_call": 0.0007083561213221401,
+            "std": 0.00015153341211706202
+          },
+          "relative_error": 0.002956977207238274,
+          "serialisation_factor": 0.9998446829895693,
+          "threadgroups": 1600
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.024049322896947462,
+            "median": 0.024062562501057982,
+            "p5": 0.023820252134464683,
+            "p95": 0.024239256279543042,
+            "per_call": 0.0007388404992525466,
+            "std": 0.00015326303973956377
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.02317297221937527,
+            "median": 0.023175770649686456,
+            "p5": 0.022941931639797984,
+            "p95": 0.023396093910560013,
+            "per_call": 0.0007242428328027017,
+            "std": 0.00015040052530800087
+          },
+          "relative_error": 0.002956977207238274,
+          "serialisation_factor": 1.0201557623889135,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 48,
+      "groups_per_row": 40,
+      "label": "linear_attn.in_proj_qkv",
+      "modules": [
+        "linear_attn.in_proj_qkv"
+      ],
+      "rows": 10240,
+      "tile": 256,
+      "tiles": 40,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.01926011828860889,
+            "median": 0.019372333539649844,
+            "p5": 0.018680633790791035,
+            "p95": 0.019520627218298614,
+            "per_call": 0.0005909212486585602,
+            "std": 0.0003759876553806906
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.017624041453624766,
+            "median": 0.017656166572123766,
+            "p5": 0.017434032843448223,
+            "p95": 0.01775361839681864,
+            "per_call": 0.0005517552053788677,
+            "std": 0.00011591251167157829
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.07098445632751,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.04380980203859508,
+            "median": 0.04383154190145433,
+            "p5": 0.042947183805517854,
+            "p95": 0.04433807707391679,
+            "per_call": 0.0013552715099649504,
+            "std": 0.0004943062548946558
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.04243252449668944,
+            "median": 0.04259435459971428,
+            "p5": 0.041359985270537435,
+            "p95": 0.04293003953061998,
+            "per_call": 0.0013310735812410712,
+            "std": 0.0006180796701992564
+          },
+          "relative_error": 0.002796345080775026,
+          "serialisation_factor": 1.0181792570034462,
+          "threadgroups": 640
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.044191993035686515,
+            "median": 0.04428800009191036,
+            "p5": 0.043530345498584214,
+            "p95": 0.04461427482310683,
+            "per_call": 0.0013695358284167014,
+            "std": 0.0003569207521285513
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.04329957285275062,
+            "median": 0.04341497947461903,
+            "p5": 0.042649570805951956,
+            "p95": 0.04370940406806767,
+            "per_call": 0.0013567181085818447,
+            "std": 0.00039793704606447527
+          },
+          "relative_error": 0.002796345080775026,
+          "serialisation_factor": 1.0094475925056052,
+          "threadgroups": 1280
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.04412360058631748,
+            "median": 0.04418972902931273,
+            "p5": 0.043540326855145396,
+            "p95": 0.044613643712364134,
+            "per_call": 0.0013664648577105254,
+            "std": 0.0003748839807560382
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.04345458672226717,
+            "median": 0.043483312940225005,
+            "p5": 0.04291697703301907,
+            "p95": 0.04381996421143412,
+            "per_call": 0.0013588535293820314,
+            "std": 0.0003113462075599931
+          },
+          "relative_error": 0.002796345080775026,
+          "serialisation_factor": 1.0056012867935482,
+          "threadgroups": 2560
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 16,
+      "groups_per_row": 40,
+      "label": "self_attn.q_proj",
+      "modules": [
+        "self_attn.q_proj"
+      ],
+      "rows": 12288,
+      "tile": 256,
+      "tiles": 48,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.01230469101574272,
+            "median": 0.012297583278268576,
+            "p5": 0.01206860386300832,
+            "p95": 0.012516474956646562,
+            "per_call": 0.000371718080714345,
+            "std": 0.00015997687740127543
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.01045061096859475,
+            "median": 0.010435624979436398,
+            "p5": 0.01026097231078893,
+            "p95": 0.010669918823987245,
+            "per_call": 0.0003261132806073874,
+            "std": 0.000139514499841966
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.1398434311599284,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014635767283228537,
+            "median": 0.014640686800703406,
+            "p5": 0.014428547769784927,
+            "p95": 0.01481600261759013,
+            "per_call": 0.00044494006579043344,
+            "std": 0.00013748222858766477
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.012724420172162354,
+            "median": 0.012712208554148674,
+            "p5": 0.012542318715713919,
+            "p95": 0.012921425071544946,
+            "per_call": 0.00039725651731714606,
+            "std": 0.00013802552743007
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.120032136402232,
+          "threadgroups": 192
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014414218642438451,
+            "median": 0.014433499658480287,
+            "p5": 0.014130103751085699,
+            "p95": 0.014625672693364322,
+            "per_call": 0.00043846546759596094,
+            "std": 0.00017154576334330266
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.013038343439499537,
+            "median": 0.013056936906650662,
+            "p5": 0.012829756061546505,
+            "p95": 0.013206589058972895,
+            "per_call": 0.0004080292783328332,
+            "std": 0.00012330113415807045
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.074593150245215,
+          "threadgroups": 384
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01419305553038915,
+            "median": 0.0142041458748281,
+            "p5": 0.013990268786437809,
+            "p95": 0.014369404478929936,
+            "per_call": 0.0004312981618568301,
+            "std": 0.00013655236727253835
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.013023173552937806,
+            "median": 0.013042687438428402,
+            "p5": 0.012832414754666389,
+            "p95": 0.013149012206122279,
+            "per_call": 0.00040758398245088756,
+            "std": 0.00011239898921118409
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.0581823143867044,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014258458279073238,
+            "median": 0.01430587493814528,
+            "p5": 0.013983051921240986,
+            "p95": 0.014412716240622103,
+            "per_call": 0.000434477195085492,
+            "std": 0.00016105531892717203
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.013409048512888452,
+            "median": 0.013477270491421223,
+            "p5": 0.013172918744385243,
+            "p95": 0.013569162273779512,
+            "per_call": 0.0004211647028569132,
+            "std": 0.000146069115220803
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.031608755762948,
+          "threadgroups": 960
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.014449350613479814,
+            "median": 0.014466249383985996,
+            "p5": 0.014242768846452236,
+            "p95": 0.014651412121020257,
+            "per_call": 0.00043948889651801437,
+            "std": 0.00014691107001899766
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.013969840132631361,
+            "median": 0.014001457951962948,
+            "p5": 0.01379353746306151,
+            "p95": 0.014086341112852096,
+            "per_call": 0.0004375455609988421,
+            "std": 0.00011199382679382932
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.0044414472283434,
+          "threadgroups": 1536
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01371362165082246,
+            "median": 0.013697396032512188,
+            "p5": 0.013541466603055597,
+            "p95": 0.013857587473466992,
+            "per_call": 0.00041546222928445786,
+            "std": 0.0001170379721613375
+          },
+          "config": "lut23_bt4_packed_k10",
+          "family": "lut23",
+          "k_split": 10,
+          "overlapped_seconds": {
+            "mean": 0.013090812601149082,
+            "median": 0.013077292125672102,
+            "p5": 0.012877530953846871,
+            "p95": 0.013335143425501883,
+            "per_call": 0.0004086653789272532,
+            "std": 0.00015538982363188855
+          },
+          "relative_error": 0.0027401055533575478,
+          "serialisation_factor": 1.0166318232658866,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 16,
+      "groups_per_row": 40,
+      "label": "self_attn.q_proj",
+      "modules": [
+        "self_attn.q_proj"
+      ],
+      "rows": 12288,
+      "tile": 256,
+      "tiles": 48,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.012508753415507575,
+            "median": 0.012509541818872094,
+            "p5": 0.012144720624201,
+            "p95": 0.01283220169134438,
+            "per_call": 0.00037776759563712403,
+            "std": 0.00024829900794499655
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.01060364938651522,
+            "median": 0.010579353431239724,
+            "p5": 0.010467823501676321,
+            "p95": 0.010821764962747693,
+            "per_call": 0.0003306047947262414,
+            "std": 0.00012565436185065347
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.142656131015692,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.02774433675222099,
+            "median": 0.027849374571815133,
+            "p5": 0.027288416377268733,
+            "p95": 0.028030056180432437,
+            "per_call": 0.000857137369166594,
+            "std": 0.0002726062948992755
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.025345791790944833,
+            "median": 0.02542222966440022,
+            "p5": 0.024829101841896774,
+            "p95": 0.025598274637013675,
+            "per_call": 0.0007944446770125069,
+            "std": 0.00028234762153530544
+          },
+          "relative_error": 0.0034195985307729224,
+          "serialisation_factor": 1.078913855134434,
+          "threadgroups": 384
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.02759771526325494,
+            "median": 0.02767795789986849,
+            "p5": 0.027107854560017585,
+            "p95": 0.02798146493732929,
+            "per_call": 0.0008517805981682613,
+            "std": 0.0003171573736718771
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.02583721183085193,
+            "median": 0.025953583419322968,
+            "p5": 0.025399810099042953,
+            "p95": 0.02604917953722179,
+            "per_call": 0.0008110494818538427,
+            "std": 0.00026222113908094086
+          },
+          "relative_error": 0.0034195985307729224,
+          "serialisation_factor": 1.0502202605706845,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.026842993063231308,
+            "median": 0.026936312904581428,
+            "p5": 0.02630792078562081,
+            "p95": 0.027141502499580382,
+            "per_call": 0.0008286041920655407,
+            "std": 0.00029344356703894147
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.025855673671079177,
+            "median": 0.026007333304733038,
+            "p5": 0.02528348343912512,
+            "p95": 0.0261288020061329,
+            "per_call": 0.0008127291657729074,
+            "std": 0.0002922219590377647
+          },
+          "relative_error": 0.0034195985307729224,
+          "serialisation_factor": 1.0195329846167587,
+          "threadgroups": 1536
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.027149138622917235,
+            "median": 0.0271548330783844,
+            "p5": 0.026857700082473457,
+            "p95": 0.027354576694779097,
+            "per_call": 0.0008354329474968836,
+            "std": 0.00018934839795735039
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.026582256929638486,
+            "median": 0.02662247885018587,
+            "p5": 0.02613987063523382,
+            "p95": 0.026873341924510897,
+            "per_call": 0.0008319524640683085,
+            "std": 0.00025935425432152234
+          },
+          "relative_error": 0.0034195985307729224,
+          "serialisation_factor": 1.0041835123746798,
+          "threadgroups": 1920
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 16,
+      "groups_per_row": 40,
+      "label": "self_attn.q_proj",
+      "modules": [
+        "self_attn.q_proj"
+      ],
+      "rows": 12288,
+      "tile": 256,
+      "tiles": 48,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.023131482497168083,
+            "median": 0.023230062564834952,
+            "p5": 0.02246799157001078,
+            "p95": 0.023523044143803417,
+            "per_call": 0.0007115201733540744,
+            "std": 0.0003795336001422814
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.020808923756703734,
+            "median": 0.020827104337513447,
+            "p5": 0.02053888780064881,
+            "p95": 0.021075945906341077,
+            "per_call": 0.0006508470105472952,
+            "std": 0.0001875279762198105
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0932218506400748,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.05312785762362182,
+            "median": 0.053259791573509574,
+            "p5": 0.05219841860234738,
+            "p95": 0.05379409564193338,
+            "per_call": 0.0016499492048751563,
+            "std": 0.0005474533153935234
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.05004318403856208,
+            "median": 0.050184791442006826,
+            "p5": 0.04900327317882329,
+            "p95": 0.05066038747318089,
+            "per_call": 0.0015682747325627133,
+            "std": 0.0005958894014423803
+          },
+          "relative_error": 0.003164915172123391,
+          "serialisation_factor": 1.0520791865204504,
+          "threadgroups": 768
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.05241433340900888,
+            "median": 0.05250593740493059,
+            "p5": 0.051580324722453955,
+            "p95": 0.053003833466209474,
+            "per_call": 0.001626391262107063,
+            "std": 0.0004935778070237838
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.05102724290918559,
+            "median": 0.05115327052772045,
+            "p5": 0.050074316165409985,
+            "p95": 0.051657162304036316,
+            "per_call": 0.001598539703991264,
+            "std": 0.0005489241679222464
+          },
+          "relative_error": 0.003164915172123391,
+          "serialisation_factor": 1.0174231256479014,
+          "threadgroups": 1536
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 128,
+      "groups_per_row": 40,
+      "label": "mlp.gate_proj",
+      "modules": [
+        "mlp.gate_proj",
+        "mlp.up_proj"
+      ],
+      "rows": 17408,
+      "tile": 256,
+      "tiles": 68,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.016201378389572103,
+            "median": 0.016196436947211623,
+            "p5": 0.015993541618809105,
+            "p95": 0.016409366950392724,
+            "per_call": 0.0004937063567922451,
+            "std": 0.00015152772733318783
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.014432312571443617,
+            "median": 0.014444874599575996,
+            "p5": 0.014161168714053929,
+            "p95": 0.014726016577333212,
+            "per_call": 0.0004514023312367499,
+            "std": 0.00019281978132641473
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0937168964980548,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0195095034626623,
+            "median": 0.01948454137891531,
+            "p5": 0.019396053440868855,
+            "p95": 0.019708179286681116,
+            "per_call": 0.0005964596202829853,
+            "std": 0.00011242372023634108
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.017696913331747055,
+            "median": 0.017706333426758647,
+            "p5": 0.01753391306847334,
+            "p95": 0.017854914790950714,
+            "per_call": 0.0005533229195862077,
+            "std": 0.00012205234800317848
+          },
+          "relative_error": 0.0028307643801203197,
+          "serialisation_factor": 1.0779593600226005,
+          "threadgroups": 272
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01948555225195984,
+            "median": 0.01954629155807197,
+            "p5": 0.019214358692988754,
+            "p95": 0.019696181663312017,
+            "per_call": 0.0005983893133816309,
+            "std": 0.00017751501295336993
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.01810877789588024,
+            "median": 0.018123917281627655,
+            "p5": 0.017917014588601888,
+            "p95": 0.018342914851382376,
+            "per_call": 0.0005663724150508642,
+            "std": 0.00013918932726933428
+          },
+          "relative_error": 0.0028307643801203197,
+          "serialisation_factor": 1.0565297628908912,
+          "threadgroups": 544
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.019175010345255334,
+            "median": 0.01918570837005973,
+            "p5": 0.018977362336590885,
+            "p95": 0.019382372871041297,
+            "per_call": 0.0005871210887562484,
+            "std": 0.0001456906838903153
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.01813780205945174,
+            "median": 0.01813656254671514,
+            "p5": 0.01792849993798882,
+            "p95": 0.01832532964181155,
+            "per_call": 0.0005667675795848481,
+            "std": 0.0001393786596640389
+          },
+          "relative_error": 0.0028307643801203197,
+          "serialisation_factor": 1.0359115621721147,
+          "threadgroups": 1088
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.01936474341588716,
+            "median": 0.019370354479178786,
+            "p5": 0.019186476827599108,
+            "p95": 0.01953664841130376,
+            "per_call": 0.0005928912796662189,
+            "std": 0.00013440115110396008
+          },
+          "config": "lut23_bt4_packed_k5",
+          "family": "lut23",
+          "k_split": 5,
+          "overlapped_seconds": {
+            "mean": 0.01863059715833515,
+            "median": 0.018685083370655775,
+            "p5": 0.01837372756563127,
+            "p95": 0.018848784919828176,
+            "per_call": 0.000583908855332993,
+            "std": 0.00017714084661054534
+          },
+          "relative_error": 0.0028307643801203197,
+          "serialisation_factor": 1.0153832644447625,
+          "threadgroups": 1360
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.019845114710430305,
+            "median": 0.019801312359049916,
+            "p5": 0.019655392249114813,
+            "p95": 0.02009657071903348,
+            "per_call": 0.0006063587134121917,
+            "std": 0.00016750209398190143
+          },
+          "config": "lut23_bt4_packed_k8",
+          "family": "lut23",
+          "k_split": 8,
+          "overlapped_seconds": {
+            "mean": 0.019063969026319683,
+            "median": 0.01908572926186025,
+            "p5": 0.01884991298429668,
+            "p95": 0.019241795921698213,
+            "per_call": 0.0005964290394331329,
+            "std": 0.000132931367973377
+          },
+          "relative_error": 0.0028307643801203197,
+          "serialisation_factor": 1.01664854211072,
+          "threadgroups": 2176
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 128,
+      "groups_per_row": 40,
+      "label": "mlp.gate_proj",
+      "modules": [
+        "mlp.gate_proj",
+        "mlp.up_proj"
+      ],
+      "rows": 17408,
+      "tile": 256,
+      "tiles": 68,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.016479288305466373,
+            "median": 0.016543125035241246,
+            "p5": 0.016090195695869624,
+            "p95": 0.01675146275665611,
+            "per_call": 0.0005034082059864886,
+            "std": 0.00022844362301782908
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.014647527869480351,
+            "median": 0.01469518756493926,
+            "p5": 0.01440877711866051,
+            "p95": 0.014867333904840052,
+            "per_call": 0.0004592246114043519,
+            "std": 0.00016718103557379266
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0962134726338364,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.03738814239234974,
+            "median": 0.03740924992598593,
+            "p5": 0.03694712514989078,
+            "p95": 0.03784731887280941,
+            "per_call": 0.00115547460882226,
+            "std": 0.00034607530243734974
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.03520119795575738,
+            "median": 0.035197125282138586,
+            "p5": 0.034610306145623326,
+            "p95": 0.035664237174205485,
+            "per_call": 0.0010999101650668308,
+            "std": 0.00035855922413772037
+          },
+          "relative_error": 0.002997799431736872,
+          "serialisation_factor": 1.05051725633616,
+          "threadgroups": 544
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0374730556892852,
+            "median": 0.03749131294898689,
+            "p5": 0.03709572113584727,
+            "p95": 0.037832859833724794,
+            "per_call": 0.00115803907829104,
+            "std": 0.00028716856704310954
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.035870632040314376,
+            "median": 0.03592095850035548,
+            "p5": 0.03537478346843272,
+            "p95": 0.03635432932060212,
+            "per_call": 0.0011225299531361088,
+            "std": 0.0003568979044089612
+          },
+          "relative_error": 0.002997799431736872,
+          "serialisation_factor": 1.031633120395341,
+          "threadgroups": 1088
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.03669186794043829,
+            "median": 0.03675143769942224,
+            "p5": 0.03619370199739933,
+            "p95": 0.03706155982799828,
+            "per_call": 0.0011349179767421447,
+            "std": 0.000317070148365432
+          },
+          "config": "lut23_bt4_packed_k4",
+          "family": "lut23",
+          "k_split": 4,
+          "overlapped_seconds": {
+            "mean": 0.03589829852959762,
+            "median": 0.035986082861199975,
+            "p5": 0.035401560156606136,
+            "p95": 0.03632517319638282,
+            "per_call": 0.0011245650894124992,
+            "std": 0.0003352005643347297
+          },
+          "relative_error": 0.002997799431736872,
+          "serialisation_factor": 1.0092061254854123,
+          "threadgroups": 2176
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 128,
+      "groups_per_row": 40,
+      "label": "mlp.gate_proj",
+      "modules": [
+        "mlp.gate_proj",
+        "mlp.up_proj"
+      ],
+      "rows": 17408,
+      "tile": 256,
+      "tiles": 68,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.03123254864476621,
+            "median": 0.03130793757736683,
+            "p5": 0.030349793937057258,
+            "p95": 0.031861183838918804,
+            "per_call": 0.0009638626434025355,
+            "std": 0.0005242979576908756
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.028799062323135633,
+            "median": 0.02881987439468503,
+            "p5": 0.02830942051950842,
+            "p95": 0.029230633401311934,
+            "per_call": 0.0009006210748339072,
+            "std": 0.0003177437045796273
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.070219951915173,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0726786214703073,
+            "median": 0.07254999992437661,
+            "p5": 0.07203919151797891,
+            "p95": 0.07359211458824574,
+            "per_call": 0.002252677091746591,
+            "std": 0.0006123816022519892
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.06978482993630071,
+            "median": 0.06990431249141693,
+            "p5": 0.06869853739626705,
+            "p95": 0.0707256062189117,
+            "per_call": 0.002184509765356779,
+            "std": 0.0008040674563166944
+          },
+          "relative_error": 0.0031265219265623856,
+          "serialisation_factor": 1.0312048622857397,
+          "threadgroups": 1088
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.0722093575168401,
+            "median": 0.07218543766066432,
+            "p5": 0.07156853750348091,
+            "p95": 0.073048016987741,
+            "per_call": 0.002241284521005582,
+            "std": 0.0005690968794894829
+          },
+          "config": "lut23_bt4_packed_k2",
+          "family": "lut23",
+          "k_split": 2,
+          "overlapped_seconds": {
+            "mean": 0.07106461108196527,
+            "median": 0.07105077058076859,
+            "p5": 0.0702438271138817,
+            "p95": 0.07209696676582097,
+            "per_call": 0.0022203365806490183,
+            "std": 0.0006647850619871788
+          },
+          "relative_error": 0.0031265219265623856,
+          "serialisation_factor": 1.0094345787657295,
+          "threadgroups": 2176
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 16,
+      "columns": 5120,
+      "dispatches_per_token": 1,
+      "groups_per_row": 40,
+      "label": "lm_head",
+      "modules": [
+        "lm_head"
+      ],
+      "rows": 248320,
+      "tile": 256,
+      "tiles": 970,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.30069393416245777,
+            "median": 0.3032365208491683,
+            "p5": 0.28092668757308276,
+            "p95": 0.31512117504607884,
+            "per_call": 0.009460782544920221,
+            "std": 0.012451168776310893
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.2904931177617982,
+            "median": 0.2895955827552825,
+            "p5": 0.27410910616163164,
+            "p95": 0.3044626125600189,
+            "per_call": 0.009049861961102579,
+            "std": 0.010448098774604375
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0454062819503578,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.37300838200220215,
+            "median": 0.3741840624716133,
+            "p5": 0.35524031647946686,
+            "p95": 0.39475951297208667,
+            "per_call": 0.011677893220621627,
+            "std": 0.014087951774575417
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.38255835390494514,
+            "median": 0.38081522891297936,
+            "p5": 0.36322816237807276,
+            "p95": 0.40711004121694716,
+            "per_call": 0.011900475903530605,
+            "std": 0.014817581575956867
+          },
+          "relative_error": 0.0034240313888577573,
+          "serialisation_factor": 0.9812963208603327,
+          "threadgroups": 3880
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 32,
+      "columns": 5120,
+      "dispatches_per_token": 1,
+      "groups_per_row": 40,
+      "label": "lm_head",
+      "modules": [
+        "lm_head"
+      ],
+      "rows": 248320,
+      "tile": 256,
+      "tiles": 970,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.30080080897702527,
+            "median": 0.3018692086916417,
+            "p5": 0.2834764472208917,
+            "p95": 0.3160513064591214,
+            "per_call": 0.0094168704454205,
+            "std": 0.01264284818047308
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.2839340034406632,
+            "median": 0.28544533299282193,
+            "p5": 0.2728768376400694,
+            "p95": 0.29646668944042176,
+            "per_call": 0.008920166656025685,
+            "std": 0.008184990289730437
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0556832409694146,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 0.7175705798824007,
+            "median": 0.7178483954630792,
+            "p5": 0.6872093855636194,
+            "p95": 0.7472522625233978,
+            "per_call": 0.022416220032027923,
+            "std": 0.02186554403702659
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 0.741495604122368,
+            "median": 0.7391889374703169,
+            "p5": 0.7012527850223705,
+            "p95": 0.7888878377154469,
+            "per_call": 0.023099654295947403,
+            "std": 0.028123719005236077
+          },
+          "relative_error": 0.0036862132480630547,
+          "serialisation_factor": 0.9704136583533468,
+          "threadgroups": 7760
+        }
+      ]
+    },
+    {
+      "activation_dtype": "bfloat16",
+      "batch": 64,
+      "columns": 5120,
+      "dispatches_per_token": 1,
+      "groups_per_row": 40,
+      "label": "lm_head",
+      "modules": [
+        "lm_head"
+      ],
+      "rows": 248320,
+      "tile": 256,
+      "tiles": 970,
+      "variants": [
+        {
+          "batch_tile": null,
+          "chained_seconds": {
+            "mean": 0.5063847398074964,
+            "median": 0.5068923544604331,
+            "p5": 0.48654516260139646,
+            "p95": 0.5260322438320145,
+            "per_call": 0.015823735047888476,
+            "std": 0.013764950264746275
+          },
+          "config": "affine_2bit",
+          "family": "affine_2bit",
+          "k_split": null,
+          "overlapped_seconds": {
+            "mean": 0.48390051392683137,
+            "median": 0.48132556304335594,
+            "p5": 0.46821841232012956,
+            "p95": 0.5036648600827902,
+            "per_call": 0.015041423845104873,
+            "std": 0.013230214415305792
+          },
+          "relative_error": null,
+          "serialisation_factor": 1.0520104486676107,
+          "threadgroups": null
+        },
+        {
+          "batch_tile": 4,
+          "chained_seconds": {
+            "mean": 1.1866824097620945,
+            "median": 1.1907791250851005,
+            "p5": 1.1395888837985695,
+            "p95": 1.2328109894413501,
+            "per_call": 0.03719519662990933,
+            "std": 0.0333663160008301
+          },
+          "config": "lut23_bt4_packed",
+          "family": "lut23",
+          "k_split": 1,
+          "overlapped_seconds": {
+            "mean": 1.2398773299064487,
+            "median": 1.2299252084922045,
+            "p5": 1.2043924312340095,
+            "p95": 1.2791595222894103,
+            "per_call": 0.03843516276538139,
+            "std": 0.027244682551396227
+          },
+          "relative_error": 0.0038587850320382262,
+          "serialisation_factor": 0.967738756746234,
+          "threadgroups": 15520
+        }
+      ]
+    }
+  ],
+  "max_foreign_gpu_share": 0.2,
+  "max_threadgroups_swept": 2560,
+  "schema_version": 1,
+  "seed": 20260809,
+  "trials_per_arm": 12,
+  "warmup_samples": 3
+}

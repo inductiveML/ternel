@@ -1,0 +1,977 @@
+{
+  "artifact": "artifacts/ternel-mlx",
+  "baseline": null,
+  "batches": [
+    8,
+    12
+  ],
+  "bucket_arm": "gemm_8x32",
+  "bucket_min_threadgroups": 320,
+  "dispatches_per_token": 497,
+  "environment_after": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 13.9,
+          "pid": 592,
+          "rss_kib": 185696
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 12.4,
+          "pid": 1310,
+          "rss_kib": 296272
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 7.9,
+          "pid": 32995,
+          "rss_kib": 44464
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 7.7,
+          "pid": 32994,
+          "rss_kib": 43584
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.7,
+          "pid": 1197,
+          "rss_kib": 186848
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 4.4,
+          "pid": 28555,
+          "rss_kib": 5908880
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 3.6,
+          "pid": 33009,
+          "rss_kib": 41024
+        },
+        {
+          "command": "/usr/libexec/opendirectoryd",
+          "cpu_percent": 2.8,
+          "pid": 560,
+          "rss_kib": 13104
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-16T08:30:53.244887+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.0,
+      "clients": [],
+      "seconds": 3.047734354622662,
+      "total_share": 0
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 5889743884,
+      "cache_memory_bytes": 48,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 6284093236
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 3.35 2.36 2.21 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "environment_before": {
+    "busiest_processes": {
+      "processes": [
+        {
+          "command": "/usr/libexec/sysmond",
+          "cpu_percent": 37.1,
+          "pid": 743,
+          "rss_kib": 4032
+        },
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 14.0,
+          "pid": 592,
+          "rss_kib": 185424
+        },
+        {
+          "command": ".venv/bin/python3 (this repository)",
+          "cpu_percent": 13.6,
+          "pid": 28555,
+          "rss_kib": 85408
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 6.8,
+          "pid": 1197,
+          "rss_kib": 186864
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 5.7,
+          "pid": 33607,
+          "rss_kib": 1298272
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.3,
+          "pid": 10104,
+          "rss_kib": 370864
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.3,
+          "pid": 10105,
+          "rss_kib": 356208
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.2,
+          "pid": 10106,
+          "rss_kib": 357056
+        }
+      ],
+      "returncode": 0
+    },
+    "captured_at_utc": "2026-08-16T08:27:02.230722+00:00",
+    "gpu": {
+      "adapters": [
+        {
+          "_name": "Apple M4 Max",
+          "spdisplays_mtlgpufamilysupport": "spdisplays_metal4",
+          "spdisplays_vendor": "sppci_vendor_Apple",
+          "sppci_bus": "spdisplays_builtin",
+          "sppci_cores": "40",
+          "sppci_device_type": "spdisplays_gpu",
+          "sppci_model": "Apple M4 Max"
+        }
+      ],
+      "returncode": 0
+    },
+    "gpu_contention": {
+      "busiest_share": 0.0018081241157269813,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0018081241157269813,
+          "pid": 1310
+        }
+      ],
+      "seconds": 3.038923020940274,
+      "total_share": 0.0018081241157269813
+    },
+    "metal_compiler": {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Apple metal version 32023.864 (metalfe-32023.864)\nTarget: air64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.LKFP0t/Metal.xctoolchain/usr/metal/current/bin"
+    },
+    "mlx": {
+      "active_memory_bytes": 8,
+      "cache_memory_bytes": 0,
+      "default_device": "Device(gpu, 0)",
+      "device_info": {
+        "architecture": "applegpu_g16s",
+        "device_name": "Apple M4 Max",
+        "max_buffer_length": 30150672384,
+        "max_recommended_working_set_size": 40200896512,
+        "memory_size": 51539607552,
+        "resource_limit": 499000
+      },
+      "metal_available": true,
+      "mlx_version": "0.32.0",
+      "peak_memory_bytes": 8
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "power": {
+      "command": [
+        "pmset",
+        "-g"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "System-wide power settings:\nCurrently in use:\n standby              1\n Sleep On Power Button 1\n hibernatefile        /var/vm/sleepimage\n powernap             1\n networkoversleep     0\n disksleep            10\n sleep                1 (sleep prevented by [redacted])\n hibernatemode        3\n ttyskeepawake        1\n displaysleep         10\n tcpkeepalive         1\n powermode            0\n womp                 1"
+    },
+    "python": "3.12.11",
+    "schema_version": 1,
+    "sw_vers": {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84"
+    },
+    "sysctl": {
+      "hw.memsize": "51539607552",
+      "hw.model": "Mac16,5",
+      "hw.ncpu": "16",
+      "hw.pagesize": "16384",
+      "hw.perflevel0.logicalcpu": "12",
+      "hw.perflevel1.logicalcpu": "4",
+      "machdep.cpu.brand_string": "Apple M4 Max",
+      "vm.loadavg": "{ 1.97 2.20 2.17 }"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "uv 0.9.18 (0cee76417 2025-12-16)"
+    },
+    "xcode": {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Xcode 26.2\nBuild version 17C52"
+    }
+  },
+  "evaluated": "cache",
+  "gemm_large_min_batch": 32,
+  "gemm_min_batch": 16,
+  "gpu_contention": [
+    {
+      "busiest_share": 0.0001857962052794885,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.0001857962052794885,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.0001397997097605379,
+          "pid": 1310
+        }
+      ],
+      "label": "bucket gemm_8x32 batch=8",
+      "seconds": 60.881442562211305,
+      "timed_seconds": 60.8617520830594,
+      "total_share": 0.0003255959150400264
+    },
+    {
+      "busiest_share": 0.00026742132835669334,
+      "clients": [
+        {
+          "command": "loginwindow",
+          "gpu_share": 0.00026742132835669334,
+          "pid": 595
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.00015502983420117984,
+          "pid": 1310
+        }
+      ],
+      "label": "bucket gemm_8x32 batch=12",
+      "seconds": 163.86953602125868,
+      "timed_seconds": 163.84827854204923,
+      "total_share": 0.0004224511625578732
+    }
+  ],
+  "inner_passes_per_reading": 3,
+  "layout_name": "TQ1_G128_MLX_TILED",
+  "layout_version": 1,
+  "max_foreign_gpu_share": 0.25,
+  "measured": {
+    "12": {
+      "additivity": 0.9528595793553482,
+      "arm": "gemm_8x32k32s1x2_frag_epi_tgt",
+      "arms": {
+        "bucket": {
+          "reference_samples": [
+            0.14699220890179276,
+            0.14484812505543232,
+            0.14536195900291204,
+            0.14562720898538828,
+            0.14591774996370077,
+            0.14632083335891366,
+            0.1452668746933341,
+            0.14705891581252217,
+            0.15278095845133066,
+            0.1633052909746766,
+            0.16808462515473366,
+            0.17627624981105328,
+            0.1847395421937108,
+            0.19163045939058065,
+            0.1973750414326787
+          ],
+          "reference_seconds": 0.14705891581252217,
+          "samples": [
+            0.052046457305550575,
+            0.05727849993854761,
+            0.05547625012695789,
+            0.06193808279931545,
+            0.057638959027826786,
+            0.057165291626006365,
+            0.05826625041663647,
+            0.07179337507113814,
+            0.05742679163813591,
+            0.061871751211583614,
+            0.0664727920666337,
+            0.06342287501320243,
+            0.06382804084569216,
+            0.068809874355793,
+            0.07097358349710703
+          ],
+          "seconds": 0.061871751211583614
+        },
+        "linear_attn.in_proj_qkv": {
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "reference_samples": [
+            0.14657454192638397,
+            0.14518995815888047,
+            0.14349337480962276,
+            0.1431705830618739,
+            0.14361437503248453,
+            0.14454300003126264,
+            0.14479212509468198,
+            0.1489656250923872,
+            0.15398212522268295,
+            0.16113095777109265,
+            0.16571941692382097,
+            0.16988795809447765,
+            0.17877950007095933,
+            0.19471504213288426,
+            0.2024905001744628
+          ],
+          "reference_seconds": 0.1489656250923872,
+          "rows": 10240,
+          "samples": [
+            0.0013675414957106113,
+            0.0016752919182181358,
+            0.0017939158715307713,
+            0.0020199166610836983,
+            0.001959459390491247,
+            0.0016072089783847332,
+            0.0024489578790962696,
+            0.0032606245949864388,
+            0.006559124682098627,
+            0.002393541857600212,
+            0.006718083284795284,
+            0.004976584110409021,
+            0.011177291627973318,
+            0.0039899577386677265,
+            0.004473249893635511
+          ],
+          "seconds": 0.0024489578790962696,
+          "shipped": "lut23_bt4_packed_k5",
+          "threadgroups": 640
+        },
+        "linear_attn.in_proj_z": {
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "reference_samples": [
+            0.14650062518194318,
+            0.14503400027751923,
+            0.14357916684821248,
+            0.1437454167753458,
+            0.1430770419538021,
+            0.14459775015711784,
+            0.14505654200911522,
+            0.14659466687589884,
+            0.15395454177632928,
+            0.16072658309713006,
+            0.16481300024315715,
+            0.16983049968257546,
+            0.18301512487232685,
+            0.19652295904234052,
+            0.20615679118782282
+          ],
+          "reference_seconds": 0.14659466687589884,
+          "rows": 6144,
+          "samples": [
+            0.0074212090112268925,
+            0.007966834120452404,
+            0.009171000216156244,
+            0.008791124913841486,
+            0.009689833037555218,
+            0.009328584186732769,
+            0.01020475011318922,
+            0.01079391734674573,
+            0.008126041386276484,
+            0.011740041896700859,
+            0.01293479185551405,
+            0.011712417006492615,
+            0.015899500343948603,
+            0.0130728748627007,
+            0.008190792053937912
+          ],
+          "seconds": 0.009689833037555218,
+          "shipped": "lut23_bt4_packed_k10",
+          "threadgroups": 384
+        },
+        "linear_attn.out_proj": {
+          "columns": 6144,
+          "dispatches_per_token": 64,
+          "reference_samples": [
+            0.1471637082286179,
+            0.14564325008541346,
+            0.14331020787358284,
+            0.1433896250091493,
+            0.1447986662387848,
+            0.1446418333798647,
+            0.14456741698086262,
+            0.1445115003734827,
+            0.1514353328384459,
+            0.16091120801866055,
+            0.17138929199427366,
+            0.17399924993515015,
+            0.18024741625413299,
+            0.19388183299452066,
+            0.19801404094323516
+          ],
+          "reference_seconds": 0.1471637082286179,
+          "rows": 5120,
+          "samples": [
+            0.008142499718815088,
+            0.008654916658997536,
+            0.009512250311672688,
+            0.009283999912440777,
+            0.009136125911027193,
+            0.009867874905467033,
+            0.010469248984009027,
+            0.011001999489963055,
+            0.010235626250505447,
+            0.009910083841532469,
+            0.008158165961503983,
+            0.011787625029683113,
+            0.013828459195792675,
+            0.01040620869025588,
+            0.014422251377254725
+          ],
+          "seconds": 0.009910083841532469,
+          "shipped": "lut23_bt4_packed_k12",
+          "threadgroups": 320
+        },
+        "lm_head": {
+          "columns": 5120,
+          "dispatches_per_token": 1,
+          "reference_samples": [
+            0.1458629579283297,
+            0.14619329199194908,
+            0.14777295803651214,
+            0.14568841690197587,
+            0.14712304109707475,
+            0.14416720811277628,
+            0.14549704175442457,
+            0.146421458106488,
+            0.16171141667291522,
+            0.16311408393085003,
+            0.16729804128408432,
+            0.17580387508496642,
+            0.1846480001695454,
+            0.19321829173713923,
+            0.19932283321395516
+          ],
+          "reference_seconds": 0.14777295803651214,
+          "rows": 248320,
+          "samples": [
+            0.0003175418823957443,
+            -0.001132042147219181,
+            -0.0021817488595843315,
+            -0.0007248329930007458,
+            -0.000820498913526535,
+            0.0020142081193625927,
+            8.816597983241081e-05,
+            0.0010036248713731766,
+            -0.0005855835042893887,
+            1.791398972272873e-06,
+            8.870894089341164e-05,
+            0.0002093748189508915,
+            0.0044123330153524876,
+            -0.0011639166623353958,
+            -0.0017326674424111843
+          ],
+          "seconds": 1.791398972272873e-06,
+          "shipped": "lut23_bt4_packed",
+          "threadgroups": 15520
+        },
+        "mlp.down_proj": {
+          "columns": 17408,
+          "dispatches_per_token": 64,
+          "reference_samples": [
+            0.14720408292487264,
+            0.1455781669355929,
+            0.14405575022101402,
+            0.14289995795115829,
+            0.1441845828667283,
+            0.14499504072591662,
+            0.1450371672399342,
+            0.14685699995607138,
+            0.15368062490597367,
+            0.16045687487348914,
+            0.16231975005939603,
+            0.17660579178482294,
+            0.1862130002118647,
+            0.19283408392220736,
+            0.20068687526509166
+          ],
+          "reference_seconds": 0.14720408292487264,
+          "rows": 5120,
+          "samples": [
+            0.022939042188227177,
+            0.023116499185562134,
+            0.02526845782995224,
+            0.025386625435203314,
+            0.025348166935145855,
+            0.025494042318314314,
+            0.026220499072223902,
+            0.026417541783303022,
+            0.02529004216194153,
+            0.02645529108121991,
+            0.028245958033949137,
+            0.02996812527999282,
+            0.027518582995980978,
+            0.03876654105260968,
+            0.028655416797846556
+          ],
+          "seconds": 0.026220499072223902,
+          "shipped": "lut23_bt4_packed_k8",
+          "threadgroups": 320
+        },
+        "mlp.gate_proj": {
+          "columns": 5120,
+          "dispatches_per_token": 128,
+          "reference_samples": [
+            0.14640816720202565,
+            0.14541195798665285,
+            0.14505199994891882,
+            0.1450052079744637,
+            0.14584762509912252,
+            0.14469225006178021,
+            0.14812229201197624,
+            0.15151183307170868,
+            0.1602044589817524,
+            0.16320504201576114,
+            0.16988262487575412,
+            0.17439774982631207,
+            0.18040137505158782,
+            0.19415666721761227,
+            0.19611045811325312
+          ],
+          "reference_seconds": 0.15151183307170868,
+          "rows": 17408,
+          "samples": [
+            0.012208790984004736,
+            0.013288375921547413,
+            0.014044041745364666,
+            0.01450437493622303,
+            0.013823125045746565,
+            0.02844499982893467,
+            0.014010291080921888,
+            0.016747666522860527,
+            0.014765499159693718,
+            0.014811625238507986,
+            0.014983541332185268,
+            0.01697716722264886,
+            0.01965170819312334,
+            0.018081374932080507,
+            0.021225417032837868
+          ],
+          "seconds": 0.014811625238507986,
+          "shipped": "lut23_bt4_packed_k2",
+          "threadgroups": 1088
+        },
+        "self_attn.q_proj": {
+          "columns": 5120,
+          "dispatches_per_token": 16,
+          "reference_samples": [
+            0.14628104120492935,
+            0.14533129194751382,
+            0.1444212500937283,
+            0.14543800009414554,
+            0.14462691685184836,
+            0.14386700000613928,
+            0.1457030000165105,
+            0.15187045792117715,
+            0.15640024980530143,
+            0.16249816585332155,
+            0.17057208390906453,
+            0.17438783310353756,
+            0.1816458748653531,
+            0.18757679080590606,
+            0.20583016658201814
+          ],
+          "reference_seconds": 0.15187045792117715,
+          "rows": 12288,
+          "samples": [
+            0.0014987918548285961,
+            0.0008926251903176308,
+            0.0029589999467134476,
+            0.0012517082504928112,
+            0.0017695827409625053,
+            0.0018499158322811127,
+            0.003245083149522543,
+            0.0017739171162247658,
+            0.005666292272508144,
+            0.0027255010791122913,
+            0.007053915876895189,
+            0.0015404997393488884,
+            -0.00021691713482141495,
+            0.005706750322133303,
+            0.004811083432286978
+          ],
+          "seconds": 0.0018499158322811127,
+          "shipped": "lut23_bt4_packed_k5",
+          "threadgroups": 768
+        }
+      },
+      "block": "gemm_8x32",
+      "layers_moved": 369,
+      "members": [
+        "linear_attn.out_proj",
+        "mlp.down_proj",
+        "linear_attn.in_proj_z",
+        "linear_attn.in_proj_qkv",
+        "self_attn.q_proj",
+        "mlp.gate_proj",
+        "lm_head"
+      ],
+      "sum_of_parts_seconds": 0.06493270630016923
+    },
+    "8": {
+      "additivity": 1.051313600569482,
+      "arm": "gemm_8x32k32s1x2_frag_epi_tgt",
+      "arms": {
+        "bucket": {
+          "reference_samples": [
+            0.09844641573727131,
+            0.0987129588611424,
+            0.09896874986588955,
+            0.09904650039970875,
+            0.0989879579283297,
+            0.0992618752643466,
+            0.09910491574555635,
+            0.09914266690611839,
+            0.10029825009405613,
+            0.10146133275702596,
+            0.10223841713741422,
+            0.10507558425888419,
+            0.10437562502920628,
+            0.10455437516793609,
+            0.10380866657942533
+          ],
+          "reference_seconds": 0.0992618752643466,
+          "samples": [
+            -0.008265832904726267,
+            -0.008233625907450914,
+            -0.00834566680714488,
+            -0.007748916279524565,
+            -0.007788623683154583,
+            -0.008465667255222797,
+            -0.007929374929517508,
+            -0.007991666905581951,
+            -0.00829254137352109,
+            -0.008438749704509974,
+            -0.008222583215683699,
+            -0.010044293478131294,
+            -0.009150166995823383,
+            -0.009605832863599062,
+            -0.00881874980404973
+          ],
+          "seconds": -0.00829254137352109
+        },
+        "linear_attn.in_proj_qkv": {
+          "columns": 5120,
+          "dispatches_per_token": 48,
+          "reference_samples": [
+            0.09850083431228995,
+            0.09854325000196695,
+            0.09884062502533197,
+            0.09902995778247714,
+            0.09902545902878046,
+            0.09900316596031189,
+            0.0988819170743227,
+            0.09917379077523947,
+            0.10046283341944218,
+            0.1015003751963377,
+            0.10177620779722929,
+            0.10335062490776181,
+            0.10437345784157515,
+            0.1042912919074297,
+            0.10375604219734669
+          ],
+          "reference_seconds": 0.09917379077523947,
+          "rows": 10240,
+          "samples": [
+            -0.0015777512453496456,
+            -0.001721290871500969,
+            -0.0015467503108084202,
+            -0.0014409157447516918,
+            -0.001576875802129507,
+            -0.0013068746775388718,
+            -0.0012175417505204678,
+            -0.0012998734600842,
+            -0.0013669165782630444,
+            -0.0009952913969755173,
+            -0.0008300826884806156,
+            -0.001651332713663578,
+            -0.002063207793980837,
+            -0.0018126671202480793,
+            -0.0022580833174288273
+          ],
+          "seconds": -0.0015467503108084202,
+          "shipped": "lut23_bt4_packed_k10",
+          "threadgroups": 320
+        },
+        "lm_head": {
+          "columns": 5120,
+          "dispatches_per_token": 1,
+          "reference_samples": [
+            0.09833412524312735,
+            0.09882304072380066,
+            0.09854537528008223,
+            0.09882954182103276,
+            0.0991254998371005,
+            0.09904175018891692,
+            0.09898945922031999,
+            0.0989407910965383,
+            0.09972116723656654,
+            0.10105291707441211,
+            0.10328358272090554,
+            0.10348412487655878,
+            0.10431700013577938,
+            0.10405437462031841,
+            0.10371712502092123
+          ],
+          "reference_seconds": 0.0991254998371005,
+          "rows": 248320,
+          "samples": [
+            0.00036641675978899,
+            -8.133286610245705e-05,
+            0.0005416246131062508,
+            0.00019616633653640747,
+            0.00015624985098838806,
+            6.404193118214607e-05,
+            0.0004497077316045761,
+            0.00032625067979097366,
+            0.00014454079791903496,
+            0.00013345805928111076,
+            -0.00016195792704820633,
+            0.0009094579145312309,
+            0.00046179164201021194,
+            -0.0009102919138967991,
+            -0.00047737499698996544
+          ],
+          "seconds": 0.00015624985098838806,
+          "shipped": "lut23_bt4_packed",
+          "threadgroups": 7760
+        },
+        "mlp.gate_proj": {
+          "columns": 5120,
+          "dispatches_per_token": 128,
+          "reference_samples": [
+            0.09845058340579271,
+            0.09870029101148248,
+            0.09898916678503156,
+            0.09896524995565414,
+            0.0992079577408731,
+            0.09928274992853403,
+            0.09872625023126602,
+            0.09877833304926753,
+            0.09952449984848499,
+            0.10206437529996037,
+            0.10254749981686473,
+            0.10348316607996821,
+            0.10430708294734359,
+            0.10380579205229878,
+            0.1038558748550713
+          ],
+          "reference_seconds": 0.09928274992853403,
+          "rows": 17408,
+          "samples": [
+            -0.005875792354345322,
+            -0.004730540793389082,
+            -0.0063207088969647884,
+            -0.0059266663156449795,
+            -0.006028290372341871,
+            -0.005990291014313698,
+            -0.005629540886729956,
+            -0.005374290980398655,
+            -0.006015291903167963,
+            -0.00597033416852355,
+            -0.005727208219468594,
+            -0.006099832709878683,
+            -0.006759165786206722,
+            -0.006752833258360624,
+            -0.006322749890387058
+          ],
+          "seconds": -0.005990291014313698,
+          "shipped": "lut23_bt4_packed_k5",
+          "threadgroups": 544
+        },
+        "self_attn.q_proj": {
+          "columns": 5120,
+          "dispatches_per_token": 16,
+          "reference_samples": [
+            0.09847887512296438,
+            0.09867254085838795,
+            0.09839599998667836,
+            0.09860820835456252,
+            0.09897691709920764,
+            0.09916491573676467,
+            0.09889054065570235,
+            0.09914804203435779,
+            0.10097024962306023,
+            0.10202983301132917,
+            0.10230987519025803,
+            0.10368274990469217,
+            0.10440862504765391,
+            0.10372808389365673,
+            0.10376150021329522
+          ],
+          "reference_seconds": 0.09916491573676467,
+          "rows": 12288,
+          "samples": [
+            -0.0006506247445940971,
+            -0.0005069989711046219,
+            -0.0009498330764472485,
+            -0.0002477504312992096,
+            -0.0005383752286434174,
+            -0.0004914156161248684,
+            -0.00045720720663666725,
+            -0.000539291650056839,
+            -0.0005803336389362812,
+            -0.0006713736802339554,
+            0.0001843748614192009,
+            -0.00025570858269929886,
+            -0.0004442906938493252,
+            -8.66670161485672e-05,
+            -0.0007973331958055496
+          ],
+          "seconds": -0.0005069989711046219,
+          "shipped": "lut23_bt4_packed_k8",
+          "threadgroups": 384
+        }
+      },
+      "block": "gemm_8x32",
+      "layers_moved": 193,
+      "members": [
+        "linear_attn.in_proj_qkv",
+        "self_attn.q_proj",
+        "mlp.gate_proj",
+        "lm_head"
+      ],
+      "sum_of_parts_seconds": -0.007887790445238352
+    }
+  },
+  "mode": "bucket",
+  "rounds": 15,
+  "schema_version": 2,
+  "seed": 20260809,
+  "warmup_passes": 2
+}

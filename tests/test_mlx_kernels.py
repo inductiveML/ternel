@@ -41,6 +41,7 @@ from ternel_mlx.kernels import (
 from ternel_mlx.layout import PackedTensorLayout
 from ternel_mlx.packing import pack_blocks, unpack_blocks, validate_packed_codes
 from ternel_mlx.reference import (
+    decode_reordered_weights,
     get_rows_reference,
     lut23_matmul,
     oracle_matmul,
@@ -55,7 +56,7 @@ NEUTRAL_BYTE = sum(POWERS)
 TAIL_TRITS = BLOCK_SIZE - FULL_CODE_SLOTS * TRITS_PER_SLOT
 NEUTRAL_TAIL = sum(POWERS[:TAIL_TRITS])
 
-FAST = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=False)
+FAST = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=False, k_split=1)
 
 
 def build(trits: np.ndarray, scale_bits: np.ndarray, *, rows: int, columns: int):
@@ -196,7 +197,7 @@ def test_kernel_is_bit_exact_against_the_lut23_reference(
     generator = np.random.default_rng(rows + columns + batch)
     x = generator.normal(0.0, 1.0, size=(batch, columns)).astype(np.float32)
     config = MatmulConfig(
-        threads=256, batch_tile=batch_tile, padded_lut=True, safe_clamp=False
+        threads=256, batch_tile=batch_tile, padded_lut=True, safe_clamp=False, k_split=1
     )
     got = run(codes, scales, x, layout=layout, config=config)
     np.testing.assert_array_equal(got, lut23_matmul(codes, scales, x, layout=layout))
@@ -208,7 +209,7 @@ def test_padded_and_unpadded_tables_agree_exactly(padded_lut: bool) -> None:
     generator = np.random.default_rng(77)
     x = generator.normal(0.0, 1.0, size=(4, 640)).astype(np.float32)
     config = MatmulConfig(
-        threads=256, batch_tile=2, padded_lut=padded_lut, safe_clamp=False
+        threads=256, batch_tile=2, padded_lut=padded_lut, safe_clamp=False, k_split=1
     )
     got = run(codes, scales, x, layout=layout, config=config)
     np.testing.assert_array_equal(got, lut23_matmul(codes, scales, x, layout=layout))
@@ -220,7 +221,7 @@ def test_safe_clamp_does_not_change_results_on_legal_data(safe_clamp: bool) -> N
     generator = np.random.default_rng(91)
     x = generator.normal(0.0, 1.0, size=(2, 384)).astype(np.float32)
     config = MatmulConfig(
-        threads=256, batch_tile=2, padded_lut=True, safe_clamp=safe_clamp
+        threads=256, batch_tile=2, padded_lut=True, safe_clamp=safe_clamp, k_split=1
     )
     got = run(codes, scales, x, layout=layout, config=config)
     np.testing.assert_array_equal(got, lut23_matmul(codes, scales, x, layout=layout))
@@ -549,7 +550,7 @@ def test_safe_clamp_keeps_malformed_bytes_inside_the_tables() -> None:
     corrupted[:, :, :FULL_CODE_SLOTS, :] = 255
     corrupted[:, :, FULL_CODE_SLOTS, :] = 255
     x = np.ones((1, 256), dtype=np.float32)
-    config = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=True)
+    config = MatmulConfig(threads=256, batch_tile=1, padded_lut=True, safe_clamp=True, k_split=1)
     got = run(corrupted, scales, x, layout=layout, config=config)
 
     clamped = corrupted.copy()
@@ -590,13 +591,173 @@ def test_packing_is_deterministic() -> None:
 
 
 def test_batch_tile_is_capped_by_threadgroup_memory() -> None:
-    assert MatmulConfig(threads=256, batch_tile=4, padded_lut=True, safe_clamp=False)
+    assert MatmulConfig(threads=256, batch_tile=4, padded_lut=True, safe_clamp=False, k_split=1)
     with pytest.raises(FormatError, match="threadgroup memory"):
-        MatmulConfig(threads=256, batch_tile=8, padded_lut=True, safe_clamp=False)
+        MatmulConfig(threads=256, batch_tile=8, padded_lut=True, safe_clamp=False, k_split=1)
     # Unpadded tables are small enough that a batch tile of 8 does fit.
-    assert MatmulConfig(threads=256, batch_tile=8, padded_lut=False, safe_clamp=False)
+    assert MatmulConfig(threads=256, batch_tile=8, padded_lut=False, safe_clamp=False, k_split=1)
     with pytest.raises(FormatError, match="threadgroup memory"):
-        MatmulConfig(threads=256, batch_tile=16, padded_lut=False, safe_clamp=False)
+        MatmulConfig(threads=256, batch_tile=16, padded_lut=False, safe_clamp=False, k_split=1)
+
+
+# --------------------------------------------------------------------------
+# The K-axis split
+# --------------------------------------------------------------------------
+
+# The group counts the model actually has, and for each *every* legal split of
+# it -- a split has to divide the group count, so this is the complete set the
+# kernel can ever be asked for at that count.
+#
+# Exhaustive rather than sampled because the alternative is a coverage claim
+# with a moving target. Which splits ship is decided by
+# ``SPLIT_K_THREADGROUPS`` against each tensor's threadgroup count, so a sample
+# chosen to match today's rule silently stops covering it the moment that
+# ceiling moves -- and it has moved once already, from 320 to 800, which changed
+# five of the nine shapes' splits. Enumerating the divisors costs 17 distinct
+# template instantiations per batch tile and makes the coverage independent of
+# the rule.
+GROUP_COUNTS = (40, 48, 136)
+SPLIT_CASES = tuple(
+    (groups, tuple(k for k in range(2, groups + 1) if groups % k == 0))
+    for groups in GROUP_COUNTS
+)
+
+
+def split_config(k_split: int, *, batch_tile: int = 1) -> MatmulConfig:
+    return MatmulConfig(
+        threads=256, batch_tile=batch_tile, padded_lut=True, safe_clamp=False, k_split=k_split
+    )
+
+
+@pytest.mark.parametrize(("groups_per_row", "splits"), SPLIT_CASES)
+def test_splitting_the_k_axis_does_not_change_exact_arithmetic(
+    groups_per_row: int, splits: tuple[int, ...]
+) -> None:
+    """Where the sum is exact, reordering it must change nothing at all.
+
+    Splitting K reassociates the accumulation: the unsplit kernel adds all ``G``
+    group sums into one fp32 accumulator in order, while a split of ``k`` adds
+    ``k`` contiguous runs and then adds those. Reassociating fp32 addition is
+    normally visible in the last bits, which would let a real boundary bug hide
+    inside a tolerance.
+
+    So the arithmetic is made exact instead. Every scale is 1.0 and every
+    activation is +1 or -1, which makes each group sum an integer in
+    ``[-128, 128]`` and each row total an integer no larger than ``136 * 128``
+    -- far inside fp32's exactly-representable range. Any difference between a
+    split and the unsplit answer is then a difference in *which* weights were
+    summed, not in how they rounded, and ``assert_array_equal`` catches it.
+    """
+    rows, columns = 256, groups_per_row * BLOCK_SIZE
+    layout = PackedTensorLayout.for_tensor(rows, columns)
+    generator = np.random.default_rng(groups_per_row)
+    ones = np.full(layout.groups, 1.0, dtype=np.float16).view(np.uint8).reshape(-1, 2)
+    trits = generator.integers(0, 3, size=(layout.groups, BLOCK_SIZE), dtype=np.uint8)
+    layout, codes, scales = build(trits, ones, rows=rows, columns=columns)
+
+    x = generator.choice((-1.0, 1.0), size=(3, columns)).astype(np.float32)
+    whole = run(codes, scales, x, layout=layout, config=split_config(1))
+    # The premise of the construction: nothing here needed rounding.
+    assert np.array_equal(whole, np.rint(whole))
+    assert np.abs(whole).max() <= groups_per_row * BLOCK_SIZE
+
+    for k_split in splits:
+        got = run(codes, scales, x, layout=layout, config=split_config(k_split))
+        np.testing.assert_array_equal(got, whole, err_msg=f"k_split={k_split}")
+
+
+@pytest.mark.parametrize(("groups_per_row", "splits"), SPLIT_CASES)
+@pytest.mark.parametrize("batch_tile", (1, 4))
+def test_a_split_stays_inside_the_fp32_summation_bound(
+    groups_per_row: int, splits: tuple[int, ...], batch_tile: int
+) -> None:
+    """On ordinary data a split rounds differently, and the difference is bounded.
+
+    A tolerance taken from the unsplit run would be circular here, and one taken
+    from the answer's own magnitude would be wrong: these dot products cancel, so
+    the terms are far larger than the total and the rounding is set by the terms.
+    The bound used instead is the textbook one for summing ``n`` floats in
+    sequence -- ``n * eps * sum|terms|`` -- with ``sum|terms|`` computed exactly
+    as ``|W| @ |x|`` in float64 and ``n`` the longest chain either arm can have,
+    the 128 weights of a group plus the ``G`` group sums after it. Splitting only
+    reassociates that chain, and never lengthens it, so the same bound holds for
+    every arm and is not tuned to any of them.
+
+    It is loose by construction -- the real error uses under a tenth of a percent
+    of it, because rounding accumulates as a walk rather than in one direction --
+    and it still has teeth. A chunk boundary that drops or repeats a group is
+    caught if any single element notices, and measuring every group of these
+    three shapes that way, even the quietest lands 154x outside its element's
+    bound. The exact-arithmetic test above is what pins the boundaries down;
+    this one asks whether ordinary floating-point data stays sane.
+    """
+    rows, columns = 256, groups_per_row * BLOCK_SIZE
+    layout, codes, scales = random_tensor(rows, columns, seed=groups_per_row * 7 + batch_tile)
+    generator = np.random.default_rng(groups_per_row + batch_tile)
+    x = generator.normal(0.0, 1.0, size=(4, columns)).astype(np.float32)
+
+    oracle = oracle_matmul(codes, scales, x, layout=layout)
+    weights = decode_reordered_weights(codes, scales, layout=layout, dtype=np.dtype(np.float64))
+    terms = np.abs(x.astype(np.float64)) @ np.abs(weights).T
+    bound = (BLOCK_SIZE + groups_per_row) * float(np.finfo(np.float32).eps) * terms
+
+    whole = run(codes, scales, x, layout=layout, config=split_config(1, batch_tile=batch_tile))
+    unsplit = float(np.abs(whole - oracle).max())
+    assert unsplit <= float(bound.max()), f"the unsplit arm itself is outside the bound: {unsplit}"
+
+    for k_split in splits:
+        got = run(
+            codes, scales, x, layout=layout, config=split_config(k_split, batch_tile=batch_tile)
+        )
+        error = np.abs(got - oracle)
+        assert (error <= bound).all(), (
+            f"k_split={k_split} bt={batch_tile} exceeded the summation bound by "
+            f"{float((error / bound).max()):.3f}x; the unsplit arm reached {unsplit:.3e}"
+        )
+
+
+@pytest.mark.parametrize("k_split", (2, 8, 40))
+def test_a_split_result_is_bit_identical_between_runs(k_split: int) -> None:
+    """The reduction is ``mx.sum``, not a float atomic, for exactly this reason.
+
+    Atomic adds arrive in whatever order the scheduler produces, so a rerun of
+    the same prompt would round differently and a greedy continuation could
+    diverge from itself. The artifact gate asserts identical continuations, so
+    that would not be a small cost.
+    """
+    layout, codes, scales = random_tensor(256, 5120, seed=k_split + 900)
+    generator = np.random.default_rng(k_split)
+    x = generator.normal(0.0, 1.0, size=(2, 5120)).astype(np.float32)
+    config = split_config(k_split)
+    first = run(codes, scales, x, layout=layout, config=config)
+    for _ in range(3):
+        np.testing.assert_array_equal(run(codes, scales, x, layout=layout, config=config), first)
+
+
+def test_a_split_that_does_not_divide_the_group_count_is_rejected() -> None:
+    """Ragged chunks are refused rather than padded.
+
+    A ceiling division would leave the last threadgroup holding fewer groups --
+    or none -- while the rest hold a full chunk, and a dispatch ends when its
+    slowest threadgroup does. The extra threadgroups would shorten nothing, so
+    the caller is told its split is not one rather than quietly given it.
+    """
+    layout, codes, scales = random_tensor(256, 5120, seed=311)
+    x = np.zeros((1, 5120), dtype=np.float32)
+    assert layout.groups_per_row == 40
+    with pytest.raises(FormatError, match="does not divide the tensor's 40 groups"):
+        run(codes, scales, x, layout=layout, config=split_config(3))
+
+
+def test_a_split_names_itself_apart_from_the_sweep_it_was_added_after() -> None:
+    assert split_config(1).benchmark_name == "lut23_bt1_padded"
+    assert split_config(8).benchmark_name == "lut23_bt1_padded_k8"
+
+
+@pytest.mark.parametrize("k_split", (0, -1))
+def test_a_non_positive_split_is_rejected(k_split: int) -> None:
+    with pytest.raises(FormatError, match="k split must be positive"):
+        split_config(k_split)
 
 
 def test_threadgroup_budget_matches_the_documented_table_sizes() -> None:
@@ -608,7 +769,7 @@ def test_threadgroup_budget_matches_the_documented_table_sizes() -> None:
 @pytest.mark.parametrize("threads", (0, -32, 100))
 def test_thread_count_must_be_a_whole_number_of_simdgroups(threads: int) -> None:
     with pytest.raises(FormatError, match="simdgroup"):
-        MatmulConfig(threads=threads, batch_tile=1, padded_lut=True, safe_clamp=False)
+        MatmulConfig(threads=threads, batch_tile=1, padded_lut=True, safe_clamp=False, k_split=1)
 
 
 def test_matmul_rejects_mismatched_shapes_and_dtypes() -> None:

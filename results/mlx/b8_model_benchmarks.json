@@ -13,56 +13,56 @@
       "processes": [
         {
           "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
-          "cpu_percent": 10.2,
+          "cpu_percent": 8.9,
           "pid": 592,
-          "rss_kib": 115200
+          "rss_kib": 127328
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 5.1,
+          "cpu_percent": 4.2,
           "pid": 1197,
-          "rss_kib": 155584
+          "rss_kib": 159504
         },
         {
           "command": ".venv/bin/python3 (this repository)",
-          "cpu_percent": 3.2,
-          "pid": 62970,
-          "rss_kib": 2521168
+          "cpu_percent": 2.6,
+          "pid": 76076,
+          "rss_kib": 4077088
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 2.6,
-          "pid": 85044,
-          "rss_kib": 119168
+          "cpu_percent": 1.3,
+          "pid": 33607,
+          "rss_kib": 512800
         },
         {
           "command": "[redacted third-party process]",
           "cpu_percent": 1.2,
-          "pid": 19896,
-          "rss_kib": 225712
-        },
-        {
-          "command": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor",
-          "cpu_percent": 1.1,
-          "pid": 1203,
-          "rss_kib": 43520
+          "pid": 637,
+          "rss_kib": 190400
         },
         {
           "command": "[redacted third-party process]",
           "cpu_percent": 1.1,
-          "pid": 22758,
-          "rss_kib": 329328
+          "pid": 165,
+          "rss_kib": 337392
         },
         {
           "command": "[redacted third-party process]",
           "cpu_percent": 1.1,
-          "pid": 22757,
-          "rss_kib": 273776
+          "pid": 164,
+          "rss_kib": 335072
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 1.1,
+          "pid": 166,
+          "rss_kib": 324192
         }
       ],
       "returncode": 0
     },
-    "captured_at_utc": "2026-08-11T16:14:01.369789+00:00",
+    "captured_at_utc": "2026-08-15T13:30:39.492472+00:00",
     "gpu": {
       "adapters": [
         {
@@ -78,15 +78,10 @@
       "returncode": 0
     },
     "gpu_contention": {
-      "busiest_share": 0.0029131094865679392,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0029131094865679392,
-          "pid": 85044
-        }
-      ],
-      "seconds": 3.000888583250344
+      "busiest_share": 0.0,
+      "clients": [],
+      "seconds": 3.040246957913041,
+      "total_share": 0
     },
     "metal_compiler": {
       "command": [
@@ -102,7 +97,7 @@
     },
     "mlx": {
       "active_memory_bytes": 13459216398,
-      "cache_memory_bytes": 539043028,
+      "cache_memory_bytes": 573398724,
       "default_device": "Device(gpu, 0)",
       "device_info": {
         "architecture": "applegpu_g16s",
@@ -144,7 +139,7 @@
       "hw.perflevel0.logicalcpu": "12",
       "hw.perflevel1.logicalcpu": "4",
       "machdep.cpu.brand_string": "Apple M4 Max",
-      "vm.loadavg": "{ 1.77 1.55 1.71 }"
+      "vm.loadavg": "{ 1.28 1.46 1.62 }"
     },
     "thermal": {
       "command": [
@@ -179,57 +174,57 @@
     "busiest_processes": {
       "processes": [
         {
-          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
-          "cpu_percent": 15.0,
-          "pid": 592,
-          "rss_kib": 220432
+          "command": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/corespotlightd",
+          "cpu_percent": 29.2,
+          "pid": 1046,
+          "rss_kib": 216544
         },
         {
-          "command": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow",
-          "cpu_percent": 12.1,
-          "pid": 595,
-          "rss_kib": 69728
+          "command": "/usr/libexec/spotlightknowledged.updater",
+          "cpu_percent": 18.7,
+          "pid": 92734,
+          "rss_kib": 35792
+        },
+        {
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+          "cpu_percent": 8.8,
+          "pid": 592,
+          "rss_kib": 235504
+        },
+        {
+          "command": "/usr/libexec/dasd",
+          "cpu_percent": 7.4,
+          "pid": 571,
+          "rss_kib": 24960
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 4.4,
+          "pid": 1197,
+          "rss_kib": 187664
         },
         {
           "command": ".venv/bin/python3 (this repository)",
-          "cpu_percent": 11.1,
-          "pid": 62970,
-          "rss_kib": 90784
+          "cpu_percent": 3.6,
+          "pid": 76076,
+          "rss_kib": 91136
+        },
+        {
+          "command": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor",
+          "cpu_percent": 1.2,
+          "pid": 1203,
+          "rss_kib": 49360
         },
         {
           "command": "[redacted third-party process]",
-          "cpu_percent": 8.0,
-          "pid": 86468,
-          "rss_kib": 827776
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 5.3,
-          "pid": 1197,
-          "rss_kib": 180224
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 5.2,
-          "pid": 62138,
-          "rss_kib": 953552
-        },
-        {
-          "command": "/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter",
-          "cpu_percent": 3.4,
-          "pid": 1036,
-          "rss_kib": 80592
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 2.9,
-          "pid": 85044,
-          "rss_kib": 149712
+          "cpu_percent": 1.0,
+          "pid": 164,
+          "rss_kib": 351248
         }
       ],
       "returncode": 0
     },
-    "captured_at_utc": "2026-08-11T15:46:59.538854+00:00",
+    "captured_at_utc": "2026-08-15T13:04:26.881149+00:00",
     "gpu": {
       "adapters": [
         {
@@ -245,15 +240,10 @@
       "returncode": 0
     },
     "gpu_contention": {
-      "busiest_share": 0.010076081975649001,
-      "clients": [
-        {
-          "command": "loginwindow",
-          "gpu_share": 0.010076081975649001,
-          "pid": 595
-        }
-      ],
-      "seconds": 3.010135792195797
+      "busiest_share": 0.0,
+      "clients": [],
+      "seconds": 3.0321377282962203,
+      "total_share": 0
     },
     "metal_compiler": {
       "command": [
@@ -311,7 +301,7 @@
       "hw.perflevel0.logicalcpu": "12",
       "hw.perflevel1.logicalcpu": "4",
       "machdep.cpu.brand_string": "Apple M4 Max",
-      "vm.loadavg": "{ 1.79 1.63 1.72 }"
+      "vm.loadavg": "{ 1.72 2.39 2.46 }"
     },
     "thermal": {
       "command": [
@@ -344,99 +334,103 @@
   },
   "gpu_contention": [
     {
-      "busiest_share": 0.0004413560957549186,
+      "busiest_share": 1.0183812159808217e-05,
       "clients": [
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.0004413560957549186,
-          "pid": 85044
-        },
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 6.740123370797664e-05,
+          "gpu_share": 1.0183812159808217e-05,
           "pid": 1310
         }
       ],
       "label": "probe candidate",
-      "seconds": 14.822310290765017
+      "seconds": 10.920075729489326,
+      "timed_seconds": 10.899384082760662,
+      "total_share": 1.0183812159808217e-05
     },
     {
-      "busiest_share": 0.00035568312079680537,
-      "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.00035568312079680537,
-          "pid": 1310
-        }
-      ],
+      "busiest_share": 0.0,
+      "clients": [],
       "label": "probe reference",
-      "seconds": 10.046043208334595
+      "seconds": 12.596033187583089,
+      "timed_seconds": 12.578233459033072,
+      "total_share": 0
     },
     {
-      "busiest_share": 0.00034667402369626386,
+      "busiest_share": 0.00020532768910463855,
       "clients": [
-        {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.00034667402369626386,
-          "pid": 85044
-        },
         {
           "command": "loginwindow",
-          "gpu_share": 0.0001552155772381302,
+          "gpu_share": 0.00020532768910463855,
           "pid": 595
         },
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.00012441974507832842,
+          "gpu_share": 0.00011633883335849464,
           "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 2.3147044509416508e-05,
+          "pid": 6322
         }
       ],
       "label": "pp32_tg64",
-      "seconds": 203.71129987481982
+      "seconds": 185.47547174990177,
+      "timed_seconds": 185.45072320802137,
+      "total_share": 0.0003448135669725497
     },
     {
-      "busiest_share": 0.00036144682489314155,
+      "busiest_share": 0.0006610218779484972,
       "clients": [
         {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.00036144682489314155,
-          "pid": 85044
-        },
-        {
           "command": "loginwindow",
-          "gpu_share": 0.0003466007535925803,
+          "gpu_share": 0.0006610218779484972,
           "pid": 595
         },
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.00030561678483919996,
+          "gpu_share": 0.00043757354490426686,
           "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 3.070694256761653e-05,
+          "pid": 6322
         }
       ],
       "label": "pp512_tg64",
-      "seconds": 383.47411141591147
+      "seconds": 363.9920508330688,
+      "timed_seconds": 363.9699891661294,
+      "total_share": 0.0011293023654203806
     },
     {
-      "busiest_share": 0.0020228771728494337,
+      "busiest_share": 0.0006222581622294523,
       "clients": [
         {
-          "command": "[redacted third-party process]",
-          "gpu_share": 0.0020228771728494337,
-          "pid": 85044
-        },
-        {
           "command": "loginwindow",
-          "gpu_share": 0.0007139861706755132,
+          "gpu_share": 0.0006222581622294523,
           "pid": 595
         },
         {
           "command": "[redacted third-party process]",
-          "gpu_share": 0.0004187062103053197,
+          "gpu_share": 0.0005194628719787385,
           "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 6.368496147620912e-05,
+          "pid": 6322
+        },
+        {
+          "command": "Spotlight",
+          "gpu_share": 2.0729158156196914e-06,
+          "pid": 9895
         }
       ],
       "label": "pp2048_tg64",
-      "seconds": 1001.6889281249605
+      "seconds": 991.7595227500424,
+      "timed_seconds": 991.7372697908431,
+      "total_share": 0.0012074789115000197
     }
   ],
   "layout_name": "TQ1_G128_MLX_TILED",
@@ -446,9 +440,9 @@
     "active_memory_saving": 0.22190828166187726,
     "candidate": {
       "after_generation": {
-        "active_memory_bytes": 5909531460,
-        "cache_memory_bytes": 206687756,
-        "peak_memory_bytes": 6266291793
+        "active_memory_bytes": 5894118420,
+        "cache_memory_bytes": 256461628,
+        "peak_memory_bytes": 6278019153
       },
       "census": {
         "by_dtype": {
@@ -486,12 +480,12 @@
         "unpacked_bytes": 5291008
       },
       "cold": {
-        "decode_seconds": 2.868552166968584,
-        "generated_tokens_per_second": 21.962298864718527,
-        "prompt_tokens_per_second": 76.22306767642044,
-        "time_to_first_token_seconds": 0.4198204162530601
+        "decode_seconds": 1.78495387500152,
+        "generated_tokens_per_second": 35.29502968245964,
+        "prompt_tokens_per_second": 90.37197255104549,
+        "time_to_first_token_seconds": 0.354092082940042
       },
-      "cold_minus_warm_seconds": 0.09249925008043647,
+      "cold_minus_warm_seconds": 0.04184191580861807,
       "device_info": {
         "architecture": "applegpu_g16s",
         "device_name": "Apple M4 Max",
@@ -500,13 +494,13 @@
         "memory_size": 51539607552,
         "resource_limit": 499000
       },
-      "load_seconds": 1.165393500123173,
+      "load_seconds": 1.5626076250337064,
       "path": "artifacts/ternel-mlx",
       "process": {
-        "note": "macOS exposes no per-process GPU accounting; on unified memory the resident size of the process is the closest honest proxy",
-        "peak_resident_bytes": 6447955968,
+        "note": "on unified memory there is no separate VRAM figure to read, so the resident size of the process is the closest honest proxy for what the model costs the machine; the IO registry accounts GPU time per process but not GPU memory per process",
+        "peak_resident_bytes": 6489423872,
         "poll_seconds": 0.25,
-        "resident_samples": 56
+        "resident_samples": 41
       },
       "quantization_declared": false,
       "resident": {
@@ -516,11 +510,11 @@
       },
       "tokens_prompted": 32,
       "warm": {
-        "decode_seconds": 2.8270465000532568,
-        "generated_tokens_per_second": 22.284741336519645,
-        "prompt_tokens_per_second": 86.76158329393903,
+        "decode_seconds": 1.781372374854982,
+        "generated_tokens_per_second": 35.36599134985952,
+        "prompt_tokens_per_second": 101.31979568672241,
         "runs": 3,
-        "time_to_first_token_seconds": 0.36882683308795094
+        "time_to_first_token_seconds": 0.31583166727796197
       }
     },
     "measured": "one model per process, nothing else resident",
@@ -531,8 +525,8 @@
     "parameter_saving": 0.22206688171120725,
     "reference": {
       "after_generation": {
-        "active_memory_bytes": 7592165564,
-        "cache_memory_bytes": 205266508,
+        "active_memory_bytes": 7600192080,
+        "cache_memory_bytes": 197321912,
         "peak_memory_bytes": 7940484445
       },
       "census": {
@@ -566,12 +560,12 @@
         "unpacked_bytes": 7569046528
       },
       "cold": {
-        "decode_seconds": 1.3300640829838812,
-        "generated_tokens_per_second": 47.36613882442797,
-        "prompt_tokens_per_second": 157.24397164822923,
-        "time_to_first_token_seconds": 0.2035054168663919
+        "decode_seconds": 1.925980041269213,
+        "generated_tokens_per_second": 32.71061934706408,
+        "prompt_tokens_per_second": 133.16798325465746,
+        "time_to_first_token_seconds": 0.24029799969866872
       },
-      "cold_minus_warm_seconds": -0.29304341692477465,
+      "cold_minus_warm_seconds": -0.6013692091219127,
       "device_info": {
         "architecture": "applegpu_g16s",
         "device_name": "Apple M4 Max",
@@ -580,13 +574,13 @@
         "memory_size": 51539607552,
         "resource_limit": 499000
       },
-      "load_seconds": 1.9120040833950043,
+      "load_seconds": 1.3523786668665707,
       "path": "artifacts/baseline-mlx-2bit",
       "process": {
-        "note": "macOS exposes no per-process GPU accounting; on unified memory the resident size of the process is the closest honest proxy",
-        "peak_resident_bytes": 8150990848,
+        "note": "on unified memory there is no separate VRAM figure to read, so the resident size of the process is the closest honest proxy for what the model costs the machine; the IO registry accounts GPU time per process but not GPU memory per process",
+        "peak_resident_bytes": 8150827008,
         "poll_seconds": 0.25,
-        "resident_samples": 37
+        "resident_samples": 47
       },
       "quantization_declared": true,
       "resident": {
@@ -596,11 +590,11 @@
       },
       "tokens_prompted": 32,
       "warm": {
-        "decode_seconds": 1.6192856249399483,
-        "generated_tokens_per_second": 38.90604537561826,
-        "prompt_tokens_per_second": 154.3453334906416,
+        "decode_seconds": 2.4229618329554796,
+        "generated_tokens_per_second": 26.0012349939305,
+        "prompt_tokens_per_second": 92.8382763217698,
         "runs": 3,
-        "time_to_first_token_seconds": 0.20732729183509946
+        "time_to_first_token_seconds": 0.3446854171343148
       }
     }
   },
@@ -612,222 +606,222 @@
   "workloads": [
     {
       "affine_2bit_rates": {
-        "decode_seconds": 2.3680922084022313,
-        "generated_tokens_per_second": 26.603693798944825,
-        "prompt_tokens_per_second": 113.78354287806344,
-        "time_to_first_token_seconds": 0.2812357498332858
+        "decode_seconds": 2.4389248334337026,
+        "generated_tokens_per_second": 25.831054379525032,
+        "prompt_tokens_per_second": 90.03315409806089,
+        "time_to_first_token_seconds": 0.35542462463490665
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 2.3520465110739073,
-          "median": 2.3680922084022313,
-          "p5": 2.1314710170729088,
-          "p95": 2.654073374904692,
-          "std": 0.17357868833149462
+          "mean": 2.4530086043290793,
+          "median": 2.4389248334337026,
+          "p5": 2.2387606814270837,
+          "p95": 2.649248534021899,
+          "std": 0.11516132427209949
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.3057622259470694,
-            1.3972597691142314
+            0.9397593313031601,
+            0.9943249915138586
           ],
-          "median": 1.3336004177979042,
+          "median": 0.9615410299901871,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.168384640120591,
-          "median": 3.137902936898172,
-          "p5": 3.073411456053145,
-          "p95": 3.2774172874866054,
-          "std": 0.09289265194433466
+          "mean": 2.3681647181821366,
+          "median": 2.3408697713166475,
+          "p5": 2.2872729170834645,
+          "p95": 2.5008390438975767,
+          "std": 0.07420715468204597
         },
-        "speedup_vs_affine_2bit": 0.754673505211445
+        "speedup_vs_affine_2bit": 1.0418883029370332
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp32_tg64",
       "packed_rates": {
-        "decode_seconds": 3.137902936898172,
-        "generated_tokens_per_second": 20.077102850821678,
-        "prompt_tokens_per_second": 50.0728762167419,
-        "time_to_first_token_seconds": 0.6390685420483351
+        "decode_seconds": 2.3408697713166475,
+        "generated_tokens_per_second": 26.91307341055755,
+        "prompt_tokens_per_second": 51.89111178766652,
+        "time_to_first_token_seconds": 0.6166759373154491
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 0.2923789861922463,
-          "median": 0.2812357498332858,
-          "p5": 0.2260043730493635,
-          "p95": 0.3631187500664964,
-          "std": 0.05928708101357365
+          "mean": 0.3515330819102625,
+          "median": 0.35542462463490665,
+          "p5": 0.32062438151333483,
+          "p95": 0.39086151858791707,
+          "std": 0.022528368741646074
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.854238197399532,
-            2.6889288630100805
+            1.6942093594819447,
+            1.8329670734820338
           ],
-          "median": 1.926260616149127,
+          "median": 1.744908993581297,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 0.5733480960285912,
-          "median": 0.6390685420483351,
-          "p5": 0.43633548356592655,
-          "p95": 0.7324642651248723,
-          "std": 0.12710507573700852
+          "mean": 0.6202757817693054,
+          "median": 0.6166759373154491,
+          "p5": 0.5865669497288764,
+          "p95": 0.664970914227888,
+          "std": 0.024935976030002662
         },
-        "speedup_vs_affine_2bit": 0.44007134028514727
+        "speedup_vs_affine_2bit": 0.5763555915318548
       },
       "prompt_tokens": 32,
       "trials": 30
     },
     {
       "affine_2bit_rates": {
-        "decode_seconds": 1.8713520204182714,
-        "generated_tokens_per_second": 33.66549922869065,
-        "prompt_tokens_per_second": 151.7413421135222,
-        "time_to_first_token_seconds": 3.3741628541611135
+        "decode_seconds": 1.8993829172104597,
+        "generated_tokens_per_second": 33.168667270381334,
+        "prompt_tokens_per_second": 145.91884999289562,
+        "time_to_first_token_seconds": 3.5087995829526335
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 1.8713312415095666,
-          "median": 1.8713520204182714,
-          "p5": 1.79851286013145,
-          "p95": 1.942590729170479,
-          "std": 0.0488547403902121
+          "mean": 1.8996928819920869,
+          "median": 1.8993829172104597,
+          "p5": 1.8431910288985818,
+          "p95": 1.9717810730217025,
+          "std": 0.04245369536105402
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.550981115959009,
-            1.5893717510910994
+            1.0423583578624955,
+            1.0646383964308743
           ],
-          "median": 1.5662788053240344,
+          "median": 1.0520703875588822,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 2.936436277736599,
-          "median": 2.930248021148145,
-          "p5": 2.9104596270946788,
-          "p95": 2.997602328727953,
-          "std": 0.02519619774357956
+          "mean": 2.0004317389645925,
+          "median": 1.9970664579886943,
+          "p5": 1.9761804957408458,
+          "p95": 2.040412368508987,
+          "std": 0.02032071937348251
         },
-        "speedup_vs_affine_2bit": 0.6386326368663593
+        "speedup_vs_affine_2bit": 0.9510864846848338
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp512_tg64",
       "packed_rates": {
-        "decode_seconds": 2.930248021148145,
-        "generated_tokens_per_second": 21.499886543841093,
-        "prompt_tokens_per_second": 135.36693063054304,
-        "time_to_first_token_seconds": 3.7823122502304614
+        "decode_seconds": 1.9970664579886943,
+        "generated_tokens_per_second": 31.54627115586789,
+        "prompt_tokens_per_second": 130.6361004317293,
+        "time_to_first_token_seconds": 3.9192841665353626
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 3.371667312690988,
-          "median": 3.3741628541611135,
-          "p5": 3.246328279818408,
-          "p95": 3.496773173403926,
-          "std": 0.08630830013356101
+          "mean": 3.5287714110066495,
+          "median": 3.5087995829526335,
+          "p5": 3.4337712496751918,
+          "p95": 3.6715320769464594,
+          "std": 0.07735696306878684
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.1106665084207081,
-            1.1378909347414354
+            1.1060708466674962,
+            1.127865843063555
           ],
-          "median": 1.121967525553829,
+          "median": 1.1161384491799817,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.8064661028639724,
-          "median": 3.7823122502304614,
-          "p5": 3.6706981253810227,
-          "p95": 3.965499731292948,
-          "std": 0.09344241053568375
+          "mean": 3.942127188791831,
+          "median": 3.9192841665353626,
+          "p5": 3.854763983562589,
+          "p95": 4.087847687117756,
+          "std": 0.07013976262204258
         },
-        "speedup_vs_affine_2bit": 0.8920899785456691
+        "speedup_vs_affine_2bit": 0.895265419362129
       },
       "prompt_tokens": 512,
       "trials": 30
     },
     {
       "affine_2bit_rates": {
-        "decode_seconds": 1.94545783335343,
-        "generated_tokens_per_second": 32.38312284127252,
-        "prompt_tokens_per_second": 171.7136000106676,
-        "time_to_first_token_seconds": 11.926836312748492
+        "decode_seconds": 1.9829905829392374,
+        "generated_tokens_per_second": 31.77019625913697,
+        "prompt_tokens_per_second": 167.37354737379408,
+        "time_to_first_token_seconds": 12.236103208269924
       },
       "decode": {
         "affine_2bit_seconds": {
-          "mean": 1.9430252763908356,
-          "median": 1.94545783335343,
-          "p5": 1.8711797746131196,
-          "p95": 2.0062805209308863,
-          "std": 0.044369536715384926
+          "mean": 1.9922922095749527,
+          "median": 1.9829905829392374,
+          "p5": 1.94235980596859,
+          "p95": 2.051792893768288,
+          "std": 0.04820957679765214
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.5489547533198333,
-            1.5806888146718858
+            1.0721547113668892,
+            1.0917816783181824
           ],
-          "median": 1.559107021879592,
+          "median": 1.0822496452460673,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 3.0396134444046767,
-          "median": 3.0343365627340972,
-          "p5": 3.014206149918027,
-          "p95": 3.0780914528761056,
-          "std": 0.02598475821611639
+          "mean": 2.1549823485935726,
+          "median": 2.1494638335425407,
+          "p5": 2.1099617584375663,
+          "p95": 2.2314394790213554,
+          "std": 0.039997612773277506
         },
-        "speedup_vs_affine_2bit": 0.6411476753259269
+        "speedup_vs_affine_2bit": 0.9225512669692432
       },
       "generate_tokens": 64,
       "greedy_common_prefix": 64,
       "greedy_continuations_identical": true,
       "label": "pp2048_tg64",
       "packed_rates": {
-        "decode_seconds": 3.0343365627340972,
-        "generated_tokens_per_second": 20.7623639294758,
-        "prompt_tokens_per_second": 142.35435515702616,
-        "time_to_first_token_seconds": 14.386633958201855
+        "decode_seconds": 2.1494638335425407,
+        "generated_tokens_per_second": 29.309634810728323,
+        "prompt_tokens_per_second": 140.0196070481228,
+        "time_to_first_token_seconds": 14.626522979000583
       },
       "prefill": {
         "affine_2bit_seconds": {
-          "mean": 11.92214162768796,
-          "median": 11.926836312748492,
-          "p5": 11.801317487447523,
-          "p95": 12.049782115989364,
-          "std": 0.0816447130619371
+          "mean": 12.233127793110906,
+          "median": 12.236103208269924,
+          "p5": 12.067585742264054,
+          "p95": 12.411266007926315,
+          "std": 0.10622999794388976
         },
         "bootstrap_candidate_over_reference": {
           "ci95": [
-            1.2006482943701575,
-            1.2138452206758261
+            1.1906717352980534,
+            1.2001150917270946
           ],
-          "median": 1.2065360441468769,
+          "median": 1.1953419316772973,
           "method": "paired bootstrap of ratio of medians",
           "samples": 100000,
           "seed": 20260811
         },
         "packed_seconds": {
-          "mean": 14.391290655499324,
-          "median": 14.386633958201855,
-          "p5": 14.218918776814826,
-          "p95": 14.573992129624822,
-          "std": 0.11027349758426494
+          "mean": 14.618248474985982,
+          "median": 14.626522979000583,
+          "p5": 14.433832408091984,
+          "p95": 14.765883862739429,
+          "std": 0.0919926030625483
         },
-        "speedup_vs_affine_2bit": 0.8290220177562085
+        "speedup_vs_affine_2bit": 0.836569513194448
       },
       "prompt_tokens": 2048,
       "trials": 30
