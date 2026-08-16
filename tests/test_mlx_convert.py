@@ -1,15 +1,13 @@
 """Gates on the safetensors writer and the sidecar-to-artifact converter.
 
 The writer is the one place in Ternel that produces bytes MLX will later read,
-so it is checked against MLX's own loader rather than only against Ternel's, and
-the ``model_file`` shim is imported through the exact ``spec_from_file_location``
-call ``mlx_lm.utils.load_model`` makes -- which is the only way to find out
-whether a checkpoint's imports actually resolve.
+so it is checked against MLX's own loader rather than only against Ternel's.
+The emitted ``model_file`` has its own gates in ``test_mlx_model_file.py``,
+where it is imported the exact way ``mlx_lm.utils.load_model`` imports it.
 """
 
 from __future__ import annotations
 
-import importlib.util
 import json
 from pathlib import Path
 
@@ -19,19 +17,18 @@ import pytest
 
 from bonsai_tq1.format import BLOCK_BYTES, BLOCK_SIZE, FormatError
 from bonsai_tq1.gguf_utils import TensorInfo
-from ternel_mlx import LAYOUT_NAME, LAYOUT_VERSION
+from ternel_mlx import LAYOUT_NAME
 from ternel_mlx.convert import (
     CONFIG_NAME,
-    MODEL_FILE_NAME,
     QUANTISATION_KEYS,
     SidecarTensor,
     artifact_config,
     read_canonical_blocks,
     reorder_blocks,
     sha256_bytes,
-    write_model_file,
 )
 from ternel_mlx.layout import PackedTensorLayout
+from ternel_mlx.model_file import MODEL_FILE_NAME, write_model_file
 from ternel_mlx.naming import HeadLayout, MappedTensor, map_gguf_name
 from ternel_mlx.packed_model import ACTIVATION_DTYPE_KEY
 from ternel_mlx.remote_safetensors import LocalSafetensors
@@ -295,35 +292,6 @@ def test_artifact_config_strips_every_claim_the_artifact_does_not_meet() -> None
 def test_artifact_config_refuses_a_baseline_without_a_text_config() -> None:
     with pytest.raises(FormatError):
         artifact_config({"model_type": "qwen3_5"}, activation_dtype="bfloat16")
-
-
-def test_the_model_file_imports_the_way_mlx_lm_imports_it(tmp_path: Path) -> None:
-    """The failure this catches: an artifact whose ``model_file`` cannot import.
-
-    ``load_model`` loads the file by path under the name ``custom_model``, with
-    no package and without the model directory on ``sys.path``, so sibling
-    modules copied beside it would not resolve. Executing it exactly that way is
-    the only check that the emitted checkpoint is loadable at all.
-    """
-    pytest.importorskip("mlx.core")
-    record = write_model_file(tmp_path)
-    path = tmp_path / MODEL_FILE_NAME
-    assert record == {
-        "name": MODEL_FILE_NAME,
-        "sha256": sha256_bytes(np.frombuffer(path.read_bytes(), dtype=np.uint8)),
-        "requires": f"ternel_mlx>={LAYOUT_VERSION}",
-    }
-
-    spec = importlib.util.spec_from_file_location("custom_model", path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    from ternel_mlx.packed_model import Model, ModelArgs
-
-    assert module.Model is Model
-    assert module.ModelArgs is ModelArgs
-    assert LAYOUT_NAME in (module.__doc__ or "")
 
 
 def test_the_emitted_config_names_a_model_file_that_exists(tmp_path: Path) -> None:

@@ -1,6 +1,6 @@
 {
   "candidate": {
-    "active_memory_bytes": 5894118424,
+    "active_memory_bytes": 5889743888,
     "census": {
       "by_dtype": {
         "float16": {
@@ -36,7 +36,7 @@
       "total_bytes": 5888211968,
       "unpacked_bytes": 5291008
     },
-    "load_seconds": 1.1341590420342982,
+    "load_seconds": 1.918444000184536,
     "path": "artifacts/ternel-mlx",
     "peak_memory_bytes": 6605017866,
     "quantization_declared": false,
@@ -48,56 +48,56 @@
       "processes": [
         {
           "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
-          "cpu_percent": 14.6,
+          "cpu_percent": 10.9,
           "pid": 592,
-          "rss_kib": 235536
+          "rss_kib": 348400
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 10.9,
+          "pid": 9127,
+          "rss_kib": 137600
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 9.5,
+          "pid": 33607,
+          "rss_kib": 1474576
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 7.8,
+          "pid": 1310,
+          "rss_kib": 288032
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 6.3,
+          "pid": 9559,
+          "rss_kib": 731344
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 5.5,
+          "pid": 1197,
+          "rss_kib": 198528
+        },
+        {
+          "command": "[redacted third-party process]",
+          "cpu_percent": 3.4,
+          "pid": 6852,
+          "rss_kib": 928448
         },
         {
           "command": ".venv/bin/python3 (this repository)",
-          "cpu_percent": 13.9,
-          "pid": 74756,
-          "rss_kib": 90624
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 5.2,
-          "pid": 1197,
-          "rss_kib": 187744
-        },
-        {
-          "command": "/sbin/launchd",
-          "cpu_percent": 2.2,
-          "pid": 1,
-          "rss_kib": 24272
-        },
-        {
-          "command": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor",
-          "cpu_percent": 1.9,
-          "pid": 1203,
-          "rss_kib": 49328
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 1.4,
-          "pid": 96076,
-          "rss_kib": 408448
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 1.1,
-          "pid": 165,
-          "rss_kib": 345296
-        },
-        {
-          "command": "[redacted third-party process]",
-          "cpu_percent": 1.1,
-          "pid": 164,
-          "rss_kib": 349056
+          "cpu_percent": 2.4,
+          "pid": 17891,
+          "rss_kib": 90736
         }
       ],
       "returncode": 0
     },
-    "captured_at_utc": "2026-08-15T13:03:18.067714+00:00",
+    "captured_at_utc": "2026-08-16T14:02:23.302878+00:00",
     "gpu": {
       "adapters": [
         {
@@ -113,10 +113,21 @@
       "returncode": 0
     },
     "gpu_contention": {
-      "busiest_share": 0.0,
-      "clients": [],
-      "seconds": 3.034991541877389,
-      "total_share": 0
+      "busiest_share": 0.08433130004764143,
+      "clients": [
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.08433130004764143,
+          "pid": 1310
+        },
+        {
+          "command": "[redacted third-party process]",
+          "gpu_share": 0.03970918276226276,
+          "pid": 9127
+        }
+      ],
+      "seconds": 3.031631895340979,
+      "total_share": 0.12404048280990419
     },
     "metal_compiler": {
       "command": [
@@ -174,7 +185,7 @@
       "hw.perflevel0.logicalcpu": "12",
       "hw.perflevel1.logicalcpu": "4",
       "machdep.cpu.brand_string": "Apple M4 Max",
-      "vm.loadavg": "{ 1.18 2.48 2.50 }"
+      "vm.loadavg": "{ 2.40 3.11 3.37 }"
     },
     "thermal": {
       "command": [
@@ -776,7 +787,7 @@
     "numeric"
   ],
   "reference": {
-    "active_memory_bytes": 7628630162,
+    "active_memory_bytes": 7570504730,
     "census": {
       "by_dtype": {
         "float16": {
@@ -807,9 +818,9 @@
       "total_bytes": 7569046528,
       "unpacked_bytes": 7569046528
     },
-    "load_seconds": 1.9266002499498427,
+    "load_seconds": 2.17578429216519,
     "path": "artifacts/baseline-mlx-2bit",
-    "peak_memory_bytes": 8198195286,
+    "peak_memory_bytes": 8198228054,
     "quantization_declared": true,
     "vocabulary": 248320
   },

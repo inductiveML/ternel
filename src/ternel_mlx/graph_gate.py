@@ -82,7 +82,6 @@ from . import LAYOUT_NAME, LAYOUT_VERSION
 from .convert import MANIFEST_NAME
 from .environment import capture_environment
 from .kernel_gate import compare
-from .modules import PackedEmbedding, PackedLinear
 
 SCHEMA_VERSION = 1
 
@@ -247,6 +246,10 @@ def parameter_census(model) -> dict[str, object]:
     still be checked after ``load_model`` has done whatever it was going to do.
     A packed graph that had been dequantised would still answer every logit
     question correctly and would fail here.
+
+    The module count matches on class name and buffer dtypes rather than on
+    ``ternel_mlx.modules``'s class objects: the artifact's ``model_file`` is
+    self-contained, so the classes in a graph it loaded are its own.
     """
     from mlx.utils import tree_flatten
 
@@ -262,11 +265,17 @@ def parameter_census(model) -> dict[str, object]:
             largest_float = {"name": name, "elements": int(array.size)}
 
     modules = {"PackedLinear": 0, "PackedEmbedding": 0}
-    for _, module in model.named_modules():
-        if isinstance(module, PackedLinear):
-            modules["PackedLinear"] += 1
-        elif isinstance(module, PackedEmbedding):
-            modules["PackedEmbedding"] += 1
+    for name, module in model.named_modules():
+        kind = type(module).__name__
+        if kind not in modules:
+            continue
+        codes = getattr(module, "codes", None)
+        scales = getattr(module, "scales", None)
+        if not isinstance(codes, mx.array) or codes.dtype != mx.uint8:
+            raise FormatError(f"{name} is a {kind} without uint8 ternary codes")
+        if not isinstance(scales, mx.array) or scales.dtype != mx.uint16:
+            raise FormatError(f"{name} is a {kind} without uint16 scale bits")
+        modules[kind] += 1
 
     return {
         "by_dtype": by_dtype,

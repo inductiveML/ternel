@@ -54,6 +54,7 @@ from bonsai_tq1.gguf_utils import load_tensor_infos
 
 from . import LAYOUT_NAME, LAYOUT_VERSION
 from .layout import CODES_SUFFIX, PackedTensorLayout, SCALES_SUFFIX
+from .model_file import MODEL_FILE_NAME, write_model_file
 from .naming import (
     HeadAxis,
     HeadLayout,
@@ -77,36 +78,6 @@ SCHEMA_VERSION = 1
 MANIFEST_NAME = "ternel_manifest.json"
 CONFIG_NAME = "config.json"
 INDEX_NAME = "model.safetensors.index.json"
-
-# The file ``mlx_lm.utils.load_model`` imports ``Model`` and ``ModelArgs`` from,
-# named by ``config["model_file"]``. It is loaded by path under the module name
-# ``custom_model``, with no package and without the model directory on
-# ``sys.path``, so it can only import from installed packages -- which is why it
-# is a shim onto Ternel rather than a copy of it.
-MODEL_FILE_NAME = "ternel_packed_model.py"
-
-MODEL_FILE_TEMPLATE = '''"""The classes ``mlx_lm.utils.load_model`` imports for this checkpoint.
-
-``config.json`` names this file in ``model_file``. mlx-lm loads it by path and
-takes ``Model`` and ``ModelArgs`` from it.
-
-Both come from the installed Ternel package, which this checkpoint requires
-rather than merely benefits from: its weights are {layout_name} blocks in a
-tiled layout that only Ternel's Metal kernels can read, and there is no
-dequantised copy to fall back to. Vendoring those kernels beside the weights
-would create a second definition of the format, free to drift from the one the
-artifact was verified against.
-
-    pip install ternel
-    mlx_lm.generate --model <this directory> --prompt "..."
-
-Written by ``ternel_mlx.convert`` for layout {layout_name} v{layout_version}.
-"""
-
-from ternel_mlx.packed_model import Model, ModelArgs
-
-__all__ = ["Model", "ModelArgs"]
-'''
 
 # Config keys that assert a quantisation mlx-lm would act on. ``load_model``
 # calls ``nn.quantize`` when it sees ``quantization``, and promotes
@@ -332,17 +303,6 @@ def copy_companions(baseline_dir: Path, out_dir: Path) -> list[str]:
         shutil.copyfile(source, out_dir / name)
         copied.append(name)
     return copied
-
-
-def write_model_file(out_dir: Path) -> dict[str, str]:
-    """Write the ``model_file`` mlx-lm imports, and hash what was written."""
-    text = MODEL_FILE_TEMPLATE.format(layout_name=LAYOUT_NAME, layout_version=LAYOUT_VERSION)
-    (out_dir / MODEL_FILE_NAME).write_text(text, encoding="utf-8")
-    return {
-        "name": MODEL_FILE_NAME,
-        "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "requires": f"ternel_mlx>={LAYOUT_VERSION}",
-    }
 
 
 def convert(

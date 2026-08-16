@@ -1,7 +1,8 @@
 """``mlx-ternel-generate`` -- run a packed TQ1_G128 model from the command line.
 
-The artifact carries a ``model_file`` pointing at :mod:`ternel_mlx.packed_model`,
-so ``mlx_lm.load`` builds the packed graph on its own and everything downstream
+The artifact carries a self-contained ``model_file`` emitted by
+:mod:`ternel_mlx.model_file`, so ``mlx_lm.load`` builds the packed graph on its
+own without this package installed and everything downstream
 of it -- the tokenizer, the chat template, the sampler, the KV cache -- is stock
 mlx-lm. This module is therefore deliberately thin: its job is to be the entry
 point ``uvx --from ternel`` exposes, not to reimplement generation.
@@ -20,8 +21,6 @@ import mlx.nn as nn
 
 from bonsai_tq1.format import FormatError
 
-from .modules import PackedEmbedding, PackedLinear
-
 
 def count_packed_modules(model: nn.Module) -> tuple[int, int]:
     """Count packed leaves and the bytes they hold.
@@ -29,13 +28,24 @@ def count_packed_modules(model: nn.Module) -> tuple[int, int]:
     Reported before generation because it is the claim under test: if a
     dequantised copy had been made anywhere, the byte count here would not be
     the artifact's payload size.
+
+    The match is on class name and buffer dtypes rather than on
+    ``ternel_mlx.modules``'s class objects: the artifact's ``model_file`` is
+    self-contained, so the classes in a graph it loaded are its own.
     """
     modules = 0
     payload = 0
-    for _, module in model.named_modules():
-        if isinstance(module, (PackedLinear, PackedEmbedding)):
-            modules += 1
-            payload += module.codes.nbytes + module.scales.nbytes
+    for name, module in model.named_modules():
+        if type(module).__name__ not in ("PackedLinear", "PackedEmbedding"):
+            continue
+        codes = getattr(module, "codes", None)
+        scales = getattr(module, "scales", None)
+        if not isinstance(codes, mx.array) or codes.dtype != mx.uint8:
+            raise FormatError(f"{name} has no uint8 ternary codes")
+        if not isinstance(scales, mx.array) or scales.dtype != mx.uint16:
+            raise FormatError(f"{name} has no uint16 scale bits")
+        modules += 1
+        payload += codes.nbytes + scales.nbytes
     return modules, payload
 
 
