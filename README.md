@@ -1,163 +1,98 @@
 # Ternel
 
-Ternel develops native, lossless execution formats for ternary language
-models. The first completed branch losslessly repacks the released PrismML
-Ternary Bonsai 27B Q2_0/g128 weights into a directly consumable base-3 CUDA
-format.
+Ternel builds native, lossless execution formats for ternary language models.
+`TQ1_G128` stores each group of 128 ternary weights in 28 bytes — two raw FP16
+scale bytes plus 26 base-3 code bytes — for **1.75 bits/weight**, and custom
+kernels execute the packed bytes directly: no weight is ever dequantized into a
+model-sized buffer.
 
-The next development target is an MLX/Metal distribution for Apple Silicon.
-See the self-contained [`MLX_HANDOFF_PROMPT.md`](MLX_HANDOFF_PROMPT.md) before
-continuing that work.
+The shipped result is
+[**Ternary Bonsai 27B — MLX, lossless, 1.75 bits/weight**](https://huggingface.co/inductiveML/Ternary-Bonsai-27B-mlx-lossless-1.75bpw):
+the same ternary weights as PrismML's official distribution, verified bit-exact
+over all 26,893,352,960 of them, emitting token-for-token identical greedy
+output while holding 22.19% less live memory (5.89 GB against 7.57 GB during
+generation, measured on an M4 Max).
 
-## Patched llama.cpp distribution
+## Run it
 
-The native format now has a validated single-file GGUF distribution path.
-`Ternary-Bonsai-27B-TQ1_G128.gguf` is 5,904,496,192 bytes with SHA-256
-`45f30340690a6cfd135f76f3d6e2d717d0cd059ff8187daa5bdd0c258e469101`.
-It preserves every ternary value and FP16 scale bit, but requires the supplied
-patch against the pinned Prism commit; an unpatched stock llama.cpp does not
-know experimental GGML type 43.
-
-Build the tested user-facing binary:
+Any Apple Silicon Mac with 16 GB+ unified memory:
 
 ```bash
-uv sync --extra dev --frozen
-uv run python tools/bootstrap_prism.py
-cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=89
-cmake --build build \
-  --target llama-app llama-bench validate-llama-distribution -j 16
+pip install mlx-lm
+mlx_lm.generate --model inductiveML/Ternary-Bonsai-27B-mlx-lossless-1.75bpw \
+  --prompt "Explain what a ternary weight is." --max-tokens 256
 ```
 
-Run it like a normal local model:
+The checkpoint carries its own model code (`ternel_packed_model.py`, generated
+from this repository); the model card documents the audit trail. From this
+repository the equivalent entry point is:
 
 ```bash
-build/bin/llama cli \
-  -m artifacts/models/Ternary-Bonsai-27B-TQ1_G128.gguf \
-  -ngl all -sm none --temp 0 \
-  -p "The capital of France is" -n 64 --single-turn
+uv run mlx-ternel-generate \
+  --model inductiveML/Ternary-Bonsai-27B-mlx-lossless-1.75bpw \
+  --prompt "Explain what a ternary weight is." \
+  --max-tokens 256 --temperature 0.0 --chat-template
 ```
 
-The end-to-end result on RTX 6000 Ada saves 17.29% in the CUDA model buffer
-and 13.65% in observed process VRAM for pp32/tg64. Decode latency was 1.0730x
-Q2 (7.30% slower); the scalar-prefill fallback was 8.0187x Q2. Exhaustive file
-parity, 8,194,560 full-graph logits, all 33 greedy decisions, and ordinary
-`llama cli` generation passed. See
-[`reports_dist/FINAL_REPORT.md`](reports_dist/FINAL_REPORT.md) and apply
-[`patches/prism-tq1-g128-distribution.patch`](patches/prism-tq1-g128-distribution.patch).
+## The MLX result
 
-Rebuild the distributable GGUF from the verified canonical sidecar:
+Full narrative in [`reports_mlx/FINAL_REPORT.md`](reports_mlx/FINAL_REPORT.md);
+every gate's machine-readable record is under [`results/mlx/`](results/mlx/).
 
-```bash
-uv run python tools/convert_tq1_gguf.py \
-  artifacts/models/Ternary-Bonsai-27B-Q2_0.gguf \
-  artifacts/packed/Ternary-Bonsai-27B-Q2_0.gguf.tq1g128 \
-  artifacts/models/Ternary-Bonsai-27B-TQ1_G128.gguf \
-  --result artifacts/results_dist/conversion.json
+- **Storage**: 5,888,388,744 bytes against the official mlx-2bit's
+  8,490,785,104 (1.75 vs 2.25 bits/weight on quantised tensors).
+- **Fidelity**: zero mismatches across 26,893,352,960 ternary weights and
+  210,104,320 raw FP16 scale groups against the pinned source GGUF;
+  teacher-forced logits argmax-identical at all 343 tested positions
+  (max KL 4.8×10⁻⁵ nats); greedy generation token-identical, 576/576.
+- **Memory**: 22.19% less live memory during generation.
+- **Speed**: decode at 0.89–0.96× the official 2-bit checkpoint, prefill at
+  0.64–0.87× — a memory-density result, not a speed win, stated as such.
+- **Kernels**: three Metal kernels via `mx.fast.metal_kernel` (single-vector,
+  batched with split-K, embedding lookup) executing packed base-3 bytes through
+  a threadgroup LUT; the artifact ships a self-contained `model_file` so stock
+  `mlx-lm >= 0.31.3` loads it with nothing else installed.
 
-uv run python tools/verify_distributed_gguf.py \
-  artifacts/models/Ternary-Bonsai-27B-Q2_0.gguf \
-  artifacts/packed/Ternary-Bonsai-27B-Q2_0.gguf.tq1g128 \
-  artifacts/models/Ternary-Bonsai-27B-TQ1_G128.gguf \
-  --result artifacts/results_dist/file_parity.json
-```
+## The format
 
-V1 remains frozen at **`PACKING_ONLY_KERNEL_FAIL`**. Packing passes: all
-26,893,352,960 weights and 210,104,320 FP16 scale groups round-trip exactly,
-and the projected file falls from 7,165,121,600 to 5,904,495,680 bytes. On an
-idle RTX 6000 Ada, direct TQ1 V1 is 5.41% faster cold-ish but 72.97% slower
-warm-cache; the required worse ratio is 1.729730×, above the 1.20 failure
-threshold. See [`reports/FINAL_REPORT.md`](reports/FINAL_REPORT.md).
+Each 28-byte `TQ1_G128` block holds the original two FP16 scale bytes and 26
+base-3 bytes: 25 encode five trits each, the final byte encodes three. Decoding
+rejects code bytes above 242, a tail byte above 26, and any non-ternary source
+code, fail-closed. Conversion is a re-encoding of released weights — no
+training, requantization, pruning, or full-matrix decompression anywhere.
 
-The cache-realistic V2 follow-up is also closed:
-**`STREAMING_TQ1_FAIL`**. A 497-GEMV real model-order traversal touches
-6,805,831,680 Q2 bytes or 5,604,802,560 TQ1 bytes. Its idle-GPU medians are
-8.972416 ms (Q2) and 11.273168 ms (TQ1), a 1.256425× ratio. The cache
-explanation therefore failed for that frozen branch. See
-[`reports_v2/FINAL_REPORT.md`](reports_v2/FINAL_REPORT.md). Those historical
-reports remain hash-frozen; the later distribution work is reported separately
-under `reports_dist/`.
+## Reproduce and audit
 
-## Reproducible environment
-
-Python 3.12 and every Python dependency/entry point are managed by
-[`uv`](https://docs.astral.sh/uv/). Native CUDA is built by CMake/NVCC under the
-Python orchestrator.
+Python 3.12 and every dependency are managed by
+[`uv`](https://docs.astral.sh/uv/):
 
 ```bash
-uv sync --extra dev --frozen
+uv sync --extra dev --extra convert --frozen
 uv run pytest
 ```
+
+Conversion, exhaustive verification, and the benchmark gates live under
+[`src/ternel_mlx/`](src/ternel_mlx/) (`convert.py`, `verify.py`,
+`graph_gate.py`, `bench_model.py`); every argument is explicit and every stage
+fails closed, capturing its environment — hardware, thermals, and GPU
+contention — into its result document.
 
 Pinned inputs:
 
 - Model repository: `prism-ml/Ternary-Bonsai-27B-gguf`
 - Model revision: `abbae723028d71be674e71e1a71201a6f43fab22`
 - Model SHA-256: `868c11714cf8fe47f5ec9eeb2be0ab1a337112886f92ee0ede6b855c4fa31757`
-- Prism llama.cpp commit: `9ca265a57f85f2117942490f421f64a226dd9847`
+- Non-quantised tensors: `prism-ml/Ternary-Bonsai-27B-mlx-2bit`, cross-checked
+  numerically against their GGUF F32 counterparts
 
-## Single runner
+## Earlier CUDA branch (frozen)
 
-Run every gate in order:
-
-```bash
-uv run ternel-experiment all
-```
-
-The CUDA stage refuses to run unless it sees the exact RTX 6000 Ada (`sm_89`)
-and no competing CUDA processes. This prevents contaminated timings from being
-promoted into a verdict. Existing successful stage artifacts are reused;
-`--force` repeats them.
-
-Individual resumable stages are:
-
-```bash
-uv run ternel-experiment download
-uv run ternel-experiment audit
-uv run ternel-experiment pack
-uv run ternel-experiment verify
-uv run ternel-experiment cuda
-uv run ternel-experiment reports
-```
-
-## Manual commands
-
-All Python commands still run through `uv`:
-
-```bash
-uv run python tools/inspect_bonsai_gguf.py \
-  artifacts/models/Ternary-Bonsai-27B-Q2_0.gguf \
-  --output artifacts/results/format_audit.json
-
-uv run python tools/pack_tq1_g128.py \
-  artifacts/models/Ternary-Bonsai-27B-Q2_0.gguf \
-  --audit artifacts/results/format_audit.json \
-  --output artifacts/packed/Ternary-Bonsai-27B-Q2_0.gguf.tq1g128 \
-  --result artifacts/results/packing.json
-
-uv run python tools/verify_tq1_g128.py \
-  artifacts/models/Ternary-Bonsai-27B-Q2_0.gguf \
-  artifacts/packed/Ternary-Bonsai-27B-Q2_0.gguf.tq1g128 \
-  --result artifacts/results/lossless_verification.json \
-  --report reports/02_lossless_verification.md
-
-uv run python tools/bootstrap_prism.py
-cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=89
-cmake --build build --target benchmark-gemv validate-prism-bridge -j 24
-```
-
-Large downloaded, packed, build, raw timing, and profiler artifacts live under
-ignored `artifacts/` and `build/`. V1 source reports are under `reports/`; V2
-reports are under `reports_v2/` and raw V2 results under
-`artifacts/results_v2/`.
-
-## Format summary
-
-`TQ1_G128` sidecar v1 is little-endian. Its 256-byte header identifies the
-source hash, block geometry, alignment, tensor count, and canonical JSON
-manifest. Each 28-byte block contains the original two FP16 scale bytes and 26
-base-3 bytes: 25 encode five trits each and the final byte encodes three. The
-canonical decoder rejects values above 242, a tail above 26, and any source Q2
-code 3. No training, requantization, pruning, or full-matrix decompression is
-performed.
+The format was first proven on CUDA against a patched llama.cpp. That branch
+shipped a validated single-file GGUF (`Ternary-Bonsai-27B-TQ1_G128.gguf`,
+5,904,496,192 bytes) saving 17.29% of the CUDA model buffer with full file
+parity and greedy agreement, but no speed win — and two earlier kernel
+hypotheses failed their own gates (`PACKING_ONLY_KERNEL_FAIL`,
+`STREAMING_TQ1_FAIL`). Those reports are hash-frozen under
+[`reports/`](reports/), [`reports_v2/`](reports_v2/), and
+[`reports_dist/`](reports_dist/); the CUDA runner is
+`uv run ternel-experiment all` and requires the exact pinned GPU.
